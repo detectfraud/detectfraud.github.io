@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Демо — AIPolygraph</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- Components -->
+  <div id="lang-switch"></div>
+  <div id="header"></div>
+  <main>
+    <h2 style="color: #1b365d;text-align: center;">AIPolygraph-Демо</h2>
+    <section>
+      <h2>Введіть відповідь на запитання:</h2>
+      <p><em>Наприклад: Чи мали ви раніше справу з державними тендерами?</em></p>
+      <textarea id="userAnswer" placeholder="Ваша відповідь..." rows="6" style="width:100%; max-width:600px;"></textarea>
+      <br><br>
+      <button onclick="analyzeWithGPT()">Аналізувати в ChatGPT</button>
+    </section>
+  </main>
+  <div id="footer"></div>
+  <!-- Script loading -->
+  <script src="layout.js"></script>
+</body>
+</html>
