@@ -35,7 +35,7 @@ function loadComponent(id, url, callback) {
         }
       }
     })
-    .catch(err => console.error(`Помилка завантаження ${url}:`, err));
+    .catch(err => console.error(`Upload error ${url}:`, err));
 }
 
 function setupLangSwitcher() {
