@@ -24,16 +24,17 @@ ul {
 
 /* === HEADER === */
 header {
-  background: #1b365d;
+ /* background: #1b365d;*/
+    background-image: url("https://themes.googleusercontent.com/image?id=1i7XdjA0YCh1VU8qGNC9bVCI6WZiohKKGLG6qaW6g3kLtKeAEBLuyhKZz_EUl6wifK7Uz");
   color: white;
   padding: 30px 20px;
   text-align: center;
 }
 
 .site-header {
-  background-image: url("https://themes.googleusercontent.com/image?id=1i7XdjA0YCh1VU8qGNC9bVCI6WZiohKKGLG6qaW6g3kLtKeAEBLuyhKZz_EUl6wifK7Uz");
-  background-size: cover;
-  background-position: center;
+  background-color: #111;
+  color: white;
+  padding: 10px 20px;
 }
 
 .header-container {
