@@ -39,26 +39,32 @@ function loadComponent(id, url, callback) {
 }
 
 function setupLangSwitcher() {
-  const current = window.location.pathname.split("/").pop();
-  const isEnglish = current.includes("-en");
+  // 1) Отримуємо поточний файл або даємо дефолт
+  let file = window.location.pathname.split("/").pop() || "index.html";
 
-  const uaVersion = current.replace("-en", "");
-  const enVersion = current.includes(".html")
-    ? current.replace(".html", "-en.html")
-    : current + "-en.html";
+  // 2) Розбираємо ім'я: <base>(-en)?(.html)?
+  const m = file.match(/^(.*?)(-en)?(\.html)?$/);
+  const base = (m && m[1]) ? m[1] : "index";
+  const isEnglish = !!(m && m[2]);
 
+  // 3) Формуємо коректні шляхи для обох мов (з .html)
+  const uaVersion = `${base}.html`;
+  const enVersion = `${base}-en.html`;
+
+  // 4) Проставляємо посилання та активні стани
   const uaLink = document.getElementById("lang-ua");
   const enLink = document.getElementById("lang-en");
 
-  if (uaLink) uaLink.href = uaVersion;
-  if (enLink) enLink.href = enVersion;
-
-  if (isEnglish) {
-    if (enLink) enLink.classList.add("active");
-  } else {
-    if (uaLink) uaLink.classList.add("active");
+  if (uaLink) {
+    uaLink.href = uaVersion;
+    uaLink.classList.toggle("active", !isEnglish);
+  }
+  if (enLink) {
+    enLink.href = enVersion;
+    enLink.classList.toggle("active", isEnglish);
   }
 }
+
 
 function setupFeedbackMenu() {
   const button = document.getElementById("feedback-button");
