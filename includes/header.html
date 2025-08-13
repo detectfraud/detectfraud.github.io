@@ -1,81 +1,21 @@
-
 <header class="hero">
   <div class="hero-wrapper">
-    <!-- Фонове зображення -->
-    <div class="hero-background"></div>
-
-    <!-- Банер -->
+    <!-- Банерний блок -->
     <div class="hero-banner">
       <img src="images/Detectfraud2-min.png" alt="Detectfraud Banner" />
     </div>
-
     <!-- Центрований текст -->
     <div class="hero-overlay">
-      <h1 title="Fraud detector">DETECTFRAUD</h1>
-      <p>Інтуїтивна перевірка шахрайств</p>
+      <h1 style="color:gold;font-family: Stencil;" title='Детектор шахрайства'>DETECTFRAUD</h1>
+     <!--  <p>&nbsp;</p>     style="font-size: 10px;" -->
+  <!-- <button class="burger" aria-label="Відкрити меню" aria-expanded="false" aria-controls="mobile-menu">&#9776;</button> -->
+  <nav id="mobile-menu" class="main-nav">
+      <a href="index.html">Головна</a>
+      <a href="demo.html">Детектор</a>
+      <a href="how-it-works.html">Інструкція</a>
+      <a href="faq.html">FAQ</a>
+      <a href="contact.html">Контакти</a>
+      </nav>
     </div>
   </div>
 </header>
-
-<style>
-.hero {
-  position: relative;
-  width: 100%;
-  height: 400px; /* висота хедера, можна змінити */
-  overflow: hidden;
-  font-family: Arial, sans-serif;
-}
-
-.hero-wrapper {
-  position: relative;
-  width: 100%;
-  height: 100%;
-}
-
-/* Фонове зображення */
-.hero-background {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-image: url('images/background.jpg'); /* твоє фон. зображення */
-  background-size: cover;
-  background-position: center;
-  filter: brightness(0.7); /* затемнює фон, щоб текст краще видно */
-  z-index: 1;
-}
-
-/* Банер */
-.hero-banner {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 2;
-}
-
-/* Текст поверх банера та фону */
-.hero-overlay {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  text-align: center;
-  color: gold;
-  z-index: 3;
-}
-
-.hero-overlay h1 {
-  font-family: Stencil, sans-serif;
-  font-size: 48px;
-  margin: 0;
-}
-
-.hero-overlay p {
-  font-size: 18px;
-  margin-top: 10px;
-  color: #fff;
-}
-</style>
-
