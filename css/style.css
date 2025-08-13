@@ -24,11 +24,15 @@ ul {
 
 /* === HEADER === */
 header {
-  background: #1b365d;
+  background-image: url("images/Detectfraud2-min.png");
+  background-size: cover;         /* розтягнути картинку на весь блок */
+  background-position: center;    /* вирівняти */
+  background-repeat: no-repeat;   /* не повторювати */
   color: white;
   padding: 30px 20px;
   text-align: center;
 }
+
 .site-header {
   background-color: #111;
   color: white;
