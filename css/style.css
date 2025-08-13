@@ -1,4 +1,4 @@
-<!-- загальний CSS -->
+/* загальний CSS */
 
 /* === BASE === */
 body {
@@ -257,7 +257,7 @@ button:hover { background: #163055; }
 footer { background: #1b365d; color: white; text-align: center; padding: 20px; margin-top: 60px; }
 
 /* === LANG SWITCHER === */
-<!-- lang-switch.html -->
+/* lang-switch.html */
 #language-switcher { position: fixed; top: 10px; right: 10px; z-index: 1000; }
 #language-switcher a { color: white; text-decoration: none; padding: 0 5px; }
 #language-switcher a:hover { color: #00ffc3; }
@@ -270,7 +270,7 @@ summary { cursor: pointer; font-weight: bold; }
 summary:hover { color: #007bff; }
 
 /* === PAGE-SPECIFIC STYLES === */
-<!-- index.html, index-en.html -->
+/* index.html, index-en.html */
 section { background: #fff; border-radius: 10px; padding: 25px 30px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); margin-bottom: 30px; transition: transform 0.3s ease; }
 section:hover { transform: translateY(-3px); }
 section h2 { color: #1a5276; margin-bottom: 15px; border-bottom: 3px solid #2980b9; padding-bottom: 8px; font-size:
