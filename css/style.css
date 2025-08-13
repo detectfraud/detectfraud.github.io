@@ -29,14 +29,7 @@ header {
   padding: 30px 20px;
   text-align: center;
 }
-#header {
-  background-image: url("images/Detectfraud2-min.png");
-  background-repeat: no-repeat;
-  background-size: cover; /* щоб заповнила весь блок */
-  background-position: center; /* щоб була по центру */
-  color: white;
-  padding: 40px 0;
-}
+
 .site-header {
   background-color: #111;
   color: white;
