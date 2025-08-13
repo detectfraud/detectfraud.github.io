@@ -73,10 +73,15 @@ nav a:hover, .main-nav a:hover {
 
 /* === HERO SECTION === */
 .hero {
-  background-color: #2B668F;  
+  /* background-color: #2B668F; */
+  background-image: url("images/Detectfraud2-min.png");
+  background-repeat: no-repeat; /* без повторів */
+  background-size: cover;       /* щоб зображення покривало весь блок */
+  background-position: center;  /* центрування зображення */
   color: white;
   padding: 40px 0;
 }
+
 .hero-wrapper {
   display: flex;
   align-items: center;
