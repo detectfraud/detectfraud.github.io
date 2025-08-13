@@ -94,12 +94,20 @@ function highlightActiveMenu() {
   });
 }
 
-document.addEventListener("DOMContentLoaded", () => {
+/*document.addEventListener("DOMContentLoaded", () => {
   const isEnglish = window.location.pathname.includes("-en");
   const headerFile = isEnglish ? "header-en.html" : "header.html";
 
   loadComponent("lang-switch", "lang-switch.html");
   loadComponent("header", headerFile);
   loadComponent("footer", "footer.html");
+}); */
+document.addEventListener("DOMContentLoaded", () => {
+  const isEnglish = window.location.pathname.includes("-en");
+  const headerFile = isEnglish ? "includes/header-en.html" : "includes/header.html";
+
+  loadComponent("lang-switch", "includes/lang-switch.html");
+  loadComponent("header", headerFile);
+  loadComponent("footer", "includes/footer.html");
 });
 
