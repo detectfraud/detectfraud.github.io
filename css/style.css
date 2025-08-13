@@ -82,7 +82,7 @@ nav a:hover, .main-nav a:hover {
   align-items: center;
   justify-content: flex-start;
   position: relative;
-  background-image: url("images/Detectfraud2-min.png");background-repeat: no-repeat, repeat;   /*   */
+ /* background-image: url("images/Detectfraud2-min.png");background-repeat: no-repeat, repeat;      */
 }
 .hero-banner {
   margin-left: 10px;
