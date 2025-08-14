@@ -85,7 +85,6 @@ nav a:hover, .main-nav a:hover {
   align-items: center;
   justify-content: flex-start;
   position: relative;
- /* background-image: url("images/Detectfraud2-min.png");background-repeat: no-repeat, repeat;      */
 }
 .hero-banner {
  /* margin-left: 10px;*/
@@ -103,7 +102,7 @@ nav a:hover, .main-nav a:hover {
   transform: translateX(-50%) scale(0.98);
   text-align: center;
   max-width: 600px;
-  background: #1b365d;
+  background: #2B668F;/*1b365d*/
   padding: 2rem;
   border-radius: 12px;
   opacity: 0;
