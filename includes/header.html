@@ -1,15 +1,10 @@
 <header class="hero" style="background-image: url('images/kiber.jpg');">
   <div class="hero-wrapper">
     <div class="hero-banner-box">
-      <!-- Банерне зображення -->
       <div class="hero-banner">
         <img src="images/Detectfraud2-min.png" alt="Detectfraud Banner">
       </div>
-
-      <!-- Заголовок -->
       <h1 class="hero-title" title="Детектор шахрайства">DETECTFRAUD</h1>
-
-      <!-- Меню -->
       <nav class="main-nav">
         <a href="index.html">Головна</a>
         <a href="demo.html">Детектор</a>
@@ -22,77 +17,53 @@
 </header>
 
 <style>
-/* Фон на всю ширину */
 .hero {
   position: relative;
   background-size: cover;
   background-position: center;
-  padding: 30px 0;
+  padding: 40px 0; /* підняти блок */
 }
 
-/* Контейнер для центрування */
 .hero-wrapper {
   display: flex;
   justify-content: center;
 }
 
-/* Блок банеру */
 .hero-banner-box {
   background-color: #2d6f94;
-  padding: 20px;
+  padding: 15px 20px;
   border-radius: 12px;
   text-align: center;
-  max-width: 400px;
+  max-width: 420px;
   box-shadow: 0 4px 15px rgba(0,0,0,0.3);
 }
 
-/* Банер */
 .hero-banner img {
   width: 100%;
-  max-width: 350px;
   border-radius: 8px;
 }
 
-/* Заголовок */
 .hero-title {
   font-family: Stencil, sans-serif;
   font-size: 28px;
   color: #e51600;
-  margin: 10px 0;
+  margin: 10px 0 5px 0;
 }
 
-/* Меню */
 .main-nav {
-  margin-top: 10px;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
 .main-nav a {
   color: white;
   text-decoration: none;
-  margin: 0 8px;
   font-weight: bold;
 }
 
 .main-nav a:hover {
   color: gold;
-}
-
-/* Адаптивність */
-@media (max-width: 600px) {
-  .hero-banner-box {
-    max-width: 90%;
-    padding: 15px;
-  }
-  .hero-title {
-    font-size: 22px;
-  }
-  .main-nav {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-  .main-nav a {
-    margin: 5px;
-  }
 }
 </style>
