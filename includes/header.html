@@ -1,66 +1,75 @@
 <header class="hero" style="background-image: url('images/kiber.jpg');">
-  <div class="hero-overlay">
-    <!-- Банер -->
-    <div class="hero-banner">
-      <img src="images/Detectfraud2-min.png" alt="Detectfraud Banner">
+  <div class="hero-wrapper">
+    <div class="hero-banner-box">
+      <!-- Банерне зображення -->
+      <div class="hero-banner">
+        <img src="images/Detectfraud2-min.png" alt="Detectfraud Banner">
+      </div>
+
+      <!-- Заголовок -->
+      <h1 class="hero-title" title="Детектор шахрайства">DETECTFRAUD</h1>
+
+      <!-- Меню -->
+      <nav class="main-nav">
+        <a href="index.html">Головна</a>
+        <a href="demo.html">Детектор</a>
+        <a href="how-it-works.html">Інструкція</a>
+        <a href="faq.html">FAQ</a>
+        <a href="contact.html">Контакти</a>
+      </nav>
     </div>
-
-    <!-- Заголовок -->
-    <h1 class="hero-title" title="Детектор шахрайства">DETECTFRAUD</h1>
-
-    <!-- Меню -->
-    <nav id="mobile-menu" class="main-nav">
-      <a href="index.html">Головна</a>
-      <a href="demo.html">Детектор</a>
-      <a href="how-it-works.html">Інструкція</a>
-      <a href="faq.html">FAQ</a>
-      <a href="contact.html">Контакти</a>
-    </nav>
   </div>
 </header>
 
 <style>
+/* Фон на всю ширину */
 .hero {
   position: relative;
-  height: 320px; /* висота шапки */
   background-size: cover;
   background-position: center;
+  padding: 30px 0;
+}
+
+/* Контейнер для центрування */
+.hero-wrapper {
   display: flex;
-  align-items: center;
   justify-content: center;
+}
+
+/* Блок банеру */
+.hero-banner-box {
+  background-color: #2d6f94;
+  padding: 20px;
+  border-radius: 12px;
   text-align: center;
-  color: white;
+  max-width: 400px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
 }
 
-.hero::before {
-  /* затемнення фону */
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: rgba(0,0,0,0.5);
-}
-
-.hero-overlay {
-  position: relative;
-  z-index: 2;
-}
-
+/* Банер */
 .hero-banner img {
+  width: 100%;
   max-width: 350px;
-  height: auto;
+  border-radius: 8px;
 }
 
+/* Заголовок */
 .hero-title {
   font-family: Stencil, sans-serif;
-  font-size: 36px;
+  font-size: 28px;
   color: #e51600;
-  margin: 10px 0 15px;
+  margin: 10px 0;
+}
+
+/* Меню */
+.main-nav {
+  margin-top: 10px;
 }
 
 .main-nav a {
   color: white;
   text-decoration: none;
-  margin: 0 10px;
+  margin: 0 8px;
   font-weight: bold;
 }
 
@@ -68,16 +77,14 @@
   color: gold;
 }
 
+/* Адаптивність */
 @media (max-width: 600px) {
-  .hero {
-    height: auto;
-    padding: 20px 0;
-  }
-  .hero-banner img {
-    max-width: 250px;
+  .hero-banner-box {
+    max-width: 90%;
+    padding: 15px;
   }
   .hero-title {
-    font-size: 28px;
+    font-size: 22px;
   }
   .main-nav {
     display: flex;
