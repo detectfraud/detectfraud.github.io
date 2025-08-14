@@ -87,8 +87,8 @@ nav a:hover, .main-nav a:hover {
   position: relative;
 }
 .hero-banner {
- /* margin-left: 10px;*/
-  text-align: center;
+  margin-left: 50%;
+ /* text-align: center;*/
 }
 .hero-banner img {
   width: 320px;
