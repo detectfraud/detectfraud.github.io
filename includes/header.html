@@ -1,25 +1,92 @@
-<header class="hero" style="background-image: url('images/kiber.jpg');">
- <br><br><br><br><br><br>
-  <div class="hero-wrapper">
-    <!-- Банерний блок <br><br>
+<header class="hero">
+  <div class="hero-background"></div>
+
+  <div class="hero-content">
+    <!-- Банер -->
     <div class="hero-banner">
-      <img src="images/Detectfraud2-min.png" alt="Detectfraud Banner" /><br>
-    </div> -->
-    <!-- Центрований текст -->
-   <div class="hero-overlay">
-          <div class="hero-banner">
-      <img src="images/Detectfraud2-min.png" alt="Detectfraud Banner" />
+      <img src="images/Detectfraud2-min.png" alt="Detectfraud Banner">
     </div>
-      <h1 style="color:#e51600;font-family: Stencil;" title='Детектор шахрайства'>DETECTFRAUD</h1>
-     <!--  <p>&nbsp;</p>     style="font-size: 10px;" -->
-  <!-- <button class="burger" aria-label="Відкрити меню" aria-expanded="false" aria-controls="mobile-menu">&#9776;</button> -->
-  <nav id="mobile-menu" class="main-nav">
-      <a href="index.html">Головна</a>
-      <a href="demo.html">Детектор</a>
-      <a href="how-it-works.html">Інструкція</a>
-      <a href="faq.html">FAQ</a>
-      <a href="contact.html">Контакти</a>
-      </nav>
-    </div>
-  </div><br><br><br><br><br><br><br>
+
+    <!-- Логотип і меню -->
+    <h1 class="hero-title" title="Fraud detector">DETECTFRAUD</h1>
+    <nav class="hero-menu">
+      <a href="#">Головна</a>
+      <a href="#">Детектор</a>
+      <a href="#">Історія</a>
+      <a href="#">FAQ</a>
+      <a href="#">Контакти</a>
+    </nav>
+  </div>
 </header>
+
+<style>
+.hero {
+  position: relative;
+  height: 300px; /* можна змінити */
+  overflow: hidden;
+}
+
+/* Фон */
+.hero-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: url("images/background.jpg") center/cover no-repeat;
+  filter: brightness(0.6); /* затемнення */
+  z-index: 1;
+}
+
+/* Контент поверх */
+.hero-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  padding-top: 20px;
+}
+
+/* Банер */
+.hero-banner img {
+  max-width: 350px;
+  height: auto;
+}
+
+/* Заголовок */
+.hero-title {
+  font-family: Stencil, sans-serif;
+  font-size: 36px;
+  color: gold;
+  margin: 10px 0;
+}
+
+/* Меню */
+.hero-menu {
+  margin-top: 10px;
+}
+
+.hero-menu a {
+  color: white;
+  text-decoration: none;
+  margin: 0 8px;
+  font-weight: bold;
+}
+
+.hero-menu a:hover {
+  color: gold;
+}
+
+/* Адаптивність */
+@media (max-width: 600px) {
+  .hero {
+    height: auto;
+    padding: 20px 0;
+  }
+  .hero-banner img {
+    max-width: 250px;
+  }
+  .hero-title {
+    font-size: 28px;
+  }
+}
+</style>
