@@ -88,7 +88,8 @@ nav a:hover, .main-nav a:hover {
  /* background-image: url("images/Detectfraud2-min.png");background-repeat: no-repeat, repeat;      */
 }
 .hero-banner {
-  margin-left: 10px;
+ /* margin-left: 10px;*/
+  text-align: center;
 }
 .hero-banner img {
   width: 320px;
