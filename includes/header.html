@@ -1,11 +1,57 @@
-<header class="hero" style="background-image: url('images/kiber.jpg');">
+<style>
+.hero {
+  min-height: 400px;
+  background-image: url('images/kiber.jpg');
+  background-repeat: repeat; /* повторення замість розтягування */
+  background-size: auto; /* оригінальний розмір */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 0;
+}
+
+.hero-wrapper {
+  background-color: #2a5b7d;
+  padding: 20px;
+  border-radius: 12px;
+  text-align: center;
+}
+
+.hero-banner img {
+  max-width: 100%;
+  border-radius: 8px;
+}
+
+.hero-overlay h1 {
+  margin: 10px 0;
+}
+
+.main-nav {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 10px;
+}
+
+.main-nav a {
+  color: white;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.main-nav a:hover {
+  color: gold;
+}
+</style>
+
+<header class="hero">
   <div class="hero-wrapper">
-    <div class="hero-banner-box">
+    <div class="hero-overlay">
       <div class="hero-banner">
-        <img src="images/Detectfraud2-min.png" alt="Detectfraud Banner">
+        <img src="images/Detectfraud2-min.png" alt="Detectfraud Banner" />
       </div>
-      <h1 class="hero-title" title="Детектор шахрайства">DETECTFRAUD</h1>
-      <nav class="main-nav">
+      <h1 style="color:#e51600;font-family: Stencil;" title='Детектор шахрайства'>DETECTFRAUD</h1>
+      <nav id="mobile-menu" class="main-nav">
         <a href="index.html">Головна</a>
         <a href="demo.html">Детектор</a>
         <a href="how-it-works.html">Інструкція</a>
@@ -15,55 +61,3 @@
     </div>
   </div>
 </header>
-
-<style>
-.hero {
-  position: relative;
-  background-size: cover;
-  background-position: center;
-  padding: 40px 0; /* підняти блок */
-}
-
-.hero-wrapper {
-  display: flex;
-  justify-content: center;
-}
-
-.hero-banner-box {
-  background-color: #2d6f94;
-  padding: 15px 20px;
-  border-radius: 12px;
-  text-align: center;
-  max-width: 420px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-}
-
-.hero-banner img {
-  width: 100%;
-  border-radius: 8px;
-}
-
-.hero-title {
-  font-family: Stencil, sans-serif;
-  font-size: 28px;
-  color: #e51600;
-  margin: 10px 0 5px 0;
-}
-
-.main-nav {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-.main-nav a {
-  color: white;
-  text-decoration: none;
-  font-weight: bold;
-}
-
-.main-nav a:hover {
-  color: gold;
-}
-</style>
