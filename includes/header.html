@@ -1,20 +1,20 @@
-<header class="hero">
-  <div class="hero-background"></div>
-
-  <div class="hero-content">
+<header class="hero" style="background-image: url('images/kiber.jpg');">
+  <div class="hero-overlay">
     <!-- Банер -->
     <div class="hero-banner">
       <img src="images/Detectfraud2-min.png" alt="Detectfraud Banner">
     </div>
 
-    <!-- Логотип і меню -->
-    <h1 class="hero-title" title="Fraud detector">DETECTFRAUD</h1>
-    <nav class="hero-menu">
-      <a href="#">Головна</a>
-      <a href="#">Детектор</a>
-      <a href="#">Історія</a>
-      <a href="#">FAQ</a>
-      <a href="#">Контакти</a>
+    <!-- Заголовок -->
+    <h1 class="hero-title" title="Детектор шахрайства">DETECTFRAUD</h1>
+
+    <!-- Меню -->
+    <nav id="mobile-menu" class="main-nav">
+      <a href="index.html">Головна</a>
+      <a href="demo.html">Детектор</a>
+      <a href="how-it-works.html">Інструкція</a>
+      <a href="faq.html">FAQ</a>
+      <a href="contact.html">Контакти</a>
     </nav>
   </div>
 </header>
@@ -22,61 +22,52 @@
 <style>
 .hero {
   position: relative;
-  height: 300px; /* можна змінити */
-  overflow: hidden;
+  height: 320px; /* висота шапки */
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: white;
 }
 
-/* Фон */
-.hero-background {
+.hero::before {
+  /* затемнення фону */
+  content: "";
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: url("images/background.jpg") center/cover no-repeat;
-  filter: brightness(0.6); /* затемнення */
-  z-index: 1;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
 }
 
-/* Контент поверх */
-.hero-content {
+.hero-overlay {
   position: relative;
   z-index: 2;
-  text-align: center;
-  padding-top: 20px;
 }
 
-/* Банер */
 .hero-banner img {
   max-width: 350px;
   height: auto;
 }
 
-/* Заголовок */
 .hero-title {
   font-family: Stencil, sans-serif;
   font-size: 36px;
-  color: gold;
-  margin: 10px 0;
+  color: #e51600;
+  margin: 10px 0 15px;
 }
 
-/* Меню */
-.hero-menu {
-  margin-top: 10px;
-}
-
-.hero-menu a {
+.main-nav a {
   color: white;
   text-decoration: none;
-  margin: 0 8px;
+  margin: 0 10px;
   font-weight: bold;
 }
 
-.hero-menu a:hover {
+.main-nav a:hover {
   color: gold;
 }
 
-/* Адаптивність */
 @media (max-width: 600px) {
   .hero {
     height: auto;
@@ -87,6 +78,14 @@
   }
   .hero-title {
     font-size: 28px;
+  }
+  .main-nav {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .main-nav a {
+    margin: 5px;
   }
 }
 </style>
