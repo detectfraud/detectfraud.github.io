@@ -86,9 +86,9 @@ nav a:hover, .main-nav a:hover {
   justify-content: flex-start;
   position: relative;
 }
-.hero-banner {
-  margin-left: 50%;
- /* text-align: center;*/
+.hero-banner {align-items: center;
+ /* margin-left: 10px;
+  text-align: center;*/
 }
 .hero-banner img {
   width: 320px;
