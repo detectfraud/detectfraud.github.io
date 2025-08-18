@@ -144,6 +144,24 @@ document.getElementById('download').addEventListener('click', ()=>{
   link.href = out.toDataURL('image/png');
   link.click();
 });
+
+  //
+  async function loadImage(src) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.crossOrigin = "anonymous"; // можна прибрати, якщо картинки локальні
+    img.onload = () => {
+      console.log("✅ Завантажено:", src);
+      resolve(img);
+    };
+    img.onerror = () => {
+      console.error("❌ Помилка завантаження:", src);
+      reject();
+    };
+    img.src = src;
+  });
+}
+
 </script>
 
 </body>
