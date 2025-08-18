@@ -1,166 +1,186 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-  <meta charset="UTF-8">
-  <title>Canvas Image Editor</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      margin: 0;
-      padding: 0;
-    }
-    #canvas {
-      border: 1px solid #ccc;
-      margin-top: 10px;
-      max-width: 100%;
-    }
-    #controls {
-      margin-top: 20px;
-      display: flex;
-      flex-direction: row;
-      gap: 10px;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-    #scaleRange {
-      width: 300px;
-    }
-  </style>
+<meta charset="UTF-8">
+<title>Камінь любові</title>
+<style>
+body { text-align:center; font-family:sans-serif; }
+.venwin {
+  background: #fff;
+  border-radius:10px;
+  padding:10px;
+  display:inline-block;
+}
+canvas {
+  border:3px solid #bbb;
+  border-radius:3%;
+  box-shadow:0 6px 18px rgba(0,0,0,.1);
+  display:block;
+  margin:10px auto;
+}
+</style>
 </head>
 <body>
-  <h2>Редактор зображень</h2>
-  <canvas id="canvas" width="900" height="600"></canvas>
 
-  <div id="controls">
-    <input type="file" id="bgInput" accept="image/*">
-    <input type="file" id="loveInput" accept="image/*">
-    <input type="range" id="scaleRange" min="0.5" max="2" step="0.01" value="1">
-    <button id="undoBtn">Відміна</button>
-    <button id="downloadBtn">Завантажити</button>
-  </div>
-  
-  <script>
-    const canvas = document.getElementById('canvas');
-    const ctx = canvas.getContext('2d');
-    const bgInput = document.getElementById('bgInput');
-    const loveInput = document.getElementById('loveInput');
-    const scaleRange = document.getElementById('scaleRange');
-    const undoBtn = document.getElementById('undoBtn');
-    const downloadBtn = document.getElementById('downloadBtn');
+<fieldset class="venwin" style="height:auto;">
+  <center>
+    <center>  <span style="color:#990000;font-size:x-large;">Камінь любові</span><br><br>
+    <canvas id="canvas" width="900" height="600" style="border:1px solid #ccc;"></canvas>
+    <br><br>
+    <label>Фон:&nbsp;&nbsp;<input type="file" id="bgLoader" accept="image/*"></label>
+    <label>Фото закоханих:&nbsp;&nbsp;<input type="file" id="loveLoader" accept="image/*"></label>
+    <br><br>
+    <input type="range" id="scaleSlider" min="0.1" max="3" step="0.01" value="1" style="width:400px;">
+    <br><br>
+    <button id="undoBtn">⟲ Undo</button>&nbsp;&nbsp;&nbsp;&nbsp;<button id="downloadBtn">📥 Завантажити</button>
+  </center>
+</fieldset>
 
-    const stateHistory = [];
-    let bgImage = null, loveImage = null, shablonImage = new Image();
-    let activeImage = null;
+<script>
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
 
-    const transforms = {
-      bg: { x: 0, y: 0, scale: 1, img: null },
-      love: { x: 0, y: 0, scale: 1, img: null }
-    };
+let background = null;
+let love = null;
+let template = new Image();
+template.src = "images/LoveStone.png"; // твій шаблон PNG з прозорістю
 
-    shablonImage.src = "images/shablon.png";
+let layers = {
+  bg: { img: null, x: 0, y: 0, scale: 1 },
+  love: { img: null, x: 0, y: 0, scale: 1 }
+};
 
-    function saveState() {
-      const snapshot = JSON.stringify(transforms);
-      stateHistory.push(snapshot);
-      if (stateHistory.length > 5) stateHistory.shift(); // максимум 5 кроків
-    }
+let activeLayer = null;
+let isDragging = false;
+let dragOffsetX = 0;
+let dragOffsetY = 0;
 
-    function undo() {
-      if (stateHistory.length > 0) {
-        const last = stateHistory.pop();
-        Object.assign(transforms, JSON.parse(last));
-        draw();
-      }
-    }
+// історія для Undo
+let history = [];
 
-    function draw() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+// завантаження з input
+document.getElementById("bgLoader").addEventListener("change", e => {
+  loadImage(e.target.files[0], img => {
+    layers.bg.img = img;
+    layers.bg.x = canvas.width/2;
+    layers.bg.y = canvas.height/2;
+    layers.bg.scale = 1;
+    activeLayer = "bg";
+    saveState();
+    drawAll();
+  });
+});
 
-      if (transforms.bg.img) {
-        const t = transforms.bg;
-        ctx.save();
-        ctx.translate(t.x, t.y);
-        ctx.scale(t.scale, t.scale);
-        ctx.drawImage(t.img, 0, 0);
-        ctx.restore();
-      }
+document.getElementById("loveLoader").addEventListener("change", e => {
+  loadImage(e.target.files[0], img => {
+    layers.love.img = img;
+    layers.love.x = canvas.width/2;
+    layers.love.y = canvas.height/2;
+    layers.love.scale = 1;
+    activeLayer = "love";
+    saveState();
+    drawAll();
+  });
+});
 
-      if (transforms.love.img) {
-        const t = transforms.love;
-        ctx.save();
-        ctx.translate(t.x, t.y);
-        ctx.scale(t.scale, t.scale);
-        ctx.drawImage(t.img, 0, 0);
-        ctx.restore();
-      }
+function loadImage(file, callback) {
+  const reader = new FileReader();
+  reader.onload = e => {
+    const img = new Image();
+    img.onload = () => callback(img);
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
 
-      if (shablonImage.complete) {
-        ctx.drawImage(shablonImage, 0, 0, canvas.width, canvas.height);
-      }
-    }
+// слайдер масштабу
+document.getElementById("scaleSlider").addEventListener("input", e => {
+  if (!activeLayer) return;
+  layers[activeLayer].scale = parseFloat(e.target.value);
+  saveState();
+  drawAll();
+});
 
-    function loadImage(file, target) {
-      const reader = new FileReader();
-      reader.onload = e => {
-        const img = new Image();
-        img.onload = () => {
-          transforms[target].img = img;
-          transforms[target].x = 0;
-          transforms[target].y = 0;
-          transforms[target].scale = 1;
-          activeImage = target;
-          saveState();
-          draw();
-        };
-        img.src = e.target.result;
-      };
-      reader.readAsDataURL(file);
-    }
+// drag мишкою
+canvas.addEventListener("mousedown", e => {
+  if (!activeLayer) return;
+  isDragging = true;
+  dragOffsetX = e.offsetX - layers[activeLayer].x;
+  dragOffsetY = e.offsetY - layers[activeLayer].y;
+});
 
-    bgInput.addEventListener('change', e => loadImage(e.target.files[0], 'bg'));
-    loveInput.addEventListener('change', e => loadImage(e.target.files[0], 'love'));
+canvas.addEventListener("mousemove", e => {
+  if (!isDragging || !activeLayer) return;
+  layers[activeLayer].x = e.offsetX - dragOffsetX;
+  layers[activeLayer].y = e.offsetY - dragOffsetY;
+  drawAll();
+});
 
-    scaleRange.addEventListener('input', () => {
-      if (activeImage) {
-        transforms[activeImage].scale = parseFloat(scaleRange.value);
-        draw();
-      }
-    });
+canvas.addEventListener("mouseup", () => {
+  if (isDragging) {
+    isDragging = false;
+    saveState();
+  }
+});
 
-    let dragging = false;
-    let startX, startY;
+// тач підтримка
+canvas.addEventListener("touchstart", e => {
+  if (!activeLayer) return;
+  const touch = e.touches[0];
+  const rect = canvas.getBoundingClientRect();
+  const x = touch.clientX - rect.left;
+  const y = touch.clientY - rect.top;
+  isDragging = true;
+  dragOffsetX = x - layers[activeLayer].x;
+  dragOffsetY = y - layers[activeLayer].y;
+});
 
-    canvas.addEventListener('mousedown', e => {
-      if (activeImage) {
-        dragging = true;
-        startX = e.offsetX - transforms[activeImage].x;
-        startY = e.offsetY - transforms[activeImage].y;
-      }
-    });
-    canvas.addEventListener('mousemove', e => {
-      if (dragging && activeImage) {
-        transforms[activeImage].x = e.offsetX - startX;
-        transforms[activeImage].y = e.offsetY - startY;
-        draw();
-      }
-    });
-    canvas.addEventListener('mouseup', () => { if (dragging) { dragging = false; saveState(); } });
-    canvas.addEventListener('mouseleave', () => { if (dragging) { dragging = false; saveState(); } });
+canvas.addEventListener("touchmove", e => {
+  if (!isDragging || !activeLayer) return;
+  const touch = e.touches[0];
+  const rect = canvas.getBoundingClientRect();
+  layers[activeLayer].x = touch.clientX - rect.left - dragOffsetX;
+  layers[activeLayer].y = touch.clientY - rect.top - dragOffsetY;
+  drawAll();
+});
 
-    undoBtn.addEventListener('click', undo);
+canvas.addEventListener("touchend", () => {
+  if (isDragging) {
+    isDragging = false;
+    saveState();
+  }
+});
 
-    downloadBtn.addEventListener('click', () => {
-      const link = document.createElement('a');
-      link.download = 'composition.png';
-      link.href = canvas.toDataURL('image/png');
-      link.click();
-    });
+// Undo
+document.getElementById("undoBtn").addEventListener("click", () => {
+  if (history.length > 1) {
+    history.pop(); // видаляємо поточний стан
+    const prev = history[history.length-1];
+    layers = JSON.parse(JSON.stringify(prev));
+    drawAll();
+  }
+});
 
-    shablonImage.onload = draw;
-  </script>
+// малювання всіх шарів
+function drawAll() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  if (layers.bg.img) drawLayer(layers.bg);
+  if (layers.love.img) drawLayer(layers.love);
+  ctx.drawImage(template, 0, 0, canvas.width, canvas.height);
+}
+
+function drawLayer(layer) {
+  const w = layer.img.width * layer.scale;
+  const h = layer.img.height * layer.scale;
+  ctx.drawImage(layer.img, layer.x - w/2, layer.y - h/2, w, h);
+}
+
+// збереження стану
+function saveState() {
+  history.push(JSON.parse(JSON.stringify(layers)));
+}
+</script>
+
+
 </body>
 </html>
