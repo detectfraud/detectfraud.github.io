@@ -130,12 +130,21 @@ document.getElementById('download').addEventListener('click', ()=>{
   octx.drawImage(bg,0,0,out.width,out.height);
   if(lovers){
     octx.save();
-    octx.translate(out.width/2,out.height/2);
-    const scaleX = scale*out.width/canvas.width;
-    const scaleY = scale*out.height/canvas.height;
-    octx.scale(scaleX, scaleY);
-    octx.drawImage(lovers,-lovers.width/2,-lovers.height/2);
-    octx.restore();
+// коефіцієнти масштабу між робочим canvas і вихідним
+const kx = out.width / canvas.width;
+const ky = out.height / canvas.height;
+
+// переносимо точку в реальні координати (де фото стояло на екрані)
+octx.translate(loverPos.x * kx, loverPos.y * ky);
+
+// масштабуємо з урахуванням коефіцієнта
+const totalScale = scale * ((kx + ky) / 2); 
+octx.scale(totalScale, totalScale);
+
+// малюємо фото
+octx.drawImage(lovers, -lovers.width / 2, -lovers.height / 2);
+octx.restore();
+
   }
   octx.drawImage(tpl,0,0,out.width,out.height);
 
