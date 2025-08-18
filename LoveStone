@@ -1,149 +1,103 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-<meta charset="UTF-8">
-<title>Камінь любові</title>
-<style>
-body { text-align:center; font-family:sans-serif; }
-.venwin {
-  background: #fff;
-  border-radius:10px;
-  padding:10px;
-  display:inline-block;
-}
-canvas {
-  border:3px solid #bbb;
-  border-radius:3%;
-  box-shadow:0 6px 18px rgba(0,0,0,.1);
-  display:block;
-  margin:10px auto;
-}
-</style>
+  <meta charset="UTF-8">
+  <title>Священний камінь для закоханих</title>
+  <style>
+   /* body { font-family: Arial, sans-serif; text-align: center; }*/
+    canvas { border: 2px solid #666; margin-top: 15px; }
+    input, button { margin: 8px; padding: 6px 10px; }
+  </style>
 </head>
 <body>
-<fieldset class="venwin">
-  <span style="color:#990000;font-size:x-large;">Камінь любові</span><br><br>
-  <input type="file" id="upload" accept="image/*"><br><br>
-  <canvas id="c" width="630" height="420"></canvas><br>
-  <input type="range" id="scale" min="0.1" max="2" step="0.01" value="1" style="width:300px;"><br><br>
+  <h2>Священний камінь для закоханих 💞</h2>
+ <br><br> 
+ <canvas id="canvas" width="630" height="420"></canvas>
+  <label>Фото закоханих:
+    <input type="file" id="coupleInput" accept="image/*">
+  </label><br>
+
+  <label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Фон:
+    <input type="file" id="backgroundInput" accept="image/*">
+  </label><br>
+
+  <button id="generate">Згенерувати фото</button>
   <button id="download">Завантажити</button>
-</fieldset>
 
-<script>
-const URLS = {
-  shablon: 'shablon.png', // локальний шаблон
-  bg: 'priroda.jpg'       // локальний фон
-};
+ 
 
-let tpl = null;
-let bg = null;
-let lovers = null;
-let loverPos = {x:0,y:0};
-let scale = 1;
+  <script>
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
 
-const canvas = document.getElementById('c');
-const ctx = canvas.getContext('2d');
-const upload = document.getElementById('upload');
-const range = document.getElementById('scale');
+    // шаблон з каменем
+    const sculpture = new Image();
+    sculpture.src = "Камень любви шаблон.jpg";
 
-// Завантаження зображень
-function loadImage(src){
-  return new Promise((res, rej)=>{
-    const img = new Image();
-    img.onload = ()=>res(img);
-    img.onerror = ()=>rej('Не вдалося завантажити '+src);
-    img.src = src;
-  });
-}
+    let coupleImg = null;
+    let bgImg = null;
 
-// Малювання
-function draw(){
-  if(!bg || !tpl) return;
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  ctx.drawImage(bg,0,0,canvas.width,canvas.height);
-  if(lovers){
-    ctx.save();
-    ctx.translate(loverPos.x, loverPos.y);
-    ctx.scale(scale, scale);
-    ctx.drawImage(lovers,-lovers.width/2,-lovers.height/2);
-    ctx.restore();
-  }
-  ctx.drawImage(tpl,0,0,canvas.width,canvas.height);
-}
+    // завантаження фото закоханих
+    document.getElementById("coupleInput").addEventListener("change", e => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = ev => {
+          coupleImg = new Image();
+          coupleImg.src = ev.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    });
 
-// Ініціалізація
-async function init(){
-  try{
-    [tpl, bg] = await Promise.all([loadImage(URLS.shablon), loadImage(URLS.bg)]);
-    draw();
-  }catch(e){console.error(e);}
-}
-init();
+    // завантаження фону
+    document.getElementById("backgroundInput").addEventListener("change", e => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = ev => {
+          bgImg = new Image();
+          bgImg.src = ev.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    });
 
-// Завантаження фото користувача
-upload.addEventListener('change', e=>{
-  const file = e.target.files[0];
-  if(!file) return;
-  const reader = new FileReader();
-  reader.onload = ev=>{
-    const img = new Image();
-    img.onload = ()=>{
-      lovers = img;
-      loverPos.x = canvas.width/2;
-      loverPos.y = canvas.height/2;
-      scale = 1;
-      range.value = 1;
-      draw();
-    };
-    img.src = ev.target.result;
-  };
-  reader.readAsDataURL(file);
-});
+    // малювання результату
+    function drawResult() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-// Масштабування
-range.addEventListener('input', e=>{
-  scale = parseFloat(e.target.value);
-  draw();
-});
+      // 1. фон
+      if (bgImg) ctx.drawImage(bgImg, 0, 0, canvas.width, canvas.height);
 
-// Drag мишею
-let drag = false;
-canvas.addEventListener('mousedown', ()=>drag=true);
-canvas.addEventListener('mouseup', ()=>drag=false);
-canvas.addEventListener('mousemove', e=>{
-  if(drag && lovers){
-    loverPos.x = e.offsetX;
-    loverPos.y = e.offsetY;
-    draw();
-  }
-});
+      // 2. фото закоханих у колі
+      if (coupleImg) {
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(450, 210, 150, 0, Math.PI * 2); // центр і радіус кола
+        ctx.closePath();
+        ctx.clip();
 
-// Завантаження PNG
-document.getElementById('download').addEventListener('click', ()=>{
-  const out = document.createElement('canvas');
-  out.width = 900;
-  out.height = 600;
-  const octx = out.getContext('2d');
+        // масштабування фото закоханих під отвір  
+        ctx.drawImage(coupleImg, 280, 40, 340, 340);   ctx.restore(); }
+       
+     
 
-  octx.drawImage(bg,0,0,out.width,out.height);
-  if(lovers){
-    octx.save();
-    octx.translate(out.width/2,out.height/2);
-    const scaleX = scale*out.width/canvas.width;
-    const scaleY = scale*out.height/canvas.height;
-    octx.scale(scaleX, scaleY);
-    octx.drawImage(lovers,-lovers.width/2,-lovers.height/2);
-    octx.restore();
-  }
-  octx.drawImage(tpl,0,0,out.width,out.height);
+      // 3. накладаємо скульптуру
+      ctx.drawImage(sculpture, 0, 0, canvas.width, canvas.height);
+    }
+    
+    // збереження
+    document.getElementById("download").addEventListener("click", () => {
+      const link = document.createElement("a");
+      link.download = "love-stone.png";
+      link.href = canvas.toDataURL("image/png");
+      link.click();
+    });
+    
+    document.getElementById("generate").addEventListener("click", drawResult);
 
-  const link = document.createElement('a');
-  link.download = 'love-stone.png';
-  link.href = out.toDataURL('image/png');
-  link.click();
-});
-</script>
 
+  </script>
 </body>
 </html>
-
