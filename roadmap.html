@@ -22,24 +22,22 @@ canvas {
 </head>
 <body>
 
-<fieldset class="venwin" style="height:auto;">
-  <br>
-  <center>
-    <canvas id="canvas" width="800" height="600" style="border:1px solid #ccc;"></canvas>
-    <br><br>
-
-    <input type="file" id="upload" accept="image/*"><br><br>
-
-    Масштаб:
-    <input type="range" id="scaleSlider" min="0.5" max="2" value="1" step="0.01">
-
-    <button id="downloadBtn">📥 Завантажити</button>
-  </center>
+<fieldset class="venwin">
+  <span style="color:#990000;font-size:x-large;">Камінь любові</span><br><br>
+<canvas id="canvas" width="630" height="420"></canvas><br>
+<input type="file" id="fileInput" accept="image/*"><br><br>
+<label>Масштаб: 
+  <input type="range" id="scaleRange" min="0.1" max="2" step="0.01" value="1">
+</label>
+<button id="download">Скачати</button>
 </fieldset>
 
 <script>
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
+const fileInput = document.getElementById("fileInput");
+const scaleRange = document.getElementById("scaleRange");
+const downloadBtn = document.getElementById("download");
 
 const URLS = {
   shablon:  "images/shablon.png",
@@ -47,17 +45,10 @@ const URLS = {
   bg:       "images/priroda.jpg"
 };
 
-let uploadedImg = null;
-let bgImg = null;
-let shablonImg = null;
-
-// Параметри сцени
+let images = {};
+let uploadedImage = null;
 let scale = 1;
-let offsetX = 0, offsetY = 0;
-let isDragging = false;
-let startX, startY;
 
-// Завантажувач зображень
 function loadImage(src) {
   return new Promise((resolve, reject) => {
     const img = new Image();
@@ -68,81 +59,68 @@ function loadImage(src) {
   });
 }
 
-// Малювання сцени
+async function init() {
+  images.bg = await loadImage(URLS.bg);
+  images.shablon = await loadImage(URLS.shablon);
+  images.template = await loadImage(URLS.template);
+  draw();
+}
+
 function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  ctx.save();
-  ctx.translate(offsetX, offsetY);
-  ctx.scale(scale, scale);
+  // фон з масштабом
+  const bgWidth = images.bg.width * scale;
+  const bgHeight = images.bg.height * scale;
+  ctx.drawImage(
+    images.bg,
+    (canvas.width - bgWidth) / 2,
+    (canvas.height - bgHeight) / 2,
+    bgWidth, bgHeight
+  );
 
-  if (bgImg) {
-    ctx.drawImage(bgImg, 0, 0, canvas.width, canvas.height);
+  // завантажене фото (також зі scale)
+  if (uploadedImage) {
+    const w = uploadedImage.width * scale;
+    const h = uploadedImage.height * scale;
+    ctx.drawImage(
+      uploadedImage,
+      (canvas.width - w) / 2,
+      (canvas.height - h) / 2,
+      w, h
+    );
   }
 
-  if (uploadedImg) {
-    ctx.drawImage(uploadedImg, 0, 0, canvas.width, canvas.height);
-  }
-
-  if (shablonImg) {
-    ctx.drawImage(shablonImg, 0, 0, canvas.width, canvas.height);
-  }
-
-  ctx.restore();
+  // поверх шаблони
+  ctx.drawImage(images.shablon, 0, 0, canvas.width, canvas.height);
+  ctx.drawImage(images.template, 0, 0, canvas.width, canvas.height);
 }
 
-// Завантаження фото користувача
-document.getElementById("upload").addEventListener("change", e => {
+fileInput.addEventListener("change", e => {
   const file = e.target.files[0];
   if (!file) return;
   const reader = new FileReader();
-  reader.onload = ev => {
-    uploadedImg = new Image();
-    uploadedImg.onload = draw;
-    uploadedImg.src = ev.target.result;
+  reader.onload = () => {
+    uploadedImage = new Image();
+    uploadedImage.onload = draw;
+    uploadedImage.src = reader.result;
   };
   reader.readAsDataURL(file);
 });
 
-// Масштабування
-document.getElementById("scaleSlider").addEventListener("input", e => {
+scaleRange.addEventListener("input", e => {
   scale = parseFloat(e.target.value);
   draw();
 });
 
-// Перетягування сцени
-canvas.addEventListener("mousedown", e => {
-  isDragging = true;
-  startX = e.offsetX - offsetX;
-  startY = e.offsetY - offsetY;
-});
-canvas.addEventListener("mousemove", e => {
-  if (isDragging) {
-    offsetX = e.offsetX - startX;
-    offsetY = e.offsetY - startY;
-    draw();
-  }
-});
-canvas.addEventListener("mouseup", () => isDragging = false);
-canvas.addEventListener("mouseleave", () => isDragging = false);
-
-// Завантаження картинки
-document.getElementById("downloadBtn").addEventListener("click", () => {
+downloadBtn.addEventListener("click", () => {
   const link = document.createElement("a");
   link.download = "love.jpg";
-  link.href = canvas.toDataURL("image/jpeg", 0.95);
+  link.href = canvas.toDataURL("image/jpeg", 0.92);
   link.click();
 });
 
-// Старт: завантаження фону і шаблону
-Promise.all([
-  loadImage(URLS.bg),
-  loadImage(URLS.template)
-]).then(([bg, shablon]) => {
-  bgImg = bg;
-  shablonImg = shablon;
-  draw();
-});
+init();
 </script>
 
 </body>
