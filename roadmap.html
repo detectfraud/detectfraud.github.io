@@ -22,18 +22,17 @@ canvas {
 </head>
 <body>
 
-<fieldset class="venwin">
-<center>  <span style="color:#990000;font-size:x-large;">Камінь любові</span><br><br>
-  
+<fieldset class="venwin" style="height:auto;">
+  <center>
+    <center>  <span style="color:#990000;font-size:x-large;">Камінь любові</span><br><br>
     <canvas id="canvas" width="900" height="600" style="border:1px solid #ccc;"></canvas>
     <br><br>
-
-    <input type="file" id="upload" accept="image/*"><br><br>
-
-
-    <input type="range" id="scaleSlider" min="0.5" max="2" value="1" step="0.01">
-
-    <button id="downloadBtn">📥 Завантажити</button>
+    <label>Фон:&nbsp;&nbsp;<input type="file" id="bgLoader" accept="image/*"></label>
+    <label>Фото закоханих:&nbsp;&nbsp;<input type="file" id="loveLoader" accept="image/*"></label>
+    <br><br>
+    <input type="range" id="scaleSlider" min="0.1" max="3" step="0.01" value="1" style="width:400px;">
+    <br><br>
+    <button id="undoBtn">⟲ Undo</button>&nbsp;&nbsp;&nbsp;&nbsp;<button id="downloadBtn">📥 Завантажити</button>
   </center>
 </fieldset>
 
@@ -41,109 +40,147 @@ canvas {
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
-const URLS = {
-  shablon:  "images/shablon.png",
-  template: "images/LoveStone.png",
-  bg:       "images/priroda.jpg"
+let background = null;
+let love = null;
+let template = new Image();
+template.src = "template.png"; // твій шаблон PNG з прозорістю
+
+let layers = {
+  bg: { img: null, x: 0, y: 0, scale: 1 },
+  love: { img: null, x: 0, y: 0, scale: 1 }
 };
 
-let uploadedImg = null;
-let bgImg = null;
-let shablonImg = null;
-
-// Параметри сцени
-let scale = 1;
-let offsetX = 0, offsetY = 0;
+let activeLayer = null;
 let isDragging = false;
-let startX, startY;
+let dragOffsetX = 0;
+let dragOffsetY = 0;
 
-// Завантажувач зображень
-function loadImage(src) {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    img.crossOrigin = "anonymous";
-    img.onload = () => resolve(img);
-    img.onerror = reject;
-    img.src = src;
+// історія для Undo
+let history = [];
+
+// завантаження з input
+document.getElementById("bgLoader").addEventListener("change", e => {
+  loadImage(e.target.files[0], img => {
+    layers.bg.img = img;
+    layers.bg.x = canvas.width/2;
+    layers.bg.y = canvas.height/2;
+    layers.bg.scale = 1;
+    activeLayer = "bg";
+    saveState();
+    drawAll();
   });
-}
+});
 
-// Малювання сцени
-function draw() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+document.getElementById("loveLoader").addEventListener("change", e => {
+  loadImage(e.target.files[0], img => {
+    layers.love.img = img;
+    layers.love.x = canvas.width/2;
+    layers.love.y = canvas.height/2;
+    layers.love.scale = 1;
+    activeLayer = "love";
+    saveState();
+    drawAll();
+  });
+});
 
-  ctx.save();
-  ctx.translate(offsetX, offsetY);
-  ctx.scale(scale, scale);
-
-  if (bgImg) {
-    ctx.drawImage(bgImg, 0, 0, canvas.width, canvas.height);
-  }
-
-  if (uploadedImg) {
-    ctx.drawImage(uploadedImg, 0, 0, canvas.width, canvas.height);
-  }
-
-  if (shablonImg) {
-    ctx.drawImage(shablonImg, 0, 0, canvas.width, canvas.height);
-  }
-
-  ctx.restore();
-}
-
-// Завантаження фото користувача
-document.getElementById("upload").addEventListener("change", e => {
-  const file = e.target.files[0];
-  if (!file) return;
+function loadImage(file, callback) {
   const reader = new FileReader();
-  reader.onload = ev => {
-    uploadedImg = new Image();
-    uploadedImg.onload = draw;
-    uploadedImg.src = ev.target.result;
+  reader.onload = e => {
+    const img = new Image();
+    img.onload = () => callback(img);
+    img.src = e.target.result;
   };
   reader.readAsDataURL(file);
-});
+}
 
-// Масштабування
+// слайдер масштабу
 document.getElementById("scaleSlider").addEventListener("input", e => {
-  scale = parseFloat(e.target.value);
-  draw();
+  if (!activeLayer) return;
+  layers[activeLayer].scale = parseFloat(e.target.value);
+  saveState();
+  drawAll();
 });
 
-// Перетягування сцени
+// drag мишкою
 canvas.addEventListener("mousedown", e => {
+  if (!activeLayer) return;
   isDragging = true;
-  startX = e.offsetX - offsetX;
-  startY = e.offsetY - offsetY;
+  dragOffsetX = e.offsetX - layers[activeLayer].x;
+  dragOffsetY = e.offsetY - layers[activeLayer].y;
 });
+
 canvas.addEventListener("mousemove", e => {
+  if (!isDragging || !activeLayer) return;
+  layers[activeLayer].x = e.offsetX - dragOffsetX;
+  layers[activeLayer].y = e.offsetY - dragOffsetY;
+  drawAll();
+});
+
+canvas.addEventListener("mouseup", () => {
   if (isDragging) {
-    offsetX = e.offsetX - startX;
-    offsetY = e.offsetY - startY;
-    draw();
+    isDragging = false;
+    saveState();
   }
 });
-canvas.addEventListener("mouseup", () => isDragging = false);
-canvas.addEventListener("mouseleave", () => isDragging = false);
 
-// Завантаження картинки
-document.getElementById("downloadBtn").addEventListener("click", () => {
-  const link = document.createElement("a");
-  link.download = "love.jpg";
-  link.href = canvas.toDataURL("image/jpeg", 0.95);
-  link.click();
+// тач підтримка
+canvas.addEventListener("touchstart", e => {
+  if (!activeLayer) return;
+  const touch = e.touches[0];
+  const rect = canvas.getBoundingClientRect();
+  const x = touch.clientX - rect.left;
+  const y = touch.clientY - rect.top;
+  isDragging = true;
+  dragOffsetX = x - layers[activeLayer].x;
+  dragOffsetY = y - layers[activeLayer].y;
 });
 
-// Старт: завантаження фону і шаблону
-Promise.all([
-  loadImage(URLS.bg),
-  loadImage(URLS.template)
-]).then(([bg, shablon]) => {
-  bgImg = bg;
-  shablonImg = shablon;
-  draw();
+canvas.addEventListener("touchmove", e => {
+  if (!isDragging || !activeLayer) return;
+  const touch = e.touches[0];
+  const rect = canvas.getBoundingClientRect();
+  layers[activeLayer].x = touch.clientX - rect.left - dragOffsetX;
+  layers[activeLayer].y = touch.clientY - rect.top - dragOffsetY;
+  drawAll();
 });
+
+canvas.addEventListener("touchend", () => {
+  if (isDragging) {
+    isDragging = false;
+    saveState();
+  }
+});
+
+// Undo
+document.getElementById("undoBtn").addEventListener("click", () => {
+  if (history.length > 1) {
+    history.pop(); // видаляємо поточний стан
+    const prev = history[history.length-1];
+    layers = JSON.parse(JSON.stringify(prev));
+    drawAll();
+  }
+});
+
+// малювання всіх шарів
+function drawAll() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  if (layers.bg.img) drawLayer(layers.bg);
+  if (layers.love.img) drawLayer(layers.love);
+  ctx.drawImage(template, 0, 0, canvas.width, canvas.height);
+}
+
+function drawLayer(layer) {
+  const w = layer.img.width * layer.scale;
+  const h = layer.img.height * layer.scale;
+  ctx.drawImage(layer.img, layer.x - w/2, layer.y - h/2, w, h);
+}
+
+// збереження стану
+function saveState() {
+  history.push(JSON.parse(JSON.stringify(layers)));
+}
 </script>
+
 
 </body>
 </html>
