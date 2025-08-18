@@ -31,146 +31,94 @@ canvas {
 </fieldset>
 
 <script>
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+const fileInput = document.getElementById("fileInput");
+const scaleRange = document.getElementById("scaleRange");
+const downloadBtn = document.getElementById("download");
+
 const URLS = {
   shablon:  "images/shablon.png",
   template: "images/LoveStone.png",
   bg:       "images/priroda.jpg"
 };
 
-let tpl = null;
-let bg = null;
-let lovers = null;
-let loverPos = {x:0,y:0};
+let images = {};
+let uploadedImage = null;
 let scale = 1;
 
-const canvas = document.getElementById('c');
-const ctx = canvas.getContext('2d');
-const upload = document.getElementById('upload');
-const range = document.getElementById('scale');
-
-// Завантаження зображень
-function loadImage(src){
-  return new Promise((res, rej)=>{
+function loadImage(src) {
+  return new Promise((resolve, reject) => {
     const img = new Image();
-    img.onload = ()=>res(img);
-    img.onerror = ()=>rej('Не вдалося завантажити '+src);
+    img.crossOrigin = "anonymous";
+    img.onload = () => resolve(img);
+    img.onerror = reject;
     img.src = src;
   });
 }
 
-// Малювання
-function draw(){
-  if(!bg || !tpl) return;
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  ctx.drawImage(bg,0,0,canvas.width,canvas.height);
-  if(lovers){
-    ctx.save();
-    ctx.translate(loverPos.x, loverPos.y);
-    ctx.scale(scale, scale);
-    ctx.drawImage(lovers,-lovers.width/2,-lovers.height/2);
-    ctx.restore();
+async function init() {
+  images.bg = await loadImage(URLS.bg);
+  images.shablon = await loadImage(URLS.shablon);
+  images.template = await loadImage(URLS.template);
+  draw();
+}
+
+function draw() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // фон з масштабом
+  const bgWidth = images.bg.width * scale;
+  const bgHeight = images.bg.height * scale;
+  ctx.drawImage(
+    images.bg,
+    (canvas.width - bgWidth) / 2,
+    (canvas.height - bgHeight) / 2,
+    bgWidth, bgHeight
+  );
+
+  // завантажене фото (також зі scale)
+  if (uploadedImage) {
+    const w = uploadedImage.width * scale;
+    const h = uploadedImage.height * scale;
+    ctx.drawImage(
+      uploadedImage,
+      (canvas.width - w) / 2,
+      (canvas.height - h) / 2,
+      w, h
+    );
   }
-  ctx.drawImage(tpl,0,0,canvas.width,canvas.height);
+
+  // поверх шаблони
+  ctx.drawImage(images.shablon, 0, 0, canvas.width, canvas.height);
+  ctx.drawImage(images.template, 0, 0, canvas.width, canvas.height);
 }
 
-// Ініціалізація
-async function init(){
-  try{
-    [tpl, bg] = await Promise.all([loadImage(URLS.shablon), loadImage(URLS.bg)]);
-    draw();
-  }catch(e){console.error(e);}
-}
-init();
-
-// Завантаження фото користувача
-upload.addEventListener('change', e=>{
+fileInput.addEventListener("change", e => {
   const file = e.target.files[0];
-  if(!file) return;
+  if (!file) return;
   const reader = new FileReader();
-  reader.onload = ev=>{
-    const img = new Image();
-    img.onload = ()=>{
-      lovers = img;
-      loverPos.x = canvas.width/2;
-      loverPos.y = canvas.height/2;
-      scale = 1;
-      range.value = 1;
-      draw();
-    };
-    img.src = ev.target.result;
+  reader.onload = () => {
+    uploadedImage = new Image();
+    uploadedImage.onload = draw;
+    uploadedImage.src = reader.result;
   };
   reader.readAsDataURL(file);
 });
 
-// Масштабування
-range.addEventListener('input', e=>{
+scaleRange.addEventListener("input", e => {
   scale = parseFloat(e.target.value);
   draw();
 });
 
-// Drag мишею
-let drag = false;
-canvas.addEventListener('mousedown', ()=>drag=true);
-canvas.addEventListener('mouseup', ()=>drag=false);
-canvas.addEventListener('mousemove', e=>{
-  if(drag && lovers){
-    loverPos.x = e.offsetX;
-    loverPos.y = e.offsetY;
-    draw();
-  }
-});
-
-// Завантаження PNG
-document.getElementById('download').addEventListener('click', ()=>{
-  const out = document.createElement('canvas');
-  out.width = 900;
-  out.height = 600;
-  const octx = out.getContext('2d');
-
-  octx.drawImage(bg,0,0,out.width,out.height);
-  if(lovers){
-    octx.save();
-// коефіцієнти масштабу між робочим canvas і вихідним
-const kx = out.width / canvas.width;
-const ky = out.height / canvas.height;
-
-// переносимо точку в реальні координати (де фото стояло на екрані)
-octx.translate(loverPos.x * kx, loverPos.y * ky);
-
-// масштабуємо з урахуванням коефіцієнта
-const totalScale = scale * ((kx + ky) / 2); 
-octx.scale(totalScale, totalScale);
-
-// малюємо фото
-octx.drawImage(lovers, -lovers.width / 2, -lovers.height / 2);
-octx.restore();
-
-  }
-  octx.drawImage(tpl,0,0,out.width,out.height);
-
-  const link = document.createElement('a');
-  link.download = 'love-stone.png';
-  link.href = out.toDataURL('image/png');
+downloadBtn.addEventListener("click", () => {
+  const link = document.createElement("a");
+  link.download = "love.jpg";
+  link.href = canvas.toDataURL("image/jpeg", 0.92);
   link.click();
 });
 
-  //
-  async function loadImage(src) {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    img.crossOrigin = "anonymous"; // можна прибрати, якщо картинки локальні
-    img.onload = () => {
-      console.log("✅ Завантажено:", src);
-      resolve(img);
-    };
-    img.onerror = () => {
-      console.error("❌ Помилка завантаження:", src);
-      reject();
-    };
-    img.src = src;
-  });
-}
-
+init();
 </script>
 
 </body>
