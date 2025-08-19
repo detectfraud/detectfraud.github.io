@@ -2,22 +2,14 @@
 <html lang="uk">
 <head>
 <meta charset="UTF-8">
-<title>Камінь любові</title>
+<title>Камінь любові — редактор</title>
 <style>
-body { text-align:center; font-family:sans-serif; }
-.venwin {
-  background: #fff;
-  border-radius:10px;
-  padding:10px;
-  display:inline-block;
-}
-canvas {
-  border:3px solid #bbb;
-  border-radius:3%;
-  box-shadow:0 6px 18px rgba(0,0,0,.1);
-  display:block;
-  margin:10px auto;
-}
+  body { text-align:center; font-family:sans-serif; }
+  .venwin { background: #fff; border-radius:10px; padding:10px; display:inline-block; }
+  canvas { border:3px solid #bbb; border-radius:6px; box-shadow:0 6px 18px rgba(0,0,0,.1); display:block; margin:10px auto; }
+  #controls{ margin-top:10px; display:flex; gap:10px; align-items:center; justify-content:center; flex-wrap:wrap; }
+  #scaleSlider{ width:420px; }
+  button{ padding:8px 12px; }
 </style>
 </head>
 <body>
@@ -26,178 +18,255 @@ canvas {
   <center>
     <span style="color:#990000;font-size:x-large;">Камінь любові</span><br><br>
     <canvas id="canvas" width="900" height="600" style="border:1px solid #ccc;"></canvas>
-    <br><br>
-    <label>Фон:&nbsp;&nbsp;<input type="file" id="bgLoader" accept="image/*"></label>
-    <label>Фото закоханих:&nbsp;&nbsp;<input type="file" id="loveLoader" accept="image/*"></label>
-    <br><br>
-    <input type="range" id="scaleSlider" min="0.1" max="3" step="0.01" value="1" style="width:400px;">
-    <br><br>
-    <button id="undoBtn">⟲ Undo</button>
-    <button id="previewBtn">👁 Перегляд</button>
-    <button id="downloadBtn" style="display:none;">📥 Завантажити</button>
+
+    <div id="controls">
+      <label>Фон: <input type="file" id="bgLoader" accept="image/*"></label>
+      <label>Фото закоханих: <input type="file" id="loveLoader" accept="image/*"></label>
+      <input type="range" id="scaleSlider" min="0.1" max="3" step="0.01" value="1">
+      <button id="undoBtn">⟲ Undo</button>
+      <button id="previewBtn">👁 Перегляд</button>
+      <button id="downloadBtn" style="display:none;">📥 Завантажити</button>
+    </div>
   </center>
 </fieldset>
 
 <script>
-const canvas = document.getElementById("canvas");
-const ctx = canvas.getContext("2d");
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+const bgLoader = document.getElementById('bgLoader');
+const loveLoader = document.getElementById('loveLoader');
+const scaleSlider = document.getElementById('scaleSlider');
+const undoBtn = document.getElementById('undoBtn');
+const previewBtn = document.getElementById('previewBtn');
+const downloadBtn = document.getElementById('downloadBtn');
 
-let template = new Image();
-template.src = "images/LoveStone.png"; // PNG-шаблон з прозорістю
+// шаблон (поверх)
+const template = new Image();
+template.src = 'images/LoveStone.png';
 
+// модель шарів: зберігаємо img (Image) і dataURL у src для історії
 let layers = {
-  bg: { img: null, x: 0, y: 0, scale: 1 },
-  love: { img: null, x: 0, y: 0, scale: 1 }
+  bg: { img: null, src: null, x: canvas.width/2, y: canvas.height/2, scale: 1 },
+  love: { img: null, src: null, x: canvas.width/2, y: canvas.height/2, scale: 1 }
 };
 
-let activeLayer = null;
-let isDragging = false;
-let dragOffsetX = 0, dragOffsetY = 0;
+let activeLayer = null; // 'bg' або 'love'
 let previewMode = false;
 
-// історія для Undo
-let history = [];
+// історія: масив снэпшотів { bg:{src,x,y,scale}, love:{...}, previewMode, activeLayer }
+const history = [];
+const MAX_HISTORY = 20;
 
-function saveState() {
-  const state = {
-    layers: JSON.parse(JSON.stringify(layers)),
-    activeLayer,
-    previewMode
+function makeSnapshot(){
+  return {
+    bg: { src: layers.bg.src, x: layers.bg.x, y: layers.bg.y, scale: layers.bg.scale },
+    love: { src: layers.love.src, x: layers.love.x, y: layers.love.y, scale: layers.love.scale },
+    previewMode: previewMode,
+    activeLayer: activeLayer
   };
-  history.push(state);
 }
 
-function restoreState(state) {
-  layers = JSON.parse(JSON.stringify(state.layers));
-  activeLayer = state.activeLayer;
-  previewMode = state.previewMode;
+function pushHistory(){
+  history.push(makeSnapshot());
+  if(history.length > MAX_HISTORY) history.shift();
+}
+
+function applySnapshot(snapshot){
+  // прочитати джерела і встановити layers; повертаємо Promise, коли картинки підвантажаться
+  previewMode = !!snapshot.previewMode;
+  activeLayer = snapshot.activeLayer || null;
+  const jobs = [];
+
+  ['bg','love'].forEach(key => {
+    const s = snapshot[key];
+    if(s && s.src){
+      // потрібно завантажити картинку
+      const img = new Image();
+      const p = new Promise((res) => {
+        img.onload = () => {
+          layers[key].img = img;
+          layers[key].src = s.src;
+          layers[key].x = s.x;
+          layers[key].y = s.y;
+          layers[key].scale = s.scale;
+          res();
+        };
+        img.onerror = () => {
+          layers[key].img = null;
+          layers[key].src = null;
+          res();
+        };
+      });
+      img.src = s.src;
+      jobs.push(p);
+    } else {
+      // немає картинки в снэпшоті
+      layers[key].img = null;
+      layers[key].src = null;
+      layers[key].x = s ? s.x : canvas.width/2;
+      layers[key].y = s ? s.y : canvas.height/2;
+      layers[key].scale = s ? s.scale : 1;
+    }
+  });
+
   toggleButtons();
+  if(jobs.length) return Promise.all(jobs).then(drawAll);
   drawAll();
+  return Promise.resolve();
 }
 
-// --- завантаження ---
-document.getElementById("bgLoader").addEventListener("change", e => {
-  loadImage(e.target.files[0], img => {
-    layers.bg.img = img;
-    layers.bg.x = canvas.width/2;
-    layers.bg.y = canvas.height/2;
-    layers.bg.scale = 1;
-    activeLayer = "bg";
-    document.getElementById("scaleSlider").value = 1;
-    saveState();
-    drawAll();
-  });
-});
+// Ініціалізація: зберігаємо початковий стан
+pushHistory();
 
-document.getElementById("loveLoader").addEventListener("change", e => {
-  loadImage(e.target.files[0], img => {
-    layers.love.img = img;
-    layers.love.x = canvas.width/2;
-    layers.love.y = canvas.height/2;
-    layers.love.scale = 1;
-    activeLayer = "love";
-    document.getElementById("scaleSlider").value = 1;
-    saveState();
-    drawAll();
-  });
-});
+// Відмалювання шару у вказаний контекст
+function drawLayerTo(ctxTarget, layer){
+  if(!layer || !layer.img) return;
+  const w = layer.img.width * layer.scale;
+  const h = layer.img.height * layer.scale;
+  ctxTarget.drawImage(layer.img, layer.x - w/2, layer.y - h/2, w, h);
+}
 
-function loadImage(file, callback) {
+function drawAll(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  if(previewMode){
+    // робимо тимчасовий canvas, куди малюємо шари, потім вирізаємо шаблоном (залишаємо тільки прозору частину шаблону)
+    const tmp = document.createElement('canvas');
+    tmp.width = canvas.width; tmp.height = canvas.height;
+    const tctx = tmp.getContext('2d');
+
+    // малюємо шари на tmp (bg під love)
+    drawLayerTo(tctx, layers.bg);
+    drawLayerTo(tctx, layers.love);
+
+    // видаляємо ту частину, де шаблон непрозорий — тобто залишаємо тільки частину, де шаблон прозорий (виріз)
+    tctx.globalCompositeOperation = 'destination-out';
+    tctx.drawImage(template, 0, 0, tmp.width, tmp.height);
+    tctx.globalCompositeOperation = 'source-over';
+
+    // переносимо tmp на основний canvas і зверху малюємо сам шаблон
+    ctx.drawImage(tmp, 0, 0);
+    ctx.drawImage(template, 0, 0, canvas.width, canvas.height);
+  } else {
+    // нормальний режим — малюємо просто шари і шаблон зверху
+    drawLayerTo(ctx, layers.bg);
+    drawLayerTo(ctx, layers.love);
+    if(template.complete) ctx.drawImage(template, 0, 0, canvas.width, canvas.height);
+  }
+}
+
+function toggleButtons(){
+  if(previewMode){
+    previewBtn.style.display = 'none';
+    downloadBtn.style.display = 'inline-block';
+  } else {
+    previewBtn.style.display = 'inline-block';
+    downloadBtn.style.display = 'none';
+  }
+}
+
+// Завантаження файлу у шар
+function handleFileLoad(file, key){
+  if(!file) return;
   const reader = new FileReader();
   reader.onload = e => {
+    const data = e.target.result;
     const img = new Image();
-    img.onload = () => callback(img);
-    img.src = e.target.result;
+    img.onload = () => {
+      layers[key].img = img;
+      layers[key].src = data;
+      layers[key].x = canvas.width/2;
+      layers[key].y = canvas.height/2;
+      layers[key].scale = 1;
+      activeLayer = key;
+      scaleSlider.value = 1; // скидання повзунка при виборі нового фото
+      pushHistory();
+      drawAll();
+    };
+    img.src = data;
   };
   reader.readAsDataURL(file);
 }
 
-// --- слайдер ---
-document.getElementById("scaleSlider").addEventListener("input", e => {
-  if (!activeLayer) return;
-  layers[activeLayer].scale = parseFloat(e.target.value);
-  saveState();
+bgLoader.addEventListener('change', e => handleFileLoad(e.target.files[0], 'bg'));
+loveLoader.addEventListener('change', e => handleFileLoad(e.target.files[0], 'love'));
+
+// Слайдер: live-preview під час руху, запис у історію при відпусканні (change)
+scaleSlider.addEventListener('input', () => {
+  if(!activeLayer) return;
+  layers[activeLayer].scale = parseFloat(scaleSlider.value);
   drawAll();
 });
-
-// --- drag ---
-canvas.addEventListener("mousedown", e => {
-  if (!activeLayer) return;
-  isDragging = true;
-  dragOffsetX = e.offsetX - layers[activeLayer].x;
-  dragOffsetY = e.offsetY - layers[activeLayer].y;
+scaleSlider.addEventListener('change', () => {
+  if(!activeLayer) return; pushHistory();
 });
-canvas.addEventListener("mousemove", e => {
-  if (!isDragging || !activeLayer) return;
-  layers[activeLayer].x = e.offsetX - dragOffsetX;
-  layers[activeLayer].y = e.offsetY - dragOffsetY;
+
+// Drag (мішка)
+let dragging = false; let dragStartX = 0; let dragStartY = 0;
+canvas.addEventListener('mousedown', e => {
+  if(!activeLayer) return;
+  dragging = true;
+  dragStartX = e.offsetX - layers[activeLayer].x;
+  dragStartY = e.offsetY - layers[activeLayer].y;
+});
+canvas.addEventListener('mousemove', e => {
+  if(!dragging || !activeLayer) return;
+  layers[activeLayer].x = e.offsetX - dragStartX;
+  layers[activeLayer].y = e.offsetY - dragStartY;
   drawAll();
 });
-canvas.addEventListener("mouseup", () => {
-  if (isDragging) {
-    isDragging = false;
-    saveState();
-  }
+canvas.addEventListener('mouseup', () => { if(dragging){ dragging=false; pushHistory(); } });
+canvas.addEventListener('mouseleave', () => { if(dragging){ dragging=false; pushHistory(); } });
+
+// Touch support
+canvas.addEventListener('touchstart', e => {
+  if(!activeLayer) return;
+  const t = e.touches[0];
+  const rect = canvas.getBoundingClientRect();
+  dragging = true;
+  dragStartX = t.clientX - rect.left - layers[activeLayer].x;
+  dragStartY = t.clientY - rect.top - layers[activeLayer].y;
+  e.preventDefault();
+});
+canvas.addEventListener('touchmove', e => {
+  if(!dragging || !activeLayer) return;
+  const t = e.touches[0];
+  const rect = canvas.getBoundingClientRect();
+  layers[activeLayer].x = t.clientX - rect.left - dragStartX;
+  layers[activeLayer].y = t.clientY - rect.top - dragStartY;
+  drawAll(); e.preventDefault();
+});
+canvas.addEventListener('touchend', () => { if(dragging){ dragging=false; pushHistory(); } });
+
+// Undo: вертаємося до попереднього snapshot (по кроку)
+undoBtn.addEventListener('click', () => {
+  if(history.length <= 1) return; // нічого скасовувати
+  history.pop(); // видаляємо поточний стан
+  const prev = history[history.length-1];
+  applySnapshot(prev);
 });
 
-// --- Undo ---
-document.getElementById("undoBtn").addEventListener("click", () => {
-  if (history.length > 1) {
-    history.pop(); 
-    const prev = history[history.length-1];
-    restoreState(prev);
-  }
-});
-
-// --- Preview ---
-document.getElementById("previewBtn").addEventListener("click", () => {
+// Preview: застосувати маску з шаблону (використовує прозорість шаблону як виріз)
+previewBtn.addEventListener('click', () => {
   previewMode = true;
-  saveState();
+  pushHistory();
   toggleButtons();
   drawAll();
 });
 
-function toggleButtons() {
-  document.getElementById("previewBtn").style.display = previewMode ? "none" : "inline-block";
-  document.getElementById("downloadBtn").style.display = previewMode ? "inline-block" : "none";
-}
-
-// --- Download ---
-document.getElementById("downloadBtn").addEventListener("click", () => {
+// Download: просто зберігаємо поточний canvas (включно з маскою, якщо previewMode)
+downloadBtn.addEventListener('click', () => {
   const link = document.createElement('a');
   link.download = 'composition.png';
   link.href = canvas.toDataURL('image/png');
   link.click();
 });
 
-// --- малювання ---
-function drawAll() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+// коли шаблон завантажиться, перемалюємо
+template.onload = () => { drawAll(); };
 
-  if (previewMode) {
-    // маскування шаблоном
-    ctx.save();
-    ctx.drawImage(template, 0, 0, canvas.width, canvas.height);
-    ctx.globalCompositeOperation = "source-in";
-    if (layers.bg.img) drawLayer(layers.bg);
-    if (layers.love.img) drawLayer(layers.love);
-    ctx.restore();
-    ctx.drawImage(template, 0, 0, canvas.width, canvas.height);
-  } else {
-    if (layers.bg.img) drawLayer(layers.bg);
-    if (layers.love.img) drawLayer(layers.love);
-    ctx.drawImage(template, 0, 0, canvas.width, canvas.height);
-  }
-}
-
-function drawLayer(layer) {
-  const w = layer.img.width * layer.scale;
-  const h = layer.img.height * layer.scale;
-  ctx.drawImage(layer.img, layer.x - w/2, layer.y - h/2, w, h);
-}
-
-saveState();
-drawAll();
+// малюємо початковий стан
+applySnapshot(history[0] || makeSnapshot());
 </script>
 </body>
 </html>
