@@ -159,53 +159,43 @@ function drawBgWithHole(ctxTarget){
   if(!layers.bg.img){
     return;
   }
+
+  // якщо дірку робити не потрібно, малюємо фон як є
   if(!bgHoleActive || mask.r <= 0){
-    // дірку ще не робимо — малюємо фон як є
     drawLayerTo(ctxTarget, layers.bg);
     return;
   }
-  // Готуємо оффскрін, щоб не "виїдати" те, що вже намальовано нижче
+
+  // малюємо фон у тимчасовий canvas
   const off = document.createElement('canvas');
   off.width = canvas.width;
   off.height = canvas.height;
   const octx = off.getContext('2d');
 
-  // малюємо фон
   drawLayerTo(octx, layers.bg);
 
-  // "вирізаємо" круг
+  // "вирізаємо" коло, щоб Love було видно крізь фон
   octx.globalCompositeOperation = 'destination-out';
   octx.beginPath();
   octx.arc(mask.cx, mask.cy, mask.r, 0, Math.PI*2);
   octx.fill();
   octx.globalCompositeOperation = 'source-over';
 
-  // повертаємо фон з діркою на основний canvas
   ctxTarget.drawImage(off, 0, 0);
 }
 
 function drawAll(){
   ctx.clearRect(0,0,canvas.width,canvas.height);
 
-  if(!previewMode){
-    // РЕЖИМ РЕДАГУВАННЯ:
-    // низ: ФОН (з діркою, якщо вже вибрано Love)
-    // середина: LOVE (без обрізки)
-    // верх: ШАБЛОН
-    drawBgWithHole(ctx);
-    drawLove(ctx, false);
-  } else {
-    // ПЕРЕГЛЯД:
-    // низ: LOVE (уже обрізаний по колу)
-    // середина: ФОН (з діркою)
-    // верх: ШАБЛОН
-    drawLove(ctx, true);
-    drawBgWithHole(ctx);
-  }
+  // 1. Love (низ)
+  drawLove(ctx, false);
 
+  // 2. Фон з діркою (середина)
+  drawBgWithHole(ctx);
+
+  // 3. Шаблон (верх)
   if(template.complete) ctx.drawImage(template, 0, 0, canvas.width, canvas.height);
 }
-
 
 function toggleButtons(){
   if(previewMode){
