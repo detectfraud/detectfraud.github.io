@@ -45,9 +45,6 @@ const undoBtn = document.getElementById('undoBtn');
 const previewBtn = document.getElementById('previewBtn');
 const downloadBtn = document.getElementById('downloadBtn');
 let mask = { cx: 0, cy: 0, r: 0 };
-let bgHoleActive = false;              // коли true — у фоні пробиваємо круглу дірку
-let dragging = false, dragStartX = 0, dragStartY = 0; // якщо десь зникли — повертаємо
-
 // шаблон (поверх)
 const template = new Image();
 template.src = 'images/LoveStone.png';
@@ -70,11 +67,9 @@ function makeSnapshot(){
     bg: { src: layers.bg.src, x: layers.bg.x, y: layers.bg.y, scale: layers.bg.scale },
     love: { src: layers.love.src, x: layers.love.x, y: layers.love.y, scale: layers.love.scale },
     previewMode: previewMode,
-    activeLayer: activeLayer,
-    bgHoleActive: bgHoleActive
+    activeLayer: activeLayer
   };
 }
-
 
 function pushHistory(){
   history.push(makeSnapshot());
@@ -85,7 +80,6 @@ function applySnapshot(snapshot){
   // прочитати джерела і встановити layers; повертаємо Promise, коли картинки підвантажаться
   previewMode = !!snapshot.previewMode;
   activeLayer = snapshot.activeLayer || null;
-bgHoleActive = !!snapshot.bgHoleActive;
   const jobs = [];
 
   ['bg','love'].forEach(key => {
@@ -136,65 +130,48 @@ function drawLayerTo(ctxTarget, layer){
   const h = layer.img.height * layer.scale;
   ctxTarget.drawImage(layer.img, layer.x - w/2, layer.y - h/2, w, h);
 }
-// Малюємо Love, при потребі обрізаючи по колу (лише в Preview)
-function drawLove(ctxTarget, clip=false){
-  const layer = layers.love;
-  if(!layer || !layer.img) return;
-
-  const w = layer.img.width * layer.scale;
-  const h = layer.img.height * layer.scale;
-
-  ctxTarget.save();
-  if (clip && mask.r > 0){
-    ctxTarget.beginPath();
-    ctxTarget.arc(mask.cx, mask.cy, mask.r, 0, Math.PI*2);
-    ctxTarget.clip();
-  }
-  ctxTarget.drawImage(layer.img, layer.x - w/2, layer.y - h/2, w, h);
-  ctxTarget.restore();
-}
-
-// Малюємо ФОН з "діркою" у місці кола (коли bgHoleActive = true)
-function drawBgWithHole(ctxTarget){
-  if(!layers.bg.img){
-    return;
-  }
-
-  // якщо дірку робити не потрібно, малюємо фон як є
-  if(!bgHoleActive || mask.r <= 0){
-    drawLayerTo(ctxTarget, layers.bg);
-    return;
-  }
-
-  // малюємо фон у тимчасовий canvas
-  const off = document.createElement('canvas');
-  off.width = canvas.width;
-  off.height = canvas.height;
-  const octx = off.getContext('2d');
-
-  drawLayerTo(octx, layers.bg);
-
-  // "вирізаємо" коло, щоб Love було видно крізь фон
-  octx.globalCompositeOperation = 'destination-out';
-  octx.beginPath();
-  octx.arc(mask.cx, mask.cy, mask.r, 0, Math.PI*2);
-  octx.fill();
-  octx.globalCompositeOperation = 'source-over';
-
-  ctxTarget.drawImage(off, 0, 0);
-}
 
 function drawAll(){
   ctx.clearRect(0,0,canvas.width,canvas.height);
 
-  // 1. Love (низ)
-  drawLove(ctx, false);
+  if(previewMode){
+    // робимо тимчасовий canvas, куди малюємо шари, потім вирізаємо шаблоном (залишаємо тільки прозору частину шаблону)
+    const tmp = document.createElement('canvas');
+    tmp.width = canvas.width; tmp.height = canvas.height;
+    const tctx = tmp.getContext('2d');
 
-  // 2. Фон з діркою (середина)
-  drawBgWithHole(ctx);
+    // малюємо шари на tmp (bg під love)
+    drawLayerTo(tctx, layers.bg);
+    drawLayerTo(tctx, layers.love);
 
-  // 3. Шаблон (верх)
-  if(template.complete) ctx.drawImage(template, 0, 0, canvas.width, canvas.height);
+    // видаляємо ту частину, де шаблон непрозорий — тобто залишаємо тільки частину, де шаблон прозорий (виріз)
+// вирізаємо все, крім кола
+tctx.save();
+tctx.beginPath();
+tctx.arc(mask.cx, mask.cy, mask.r, 0, Math.PI*2);
+tctx.clip();
+
+// малюємо лише те, що всередині кола
+const tmpInside = document.createElement('canvas');
+tmpInside.width = canvas.width;
+tmpInside.height = canvas.height;
+const insideCtx = tmpInside.getContext('2d');
+drawLayerTo(insideCtx, layers.bg);
+drawLayerTo(insideCtx, layers.love);
+
+tctx.drawImage(tmpInside, 0, 0);
+tctx.restore();
+
+
+    // переносимо tmp на основний canvas і зверху малюємо сам шаблон
+    ctx.drawImage(tmp, 0, 0);
+    ctx.drawImage(template, 0, 0, canvas.width, canvas.height);
+  } else {
+    // нормальний режим — малюємо просто шари і шаблон зверху
+    drawLayerTo(ctx, layers.bg);
+    drawLayerTo(ctx, layers.love);
+    if(template.complete) ctx.drawImage(template, 0, 0, canvas.width, canvas.height);
+  }
 }
 
 function toggleButtons(){
@@ -231,34 +208,18 @@ function handleFileLoad(file, key){
 }
 
 bgLoader.addEventListener('change', e => handleFileLoad(e.target.files[0], 'bg'));
-loveLoader.addEventListener('change', e => {
-  const file = e.target.files[0];
-  if(!file) return;
-  const reader = new FileReader();
-  reader.onload = ev => {
-    const data = ev.target.result;
-    const img = new Image();
-    img.onload = () => {
-      // перед вставкою Love — активуємо дірку у фоні
-      bgHoleActive = true;
+loveLoader.addEventListener('change', e => handleFileLoad(e.target.files[0], 'love'));
 
-      layers.love.img = img;
-      layers.love.src = data;
-      layers.love.x = canvas.width/2;
-      layers.love.y = canvas.height/2;
-      layers.love.scale = 1;
-
-      activeLayer = 'love';
-      scaleSlider.value = 1;
-
-      pushHistory();
-      drawAll();
-    };
-    img.src = data;
-  };
-  reader.readAsDataURL(file);
+// Слайдер
+scaleSlider.addEventListener('input', () => {
+  if(previewMode || !activeLayer) return;
+  layers[activeLayer].scale = parseFloat(scaleSlider.value);
+  drawAll();
 });
-
+scaleSlider.addEventListener('change', () => {
+  if(previewMode || !activeLayer) return;
+  pushHistory();
+});
 
 // Drag (мішка)
 canvas.addEventListener('mousedown', e => {
