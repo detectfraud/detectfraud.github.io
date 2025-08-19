@@ -191,36 +191,42 @@ function handleFileLoad(file, key){
 bgLoader.addEventListener('change', e => handleFileLoad(e.target.files[0], 'bg'));
 loveLoader.addEventListener('change', e => handleFileLoad(e.target.files[0], 'love'));
 
-// Слайдер: live-preview під час руху, запис у історію при відпусканні (change)
+// Слайдер
 scaleSlider.addEventListener('input', () => {
-  if(!activeLayer) return;
+  if(previewMode || !activeLayer) return;
   layers[activeLayer].scale = parseFloat(scaleSlider.value);
   drawAll();
 });
 scaleSlider.addEventListener('change', () => {
-  if(!activeLayer) return; pushHistory();
+  if(previewMode || !activeLayer) return;
+  pushHistory();
 });
 
 // Drag (мішка)
-let dragging = false; let dragStartX = 0; let dragStartY = 0;
 canvas.addEventListener('mousedown', e => {
-  if(!activeLayer) return;
+  if(previewMode || !activeLayer) return;
   dragging = true;
   dragStartX = e.offsetX - layers[activeLayer].x;
   dragStartY = e.offsetY - layers[activeLayer].y;
 });
 canvas.addEventListener('mousemove', e => {
-  if(!dragging || !activeLayer) return;
+  if(previewMode || !dragging || !activeLayer) return;
   layers[activeLayer].x = e.offsetX - dragStartX;
   layers[activeLayer].y = e.offsetY - dragStartY;
   drawAll();
 });
-canvas.addEventListener('mouseup', () => { if(dragging){ dragging=false; pushHistory(); } });
-canvas.addEventListener('mouseleave', () => { if(dragging){ dragging=false; pushHistory(); } });
+canvas.addEventListener('mouseup', () => { 
+  if(previewMode) return;
+  if(dragging){ dragging=false; pushHistory(); } 
+});
+canvas.addEventListener('mouseleave', () => { 
+  if(previewMode) return;
+  if(dragging){ dragging=false; pushHistory(); } 
+});
 
 // Touch support
 canvas.addEventListener('touchstart', e => {
-  if(!activeLayer) return;
+  if(previewMode || !activeLayer) return;
   const t = e.touches[0];
   const rect = canvas.getBoundingClientRect();
   dragging = true;
@@ -229,14 +235,18 @@ canvas.addEventListener('touchstart', e => {
   e.preventDefault();
 });
 canvas.addEventListener('touchmove', e => {
-  if(!dragging || !activeLayer) return;
+  if(previewMode || !dragging || !activeLayer) return;
   const t = e.touches[0];
   const rect = canvas.getBoundingClientRect();
   layers[activeLayer].x = t.clientX - rect.left - dragStartX;
   layers[activeLayer].y = t.clientY - rect.top - dragStartY;
   drawAll(); e.preventDefault();
 });
-canvas.addEventListener('touchend', () => { if(dragging){ dragging=false; pushHistory(); } });
+canvas.addEventListener('touchend', () => { 
+  if(previewMode) return;
+  if(dragging){ dragging=false; pushHistory(); } 
+});
+
 
 // Undo: вертаємося до попереднього snapshot (по кроку)
 undoBtn.addEventListener('click', () => {
