@@ -10,6 +10,11 @@
   #controls{ margin-top:10px; display:flex; gap:10px; align-items:center; justify-content:center; flex-wrap:wrap; }
   #scaleSlider{ width:420px; }
   button{ padding:8px 12px; }
+.disabled {
+  pointer-events: none;        /* блокує кліки/тач */
+  opacity: 0.5;                /* робить напівпрозорим */
+  filter: grayscale(100%);     /* чорно-білий */
+}
 </style>
 </head>
 <body>
@@ -277,6 +282,19 @@ template.onload = () => { drawAll(); };
 
 // малюємо початковий стан
 applySnapshot(history[0] || makeSnapshot());
+
+//
+function setDisabled(state) {
+  // беремо всі елементи управління, крім самих картинок
+  const controls = document.querySelectorAll("button, input:not(#background):not(#love), #scaleSlider");
+  controls.forEach(ctrl => {
+    if (state) {
+      ctrl.classList.add("disabled");
+    } else {
+      ctrl.classList.remove("disabled");
+    }
+  });
+}
 </script>
 </body>
 </html>
