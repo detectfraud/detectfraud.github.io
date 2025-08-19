@@ -44,7 +44,7 @@ const scaleSlider = document.getElementById('scaleSlider');
 const undoBtn = document.getElementById('undoBtn');
 const previewBtn = document.getElementById('previewBtn');
 const downloadBtn = document.getElementById('downloadBtn');
-
+let mask = { cx: 0, cy: 0, r: 0 };
 // шаблон (поверх)
 const template = new Image();
 template.src = 'images/LoveStone.png';
@@ -145,9 +145,23 @@ function drawAll(){
     drawLayerTo(tctx, layers.love);
 
     // видаляємо ту частину, де шаблон непрозорий — тобто залишаємо тільки частину, де шаблон прозорий (виріз)
-    tctx.globalCompositeOperation = 'destination-out';
-    tctx.drawImage(template, 0, 0, tmp.width, tmp.height);
-    tctx.globalCompositeOperation = 'source-over';
+// вирізаємо все, крім кола
+tctx.save();
+tctx.beginPath();
+tctx.arc(mask.cx, mask.cy, mask.r, 0, Math.PI*2);
+tctx.clip();
+
+// малюємо лише те, що всередині кола
+const tmpInside = document.createElement('canvas');
+tmpInside.width = canvas.width;
+tmpInside.height = canvas.height;
+const insideCtx = tmpInside.getContext('2d');
+drawLayerTo(insideCtx, layers.bg);
+drawLayerTo(insideCtx, layers.love);
+
+tctx.drawImage(tmpInside, 0, 0);
+tctx.restore();
+
 
     // переносимо tmp на основний canvas і зверху малюємо сам шаблон
     ctx.drawImage(tmp, 0, 0);
@@ -278,7 +292,48 @@ downloadBtn.addEventListener('click', () => {
 });
 
 // коли шаблон завантажиться, перемалюємо
-template.onload = () => { drawAll(); };
+template.onload = function(){
+  // малюємо шаблон у приховане полотно
+  let tempCanvas = document.createElement("canvas");
+  tempCanvas.width = canvas.width;
+  tempCanvas.height = canvas.height;
+  let tctx = tempCanvas.getContext("2d");
+  tctx.drawImage(template, 0, 0, canvas.width, canvas.height);
+
+  let imgData = tctx.getImageData(0, 0, canvas.width, canvas.height);
+  let data = imgData.data;
+
+  let xs = [], ys = [];
+  for(let y=0; y<canvas.height; y++){
+    for(let x=0; x<canvas.width; x++){
+      let alpha = data[(y*canvas.width + x)*4 + 3]; // альфа-канал
+      if(alpha < 50){ // прозорий піксель
+        xs.push(x);
+        ys.push(y);
+      }
+    }
+  }
+
+  if(xs.length > 0){
+    // центр вирізу
+    let avgX = xs.reduce((a,b)=>a+b,0)/xs.length;
+    let avgY = ys.reduce((a,b)=>a+b,0)/ys.length;
+    mask.cx = avgX;
+    mask.cy = avgY;
+
+    // радіус
+    let maxDist = 0;
+    for(let i=0; i<xs.length; i++){
+      let dx = xs[i]-avgX, dy = ys[i]-avgY;
+      let dist = Math.sqrt(dx*dx + dy*dy);
+      if(dist > maxDist) maxDist = dist;
+    }
+    mask.r = maxDist;
+  }
+
+  drawAll();
+};
+
 
 // малюємо початковий стан
 applySnapshot(history[0] || makeSnapshot());
