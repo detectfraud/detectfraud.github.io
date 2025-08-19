@@ -213,8 +213,8 @@ function drawLove(ctxTarget, clip=false){
   ctxTarget.drawImage(layer.img, layer.x - w/2, layer.y - h/2, w, h);
   ctxTarget.restore();
 }
-/*
-// Малюємо фон з "діркою" 
+
+/* Малюємо фон з "діркою" */
 function drawBgWithHole(ctxTarget){
   if(!layers.bg.img) return;
 
@@ -241,7 +241,7 @@ function drawBgWithHole(ctxTarget){
   ctxTarget.drawImage(off, 0, 0);
 }
 
-//Загальне перемальовування 
+/* Загальне перемальовування */
 function drawAll(){
   ctx.clearRect(0,0,canvas.width,canvas.height);
   if(!previewMode){
@@ -253,7 +253,6 @@ function drawAll(){
   }
   if(template.complete) ctx.drawImage(template, 0, 0, canvas.width, canvas.height);
 }
-*/
 
 /* Перемикач кнопок Preview/Download */
 function toggleButtons(){
