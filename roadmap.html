@@ -24,8 +24,8 @@ canvas {
 
 <fieldset class="venwin" style="height:auto;">
   <center>
-    <center>  <span style="color:#990000;font-size:x-large;">Камінь любові</span><br><br>
-    <canvas id="canvas" width="900" height="600" style="border:1px solid #ccc;"></canvas>
+    <span style="color:#990000;font-size:x-large;">Камінь любові</span><br><br>
+    <canvas id="canvas" width="900" height="600"></canvas>
     <br><br>
     <label>Фон:&nbsp;&nbsp;<input type="file" id="bgLoader" accept="image/*"></label>
     <label>Фото закоханих:&nbsp;&nbsp;<input type="file" id="loveLoader" accept="image/*"></label>
@@ -40,10 +40,8 @@ canvas {
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
-let background = null;
-let love = null;
 let template = new Image();
-template.src = "images/LoveStone.png"; // твій шаблон PNG з прозорістю
+template.src = "images/LoveStone.png"; // PNG з прозорістю
 
 let layers = {
   bg: { img: null, x: 0, y: 0, scale: 1 },
@@ -61,11 +59,9 @@ let history = [];
 // завантаження з input
 document.getElementById("bgLoader").addEventListener("change", e => {
   loadImage(e.target.files[0], img => {
-    layers.bg.img = img;
-    layers.bg.x = canvas.width/2;
-    layers.bg.y = canvas.height/2;
-    layers.bg.scale = 1;
+    layers.bg = { img, x: canvas.width/2, y: canvas.height/2, scale: 1 };
     activeLayer = "bg";
+    document.getElementById("scaleSlider").value = 1; // скидання слайдера
     saveState();
     drawAll();
   });
@@ -73,11 +69,9 @@ document.getElementById("bgLoader").addEventListener("change", e => {
 
 document.getElementById("loveLoader").addEventListener("change", e => {
   loadImage(e.target.files[0], img => {
-    layers.love.img = img;
-    layers.love.x = canvas.width/2;
-    layers.love.y = canvas.height/2;
-    layers.love.scale = 1;
+    layers.love = { img, x: canvas.width/2, y: canvas.height/2, scale: 1 };
     activeLayer = "love";
+    document.getElementById("scaleSlider").value = 1; // скидання слайдера
     saveState();
     drawAll();
   });
@@ -164,8 +158,20 @@ document.getElementById("undoBtn").addEventListener("click", () => {
 // малювання всіх шарів
 function drawAll() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // маска кругом (по центру)
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(canvas.width/2, canvas.height/2, 250, 0, Math.PI*2, true); // радіус 250px
+  ctx.closePath();
+  ctx.clip();
+
   if (layers.bg.img) drawLayer(layers.bg);
   if (layers.love.img) drawLayer(layers.love);
+
+  ctx.restore();
+
+  // шаблон зверху
   ctx.drawImage(template, 0, 0, canvas.width, canvas.height);
 }
 
@@ -179,13 +185,13 @@ function drawLayer(layer) {
 function saveState() {
   history.push(JSON.parse(JSON.stringify(layers)));
 }
-    downloadBtn.addEventListener('click', () => {
-      const link = document.createElement('a');
-      link.download = 'composition.png';
-      link.href = canvas.toDataURL('image/png');
-      link.click();
-    });
 
+document.getElementById("downloadBtn").addEventListener("click", () => {
+  const link = document.createElement('a');
+  link.download = 'composition.png';
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+});
 </script>
 </body>
 </html>
