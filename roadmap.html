@@ -118,51 +118,49 @@ function applySnapshot(snapshot){
 // Ініціалізація: зберігаємо початковий стан
 pushHistory();
 
-// Відмалювання шару у вигляді кола
+// Малюємо шар без обрізки (завжди прямокутник)
 function drawLayerTo(ctxTarget, layer){
   if(!layer || !layer.img) return;
   const w = layer.img.width * layer.scale;
   const h = layer.img.height * layer.scale;
-  const r = Math.min(w, h) / 2;
-
-  ctxTarget.save();
-  ctxTarget.beginPath();
-  ctxTarget.arc(layer.x, layer.y, r, 0, Math.PI * 2);
-  ctxTarget.closePath();
-  ctxTarget.clip();
   ctxTarget.drawImage(layer.img, layer.x - w/2, layer.y - h/2, w, h);
-  ctxTarget.restore();
 }
 
-
+// Повна перемальовка сцени
 function drawAll(){
   ctx.clearRect(0,0,canvas.width,canvas.height);
 
   if(previewMode){
-    // робимо тимчасовий canvas, куди малюємо шари, потім вирізаємо шаблоном (залишаємо тільки прозору частину шаблону)
+    // створюємо тимчасове полотно
     const tmp = document.createElement('canvas');
-    tmp.width = canvas.width; tmp.height = canvas.height;
+    tmp.width = canvas.width; 
+    tmp.height = canvas.height;
     const tctx = tmp.getContext('2d');
 
-    // малюємо шари на tmp (bg під love)
+    // малюємо фото
     drawLayerTo(tctx, layers.bg);
     drawLayerTo(tctx, layers.love);
 
-    // видаляємо ту частину, де шаблон непрозорий — тобто залишаємо тільки частину, де шаблон прозорий (виріз)
+    // вирізаємо прозору частину шаблону (маска)
     tctx.globalCompositeOperation = 'destination-out';
     tctx.drawImage(template, 0, 0, tmp.width, tmp.height);
     tctx.globalCompositeOperation = 'source-over';
 
-    // переносимо tmp на основний canvas і зверху малюємо сам шаблон
+    // переносимо результат на головний canvas
     ctx.drawImage(tmp, 0, 0);
+
+    // малюємо шаблон поверх
     ctx.drawImage(template, 0, 0, canvas.width, canvas.height);
   } else {
-    // нормальний режим — малюємо просто шари і шаблон зверху
+    // звичайний режим (редагування)
     drawLayerTo(ctx, layers.bg);
     drawLayerTo(ctx, layers.love);
-    if(template.complete) ctx.drawImage(template, 0, 0, canvas.width, canvas.height);
+    if(template.complete) {
+      ctx.drawImage(template, 0, 0, canvas.width, canvas.height);
+    }
   }
 }
+
 
 function toggleButtons(){
   if(previewMode){
