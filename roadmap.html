@@ -283,18 +283,31 @@ template.onload = () => { drawAll(); };
 // малюємо початковий стан
 applySnapshot(history[0] || makeSnapshot());
 
-//
+// функція блокування / розблокування
 function setDisabled(state) {
-  // беремо всі елементи управління, крім самих картинок
+  // беремо всі елементи управління, крім завантаження фото та фону
   const controls = document.querySelectorAll("button, input:not(#background):not(#love), #scaleSlider");
+
   controls.forEach(ctrl => {
     if (state) {
+      ctrl.disabled = true;
       ctrl.classList.add("disabled");
     } else {
+      ctrl.disabled = false;
       ctrl.classList.remove("disabled");
     }
   });
 }
+
+// Прив’язка кнопки "Перегляд"
+document.getElementById("previewBtn").addEventListener("click", () => {
+  setDisabled(true);
+});
+
+// Прив’язка кнопки "Undo"
+document.getElementById("undoBtn").addEventListener("click", () => {
+  setDisabled(false);
+});
 </script>
 </body>
 </html>
