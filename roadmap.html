@@ -118,13 +118,22 @@ function applySnapshot(snapshot){
 // Ініціалізація: зберігаємо початковий стан
 pushHistory();
 
-// Відмалювання шару у вказаний контекст
+// Відмалювання шару у вигляді кола
 function drawLayerTo(ctxTarget, layer){
   if(!layer || !layer.img) return;
   const w = layer.img.width * layer.scale;
   const h = layer.img.height * layer.scale;
+  const r = Math.min(w, h) / 2;
+
+  ctxTarget.save();
+  ctxTarget.beginPath();
+  ctxTarget.arc(layer.x, layer.y, r, 0, Math.PI * 2);
+  ctxTarget.closePath();
+  ctxTarget.clip();
   ctxTarget.drawImage(layer.img, layer.x - w/2, layer.y - h/2, w, h);
+  ctxTarget.restore();
 }
+
 
 function drawAll(){
   ctx.clearRect(0,0,canvas.width,canvas.height);
