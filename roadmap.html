@@ -286,7 +286,7 @@ applySnapshot(history[0] || makeSnapshot());
 // функція блокування / розблокування
 function setDisabled(state) {
   // беремо всі елементи управління, крім завантаження фото та фону
-  const controls = document.querySelectorAll("button, input:not(#background):not(#love), #scaleSlider");
+  const controls = document.querySelectorAll("input:not(#background):not(#love), #scaleSlider");
 
   controls.forEach(ctrl => {
     if (state) {
