@@ -44,16 +44,16 @@ const downloadBtn = document.getElementById('downloadBtn');
 const template = new Image();
 template.src = 'images/LoveStone.png';
 
-// модель шарів: зберігаємо img (Image) і dataURL у src для історії
+// моделі шарів
 let layers = {
   bg: { img: null, src: null, x: canvas.width/2, y: canvas.height/2, scale: 1 },
   love: { img: null, src: null, x: canvas.width/2, y: canvas.height/2, scale: 1 }
 };
 
-let activeLayer = null; // 'bg' або 'love'
+let activeLayer = null;
 let previewMode = false;
 
-// історія: масив снэпшотів { bg:{src,x,y,scale}, love:{...}, previewMode, activeLayer }
+// історія
 const history = [];
 const MAX_HISTORY = 20;
 
@@ -72,7 +72,6 @@ function pushHistory(){
 }
 
 function applySnapshot(snapshot){
-  // прочитати джерела і встановити layers; повертаємо Promise, коли картинки підвантажаться
   previewMode = !!snapshot.previewMode;
   activeLayer = snapshot.activeLayer || null;
   const jobs = [];
@@ -80,9 +79,8 @@ function applySnapshot(snapshot){
   ['bg','love'].forEach(key => {
     const s = snapshot[key];
     if(s && s.src){
-      // потрібно завантажити картинку
       const img = new Image();
-      const p = new Promise((res) => {
+      const p = new Promise(res => {
         img.onload = () => {
           layers[key].img = img;
           layers[key].src = s.src;
@@ -91,16 +89,11 @@ function applySnapshot(snapshot){
           layers[key].scale = s.scale;
           res();
         };
-        img.onerror = () => {
-          layers[key].img = null;
-          layers[key].src = null;
-          res();
-        };
+        img.onerror = () => { layers[key].img = null; layers[key].src = null; res(); };
       });
       img.src = s.src;
       jobs.push(p);
     } else {
-      // немає картинки в снэпшоті
       layers[key].img = null;
       layers[key].src = null;
       layers[key].x = s ? s.x : canvas.width/2;
@@ -115,10 +108,7 @@ function applySnapshot(snapshot){
   return Promise.resolve();
 }
 
-// Ініціалізація: зберігаємо початковий стан
-pushHistory();
-
-// Малюємо шар без обрізки (завжди прямокутник)
+// Відмалювання шару
 function drawLayerTo(ctxTarget, layer){
   if(!layer || !layer.img) return;
   const w = layer.img.width * layer.scale;
@@ -126,71 +116,75 @@ function drawLayerTo(ctxTarget, layer){
   ctxTarget.drawImage(layer.img, layer.x - w/2, layer.y - h/2, w, h);
 }
 
-// Повна перемальовка сцени
+// малюємо всі шари
 function drawAll(){
-  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   if(previewMode){
-    // створюємо тимчасове полотно
     const tmp = document.createElement('canvas');
-    tmp.width = canvas.width; 
-    tmp.height = canvas.height;
+    tmp.width = canvas.width; tmp.height = canvas.height;
     const tctx = tmp.getContext('2d');
 
-    // малюємо фото
-    drawLayerTo(tctx, layers.bg);
-    drawLayerTo(tctx, layers.love);
+    // малюємо фон
+    if(layers.bg.img){
+      tctx.save();
+      const r = Math.min(canvas.width, canvas.height) / 2;
+      tctx.beginPath();
+      tctx.arc(layers.bg.x, layers.bg.y, r, 0, Math.PI*2);
+      tctx.clip();
+      const w = layers.bg.img.width * layers.bg.scale;
+      const h = layers.bg.img.height * layers.bg.scale;
+      tctx.drawImage(layers.bg.img, layers.bg.x - w/2, layers.bg.y - h/2, w, h);
+      tctx.restore();
+    }
 
-    // вирізаємо прозору частину шаблону (маска)
-    tctx.globalCompositeOperation = 'destination-out';
-    tctx.drawImage(template, 0, 0, tmp.width, tmp.height);
-    tctx.globalCompositeOperation = 'source-over';
+    // малюємо love
+    if(layers.love.img){
+      tctx.save();
+      const r = Math.min(canvas.width, canvas.height) / 2;
+      tctx.beginPath();
+      tctx.arc(layers.love.x, layers.love.y, r, 0, Math.PI*2);
+      tctx.clip();
+      const w = layers.love.img.width * layers.love.scale;
+      const h = layers.love.img.height * layers.love.scale;
+      tctx.drawImage(layers.love.img, layers.love.x - w/2, layers.love.y - h/2, w, h);
+      tctx.restore();
+    }
 
-    // переносимо результат на головний canvas
+    // переносимо на основний canvas
     ctx.drawImage(tmp, 0, 0);
+    if(template.complete) ctx.drawImage(template, 0, 0, canvas.width, canvas.height);
 
-    // малюємо шаблон поверх
-    ctx.drawImage(template, 0, 0, canvas.width, canvas.height);
   } else {
-    // звичайний режим (редагування)
     drawLayerTo(ctx, layers.bg);
     drawLayerTo(ctx, layers.love);
-    if(template.complete) {
-      ctx.drawImage(template, 0, 0, canvas.width, canvas.height);
-    }
+    if(template.complete) ctx.drawImage(template, 0, 0, canvas.width, canvas.height);
   }
 }
 
-
+// Кнопки та слайдер
 function toggleButtons(){
-  if(previewMode){
-    previewBtn.style.display = 'none';
-    downloadBtn.style.display = 'inline-block';
-  } else {
-    previewBtn.style.display = 'inline-block';
-    downloadBtn.style.display = 'none';
-  }
+  previewBtn.style.display = previewMode ? 'none' : 'inline-block';
+  downloadBtn.style.display = previewMode ? 'inline-block' : 'none';
 }
 
-// Завантаження файлу у шар
 function handleFileLoad(file, key){
   if(!file) return;
   const reader = new FileReader();
   reader.onload = e => {
-    const data = e.target.result;
     const img = new Image();
     img.onload = () => {
       layers[key].img = img;
-      layers[key].src = data;
+      layers[key].src = e.target.result;
       layers[key].x = canvas.width/2;
       layers[key].y = canvas.height/2;
       layers[key].scale = 1;
       activeLayer = key;
-      scaleSlider.value = 1; // скидання повзунка при виборі нового фото
+      scaleSlider.value = 1;
       pushHistory();
       drawAll();
     };
-    img.src = data;
+    img.src = e.target.result;
   };
   reader.readAsDataURL(file);
 }
@@ -198,18 +192,15 @@ function handleFileLoad(file, key){
 bgLoader.addEventListener('change', e => handleFileLoad(e.target.files[0], 'bg'));
 loveLoader.addEventListener('change', e => handleFileLoad(e.target.files[0], 'love'));
 
-// Слайдер: live-preview під час руху, запис у історію при відпусканні (change)
 scaleSlider.addEventListener('input', () => {
   if(!activeLayer) return;
   layers[activeLayer].scale = parseFloat(scaleSlider.value);
   drawAll();
 });
-scaleSlider.addEventListener('change', () => {
-  if(!activeLayer) return; pushHistory();
-});
+scaleSlider.addEventListener('change', () => { if(!activeLayer) return; pushHistory(); });
 
-// Drag (мішка)
-let dragging = false; let dragStartX = 0; let dragStartY = 0;
+// Drag & Touch
+let dragging = false, dragStartX = 0, dragStartY = 0;
 canvas.addEventListener('mousedown', e => {
   if(!activeLayer) return;
   dragging = true;
@@ -224,8 +215,6 @@ canvas.addEventListener('mousemove', e => {
 });
 canvas.addEventListener('mouseup', () => { if(dragging){ dragging=false; pushHistory(); } });
 canvas.addEventListener('mouseleave', () => { if(dragging){ dragging=false; pushHistory(); } });
-
-// Touch support
 canvas.addEventListener('touchstart', e => {
   if(!activeLayer) return;
   const t = e.touches[0];
@@ -245,15 +234,14 @@ canvas.addEventListener('touchmove', e => {
 });
 canvas.addEventListener('touchend', () => { if(dragging){ dragging=false; pushHistory(); } });
 
-// Undo: вертаємося до попереднього snapshot (по кроку)
+// Undo
 undoBtn.addEventListener('click', () => {
-  if(history.length <= 1) return; // нічого скасовувати
-  history.pop(); // видаляємо поточний стан
-  const prev = history[history.length-1];
-  applySnapshot(prev);
+  if(history.length <= 1) return;
+  history.pop();
+  applySnapshot(history[history.length-1]);
 });
 
-// Preview: застосувати маску з шаблону (використовує прозорість шаблону як виріз)
+// Preview
 previewBtn.addEventListener('click', () => {
   previewMode = true;
   pushHistory();
@@ -261,7 +249,7 @@ previewBtn.addEventListener('click', () => {
   drawAll();
 });
 
-// Download: просто зберігаємо поточний canvas (включно з маскою, якщо previewMode)
+// Download
 downloadBtn.addEventListener('click', () => {
   const link = document.createElement('a');
   link.download = 'composition.png';
@@ -269,11 +257,9 @@ downloadBtn.addEventListener('click', () => {
   link.click();
 });
 
-// коли шаблон завантажиться, перемалюємо
 template.onload = () => { drawAll(); };
-
-// малюємо початковий стан
-applySnapshot(history[0] || makeSnapshot());
+pushHistory();
+applySnapshot(history[0]);
 </script>
 </body>
 </html>
