@@ -1,29 +1,59 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Roadmap — AIPolygraph</title>
-  <link rel="stylesheet" href="css/style.css" />
-</head>
-<body>
-  <!-- Components -->
-  <div id="lang-switch"></div>
-  <div id="header"></div>
-  <main>
-    <h2 style="color: #1b365d;text-align: center;">Roadmap</h2>
-    <section>
-      <h2>Project Milestones</h2>
-      <ul>
-        <li>✅ MVP Demo</li>
-        <li>🚧 Website Structure</li>
-        <li>🧠 GPT Integration</li>
-        <li>📲 Mobile Optimization</li>
-        <li>🏛 Presentation for Government Agencies</li>
-      </ul>
-    </section>
-  </main>  <div id="footer"></div>
-  <!-- Script loading -->
-  <script src="js/layout.js"></script>
-</body>
-</html>
+<canvas id="canvas" width="900" height="600"></canvas>
+<script>
+async function loadImage(src) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => resolve(img);
+    img.onerror = reject;
+    img.src = src;
+  });
+}
+
+async function findHole() {
+  const canvas = document.getElementById("canvas");
+  const ctx = canvas.getContext("2d");
+
+  // 1. Завантажуємо PNG-шаблон (з прозорою дірою)
+  const img = await loadImage("images/LoveStone.png");
+  ctx.drawImage(img, 0, 0);
+
+  // 2. Читаємо пікселі
+  const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  const data = imageData.data;
+
+  let minX = Infinity, minY = Infinity;
+  let maxX = -Infinity, maxY = -Infinity;
+
+  // 3. Перебір пікселів
+  for (let y = 0; y < canvas.height; y++) {
+    for (let x = 0; x < canvas.width; x++) {
+      let idx = (y * canvas.width + x) * 4;
+      let alpha = data[idx + 3]; // альфа-канал
+
+      if (alpha === 0) { // прозорий
+        if (x < minX) minX = x;
+        if (y < minY) minY = y;
+        if (x > maxX) maxX = x;
+        if (y > maxY) maxY = y;
+      }
+    }
+  }
+
+  // 4. Центр і радіус
+  let centerX = (minX + maxX) / 2;
+  let centerY = (minY + maxY) / 2;
+  let radius = Math.max(maxX - minX, maxY - minY) / 2;
+
+  console.log("Hole center:", centerX, centerY, "radius:", radius);
+
+  // 5. Малюємо червоне коло для перевірки
+  ctx.beginPath();
+  ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+  ctx.strokeStyle = "red";
+  ctx.lineWidth = 3;
+  ctx.stroke();
+}
+
+findHole();
+</script>
