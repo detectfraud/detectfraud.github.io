@@ -1,265 +1,199 @@
+
 <!DOCTYPE html>
 <html lang="uk">
 <head>
 <meta charset="UTF-8">
-<title>Камінь любові — редактор</title>
+<title>Камінь любові</title>
 <style>
-  body { text-align:center; font-family:sans-serif; }
-  .venwin { background: #fff; border-radius:10px; padding:10px; display:inline-block; }
-  canvas { border:3px solid #bbb; border-radius:6px; box-shadow:0 6px 18px rgba(0,0,0,.1); display:block; margin:10px auto; }
-  #controls{ margin-top:10px; display:flex; gap:10px; align-items:center; justify-content:center; flex-wrap:wrap; }
-  #scaleSlider{ width:420px; }
-  button{ padding:8px 12px; }
+body { text-align:center; font-family:sans-serif; }
+.venwin {
+  background: #fff;
+  border-radius:10px;
+  padding:10px;
+  display:inline-block;
+}
+canvas {
+  border:3px solid #bbb;
+  border-radius:3%;
+  box-shadow:0 6px 18px rgba(0,0,0,.1);
+  display:block;
+  margin:10px auto;
+}
 </style>
 </head>
 <body>
 
 <fieldset class="venwin" style="height:auto;">
   <center>
-    <span style="color:#990000;font-size:x-large;">Камінь любові</span><br><br>
+    <center>  <span style="color:#990000;font-size:x-large;">Камінь любові</span><br><br>
     <canvas id="canvas" width="900" height="600" style="border:1px solid #ccc;"></canvas>
-
-    <div id="controls">
-      <label>Фон: <input type="file" id="bgLoader" accept="image/*"></label>
-      <label>Фото закоханих: <input type="file" id="loveLoader" accept="image/*"></label>
-      <input type="range" id="scaleSlider" min="0.1" max="3" step="0.01" value="1">
-      <button id="undoBtn">⟲ Undo</button>
-      <button id="previewBtn">👁 Перегляд</button>
-      <button id="downloadBtn" style="display:none;">📥 Завантажити</button>
-    </div>
+    <br><br>
+    <label>Фон:&nbsp;&nbsp;<input type="file" id="bgLoader" accept="image/*"></label>
+    <label>Фото закоханих:&nbsp;&nbsp;<input type="file" id="loveLoader" accept="image/*"></label>
+    <br><br>
+    <input type="range" id="scaleSlider" min="0.1" max="3" step="0.01" value="1" style="width:400px;">
+    <br><br>
+    <button id="undoBtn">⟲ Undo</button>&nbsp;&nbsp;&nbsp;&nbsp;<button id="downloadBtn">📥 Завантажити</button>
   </center>
 </fieldset>
 
 <script>
-const canvas = document.getElementById('canvas');
-const ctx = canvas.getContext('2d');
-const bgLoader = document.getElementById('bgLoader');
-const loveLoader = document.getElementById('loveLoader');
-const scaleSlider = document.getElementById('scaleSlider');
-const undoBtn = document.getElementById('undoBtn');
-const previewBtn = document.getElementById('previewBtn');
-const downloadBtn = document.getElementById('downloadBtn');
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
 
-// шаблон (поверх)
-const template = new Image();
-template.src = 'images/LoveStone.png';
+let background = null;
+let love = null;
+let template = new Image();
+template.src = "images/LoveStone.png"; // твій шаблон PNG з прозорістю
 
-// моделі шарів
 let layers = {
-  bg: { img: null, src: null, x: canvas.width/2, y: canvas.height/2, scale: 1 },
-  love: { img: null, src: null, x: canvas.width/2, y: canvas.height/2, scale: 1 }
+  bg: { img: null, x: 0, y: 0, scale: 1 },
+  love: { img: null, x: 0, y: 0, scale: 1 }
 };
 
 let activeLayer = null;
-let previewMode = false;
+let isDragging = false;
+let dragOffsetX = 0;
+let dragOffsetY = 0;
 
-// історія
-const history = [];
-const MAX_HISTORY = 20;
+// історія для Undo
+let history = [];
 
-function makeSnapshot(){
-  return {
-    bg: { src: layers.bg.src, x: layers.bg.x, y: layers.bg.y, scale: layers.bg.scale },
-    love: { src: layers.love.src, x: layers.love.x, y: layers.love.y, scale: layers.love.scale },
-    previewMode: previewMode,
-    activeLayer: activeLayer
-  };
-}
-
-function pushHistory(){
-  history.push(makeSnapshot());
-  if(history.length > MAX_HISTORY) history.shift();
-}
-
-function applySnapshot(snapshot){
-  previewMode = !!snapshot.previewMode;
-  activeLayer = snapshot.activeLayer || null;
-  const jobs = [];
-
-  ['bg','love'].forEach(key => {
-    const s = snapshot[key];
-    if(s && s.src){
-      const img = new Image();
-      const p = new Promise(res => {
-        img.onload = () => {
-          layers[key].img = img;
-          layers[key].src = s.src;
-          layers[key].x = s.x;
-          layers[key].y = s.y;
-          layers[key].scale = s.scale;
-          res();
-        };
-        img.onerror = () => { layers[key].img = null; layers[key].src = null; res(); };
-      });
-      img.src = s.src;
-      jobs.push(p);
-    } else {
-      layers[key].img = null;
-      layers[key].src = null;
-      layers[key].x = s ? s.x : canvas.width/2;
-      layers[key].y = s ? s.y : canvas.height/2;
-      layers[key].scale = s ? s.scale : 1;
-    }
+// завантаження з input
+document.getElementById("bgLoader").addEventListener("change", e => {
+  loadImage(e.target.files[0], img => {
+    layers.bg.img = img;
+    layers.bg.x = canvas.width/2;
+    layers.bg.y = canvas.height/2;
+    layers.bg.scale = 1;
+    activeLayer = "bg";
+    saveState();
+    drawAll();
   });
+});
 
-  toggleButtons();
-  if(jobs.length) return Promise.all(jobs).then(drawAll);
-  drawAll();
-  return Promise.resolve();
-}
+document.getElementById("loveLoader").addEventListener("change", e => {
+  loadImage(e.target.files[0], img => {
+    layers.love.img = img;
+    layers.love.x = canvas.width/2;
+    layers.love.y = canvas.height/2;
+    layers.love.scale = 1;
+    activeLayer = "love";
+    saveState();
+    drawAll();
+  });
+});
 
-// Відмалювання шару
-function drawLayerTo(ctxTarget, layer){
-  if(!layer || !layer.img) return;
-  const w = layer.img.width * layer.scale;
-  const h = layer.img.height * layer.scale;
-  ctxTarget.drawImage(layer.img, layer.x - w/2, layer.y - h/2, w, h);
-}
-
-// малюємо всі шари
-function drawAll(){
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-  if(previewMode){
-    const tmp = document.createElement('canvas');
-    tmp.width = canvas.width; tmp.height = canvas.height;
-    const tctx = tmp.getContext('2d');
-
-    // малюємо фон
-    if(layers.bg.img){
-      tctx.save();
-      const r = Math.min(canvas.width, canvas.height) / 2;
-      tctx.beginPath();
-      tctx.arc(layers.bg.x, layers.bg.y, r, 0, Math.PI*2);
-      tctx.clip();
-      const w = layers.bg.img.width * layers.bg.scale;
-      const h = layers.bg.img.height * layers.bg.scale;
-      tctx.drawImage(layers.bg.img, layers.bg.x - w/2, layers.bg.y - h/2, w, h);
-      tctx.restore();
-    }
-
-    // малюємо love
-    if(layers.love.img){
-      tctx.save();
-      const r = Math.min(canvas.width, canvas.height) / 2;
-      tctx.beginPath();
-      tctx.arc(layers.love.x, layers.love.y, r, 0, Math.PI*2);
-      tctx.clip();
-      const w = layers.love.img.width * layers.love.scale;
-      const h = layers.love.img.height * layers.love.scale;
-      tctx.drawImage(layers.love.img, layers.love.x - w/2, layers.love.y - h/2, w, h);
-      tctx.restore();
-    }
-
-    // переносимо на основний canvas
-    ctx.drawImage(tmp, 0, 0);
-    if(template.complete) ctx.drawImage(template, 0, 0, canvas.width, canvas.height);
-
-  } else {
-    drawLayerTo(ctx, layers.bg);
-    drawLayerTo(ctx, layers.love);
-    if(template.complete) ctx.drawImage(template, 0, 0, canvas.width, canvas.height);
-  }
-}
-
-// Кнопки та слайдер
-function toggleButtons(){
-  previewBtn.style.display = previewMode ? 'none' : 'inline-block';
-  downloadBtn.style.display = previewMode ? 'inline-block' : 'none';
-}
-
-function handleFileLoad(file, key){
-  if(!file) return;
+function loadImage(file, callback) {
   const reader = new FileReader();
   reader.onload = e => {
     const img = new Image();
-    img.onload = () => {
-      layers[key].img = img;
-      layers[key].src = e.target.result;
-      layers[key].x = canvas.width/2;
-      layers[key].y = canvas.height/2;
-      layers[key].scale = 1;
-      activeLayer = key;
-      scaleSlider.value = 1;
-      pushHistory();
-      drawAll();
-    };
+    img.onload = () => callback(img);
     img.src = e.target.result;
   };
   reader.readAsDataURL(file);
 }
 
-bgLoader.addEventListener('change', e => handleFileLoad(e.target.files[0], 'bg'));
-loveLoader.addEventListener('change', e => handleFileLoad(e.target.files[0], 'love'));
-
-scaleSlider.addEventListener('input', () => {
-  if(!activeLayer) return;
-  layers[activeLayer].scale = parseFloat(scaleSlider.value);
+// слайдер масштабу
+document.getElementById("scaleSlider").addEventListener("input", e => {
+  if (!activeLayer) return;
+  layers[activeLayer].scale = parseFloat(e.target.value);
+  saveState();
   drawAll();
 });
-scaleSlider.addEventListener('change', () => { if(!activeLayer) return; pushHistory(); });
 
-// Drag & Touch
-let dragging = false, dragStartX = 0, dragStartY = 0;
-canvas.addEventListener('mousedown', e => {
-  if(!activeLayer) return;
-  dragging = true;
-  dragStartX = e.offsetX - layers[activeLayer].x;
-  dragStartY = e.offsetY - layers[activeLayer].y;
+// drag мишкою
+canvas.addEventListener("mousedown", e => {
+  if (!activeLayer) return;
+  isDragging = true;
+  dragOffsetX = e.offsetX - layers[activeLayer].x;
+  dragOffsetY = e.offsetY - layers[activeLayer].y;
 });
-canvas.addEventListener('mousemove', e => {
-  if(!dragging || !activeLayer) return;
-  layers[activeLayer].x = e.offsetX - dragStartX;
-  layers[activeLayer].y = e.offsetY - dragStartY;
+
+canvas.addEventListener("mousemove", e => {
+  if (!isDragging || !activeLayer) return;
+  layers[activeLayer].x = e.offsetX - dragOffsetX;
+  layers[activeLayer].y = e.offsetY - dragOffsetY;
   drawAll();
 });
-canvas.addEventListener('mouseup', () => { if(dragging){ dragging=false; pushHistory(); } });
-canvas.addEventListener('mouseleave', () => { if(dragging){ dragging=false; pushHistory(); } });
-canvas.addEventListener('touchstart', e => {
-  if(!activeLayer) return;
-  const t = e.touches[0];
-  const rect = canvas.getBoundingClientRect();
-  dragging = true;
-  dragStartX = t.clientX - rect.left - layers[activeLayer].x;
-  dragStartY = t.clientY - rect.top - layers[activeLayer].y;
-  e.preventDefault();
+
+canvas.addEventListener("mouseup", () => {
+  if (isDragging) {
+    isDragging = false;
+    saveState();
+  }
 });
-canvas.addEventListener('touchmove', e => {
-  if(!dragging || !activeLayer) return;
-  const t = e.touches[0];
+
+// тач підтримка
+canvas.addEventListener("touchstart", e => {
+  if (!activeLayer) return;
+  const touch = e.touches[0];
   const rect = canvas.getBoundingClientRect();
-  layers[activeLayer].x = t.clientX - rect.left - dragStartX;
-  layers[activeLayer].y = t.clientY - rect.top - dragStartY;
-  drawAll(); e.preventDefault();
+  const x = touch.clientX - rect.left;
+  const y = touch.clientY - rect.top;
+  isDragging = true;
+  dragOffsetX = x - layers[activeLayer].x;
+  dragOffsetY = y - layers[activeLayer].y;
 });
-canvas.addEventListener('touchend', () => { if(dragging){ dragging=false; pushHistory(); } });
+
+canvas.addEventListener("touchmove", e => {
+  if (!isDragging || !activeLayer) return;
+  const touch = e.touches[0];
+  const rect = canvas.getBoundingClientRect();
+  layers[activeLayer].x = touch.clientX - rect.left - dragOffsetX;
+  layers[activeLayer].y = touch.clientY - rect.top - dragOffsetY;
+  drawAll();
+});
+
+canvas.addEventListener("touchend", () => {
+  if (isDragging) {
+    isDragging = false;
+    saveState();
+  }
+});
 
 // Undo
-undoBtn.addEventListener('click', () => {
-  if(history.length <= 1) return;
-  history.pop();
-  applySnapshot(history[history.length-1]);
+document.getElementById("undoBtn").addEventListener("click", () => {
+  if (history.length > 1) {
+    history.pop(); // видаляємо поточний стан
+    const prev = history[history.length-1];
+    layers = JSON.parse(JSON.stringify(prev));
+    drawAll();
+  }
 });
 
-// Preview
-previewBtn.addEventListener('click', () => {
-  previewMode = true;
-  pushHistory();
-  toggleButtons();
-  drawAll();
-});
+// малювання всіх шарів
+function drawAll() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  if (layers.bg.img) drawLayer(layers.bg);
+  if (layers.love.img) drawLayer(layers.love);
+  ctx.drawImage(template, 0, 0, canvas.width, canvas.height);
+}
 
-// Download
-downloadBtn.addEventListener('click', () => {
-  const link = document.createElement('a');
-  link.download = 'composition.png';
-  link.href = canvas.toDataURL('image/png');
-  link.click();
-});
+function drawLayer(layer) {
+  const w = layer.img.width * layer.scale;
+  const h = layer.img.height * layer.scale;
+  ctx.drawImage(layer.img, layer.x - w/2, layer.y - h/2, w, h);
+}
 
-template.onload = () => { drawAll(); };
-pushHistory();
-applySnapshot(history[0]);
+// збереження стану
+function saveState() {
+  history.push(JSON.parse(JSON.stringify(layers)));
+}
+    downloadBtn.addEventListener('click', () => {
+      const link = document.createElement('a');
+      link.download = 'composition.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    });
+
 </script>
 </body>
 </html>
+
+
+
+
+
+
+
