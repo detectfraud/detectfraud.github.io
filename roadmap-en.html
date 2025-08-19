@@ -4,9 +4,7 @@
     <meta charset="UTF-8">
     <title>Прозорий круг на зображенні</title>
     <style>
-        body {
-            background-color: #f0f0f0;
-        }
+       /* body { background-color: #f0f0f0; }*/
         canvas {
             border: 2px solid black;
         }
@@ -24,28 +22,28 @@
         const img = new Image();
 
         // Замініть на шлях до вашого зображення
-        img.src = 'images/priroda.jpg';
+        img.src = 'images/LoveStoneG.png';
 
         img.onload = () => {
             // Встановлюємо розміри Canvas як у зображення
-            canvas.width = 455;
-            canvas.height = 185;
+            canvas.width = img.width;
+            canvas.height = img.height;
 
             // Крок 1: Малюємо початкове зображення на Canvas
             ctx.drawImage(img, 0, 0);
 
             // Крок 2: Налаштовуємо параметри для кола
-            const centerX = canvas.width; // 2
-            const centerY = canvas.height; // 2
-            const radius = 195;
+            const centerX = (canvas.width / 2)+6;
+            const centerY = (canvas.height / 2)-115;
+            const radius = 98;
 
             // Крок 3: Створюємо прозорий ефект
-            ctx.globalCompositeOperation = 'destination-out';
+           // ctx.globalCompositeOperation = 'destination-out';
 
             // Крок 4: Малюємо коло, яке зробить область прозорою
             ctx.beginPath();
             ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
-            ctx.fillStyle = 'black'; // Колір не має значення, оскільки використовуємо 'destination-out'
+            ctx.fillStyle = 'red'; // Колір не має значення, оскільки використовуємо 'destination-out'
             ctx.fill();
             
             // За бажанням: скидаємо режим композиції
