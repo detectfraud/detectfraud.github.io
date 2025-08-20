@@ -1,29 +1,82 @@
 <!DOCTYPE html>
 <html lang="uk">
-  <!-- можна використовувати -->
 <head>
-<meta charset="UTF-8">
-<title>Камінь любові — редактор</title>
-<style>
-  body { text-align:center; font-family:sans-serif; }
-  .venwin { background: #fff; border-radius:10px; padding:10px; display:inline-block; }
-  canvas { border:3px solid #bbb; border-radius:6px; box-shadow:0 6px 18px rgba(0,0,0,.1); display:block; margin:10px auto; }
-  #controls{ margin-top:10px; display:flex; gap:10px; align-items:center; justify-content:center; flex-wrap:wrap; }
-  #scaleSlider{ width:420px; }
-  button{ padding:8px 12px; }
-</style>
-</head>
-<body>
+  <meta charset="UTF-8">
+  <title>Камінь любові — редактор</title>
 
+  <style>
+    /* Базові стилі сторінки */
+    body {
+      text-align:center;            /* Вирівнюємо все по центру */
+      font-family:sans-serif;       /* Простий шрифт */
+    }
+
+    /* Обгортка вікна */
+    .venwin {
+      background: #fff;             /* Білий фон */
+      border-radius:10px;           /* Закруглені кути */
+      padding:10px;
+      display:inline-block;         /* Щоб блок обтягував вміст */
+    }
+
+    /* Полотно для малювання */
+    canvas {
+      border:3px solid #bbb;        /* Сіра рамка */
+      border-radius:6px;            /* Легке закруглення */
+      box-shadow:0 6px 18px rgba(0,0,0,.1); /* Тінь */
+      display:block;
+      margin:10px auto;             /* Центруємо */
+    }
+
+    /* Контейнер з елементами управління */
+    #controls{
+      margin-top:10px;
+      display:flex;
+      gap:10px;
+      align-items:center;
+      justify-content:center;
+      flex-wrap:wrap;               /* Перенос рядків */
+    }
+
+    /* Повзунок масштабу */
+    #scaleSlider{
+      width:420px;
+    }
+
+    /* Кнопки */
+    button{
+      padding:8px 12px;
+    }
+
+    /* Дизабл режим */
+    .disabled {
+      pointer-events: none;         /* Блокує кліки */
+      opacity: 0.5;                 /* Робить напівпрозорим */
+      filter: grayscale(100%);      /* Чорно-білий вигляд */
+    }
+  </style>
+</head>
+
+<body>
 <fieldset class="venwin" style="height:auto;">
   <center>
     <span style="color:#990000;font-size:x-large;">Камінь любові</span><br><br>
+
+    <!-- Полотно для малювання -->
     <canvas id="canvas" width="900" height="600" style="border:1px solid #ccc;"></canvas>
 
+    <!-- Панель управління -->
     <div id="controls">
-      <label>Фон: <input type="file" id="bgLoader" accept="image/*"></label>
-      <label>Фото закоханих: <input type="file" id="loveLoader" accept="image/*"></label>
-      <input type="range" id="scaleSlider" min="0.1" max="3" step="0.01" value="1">
+      <!-- Завантаження фону -->
+      <label>Фон: <input type="file" id="bgLoader" accept="image/*"></label><br>
+
+      <!-- Завантаження фото закоханих -->
+      <label>Фото закоханих: <input type="file" id="loveLoader" accept="image/*"></label><br>
+
+      <!-- Повзунок масштабу -->
+      <input type="range" id="scaleSlider" min="0.1" max="3" step="0.01" value="1"><br><br>
+
+      <!-- Кнопки -->
       <button id="undoBtn">⟲ Undo</button>
       <button id="previewBtn">👁 Перегляд</button>
       <button id="downloadBtn" style="display:none;">📥 Завантажити</button>
@@ -32,56 +85,76 @@
 </fieldset>
 
 <script>
+/* === ПІДГОТОВКА CANVAS та ЕЛЕМЕНТІВ === */
 const canvas = document.getElementById('canvas');
-const ctx = canvas.getContext('2d');
-const bgLoader = document.getElementById('bgLoader');
-const loveLoader = document.getElementById('loveLoader');
-const scaleSlider = document.getElementById('scaleSlider');
-const undoBtn = document.getElementById('undoBtn');
-const previewBtn = document.getElementById('previewBtn');
-const downloadBtn = document.getElementById('downloadBtn');
+const ctx = canvas.getContext('2d');     // контекст малювання
 
-// шаблон (поверх)
+const bgLoader = document.getElementById('bgLoader');       // завантажувач фону
+const loveLoader = document.getElementById('loveLoader');   // завантажувач love-фото
+const scaleSlider = document.getElementById('scaleSlider'); // повзунок масштабу
+const undoBtn = document.getElementById('undoBtn');         // кнопка Undo
+const previewBtn = document.getElementById('previewBtn');   // кнопка перегляду
+const downloadBtn = document.getElementById('downloadBtn'); // кнопка завантаження
+
+/* Об’єкт маски (вирізане коло) */
+let mask = { cx: 0, cy: 0, r: 0 };
+
+/* прапорець: чи активна дірка у фоні */
+let bgHoleActive = false;
+
+/* Змінні для drag&drop */
+let dragging = false, dragStartX = 0, dragStartY = 0;
+
+/* Шаблон-рамка поверх усього */
 const template = new Image();
 template.src = 'images/LoveStone.png';
 
-// моделі шарів
+/* Система шарів */
 let layers = {
-  bg: { img: null, src: null, x: canvas.width/2, y: canvas.height/2, scale: 1 },
+  bg:   { img: null, src: null, x: canvas.width/2, y: canvas.height/2, scale: 1 },
   love: { img: null, src: null, x: canvas.width/2, y: canvas.height/2, scale: 1 }
 };
 
-let activeLayer = null;
+/* Активний шар */
+let activeLayer = null; // 'bg' або 'love'
+
+/* Режим перегляду */
 let previewMode = false;
 
-// історія
+/* Історія змін (для Undo) */
 const history = [];
 const MAX_HISTORY = 20;
 
+/* Зробити "снепшот" поточного стану */
 function makeSnapshot(){
   return {
     bg: { src: layers.bg.src, x: layers.bg.x, y: layers.bg.y, scale: layers.bg.scale },
     love: { src: layers.love.src, x: layers.love.x, y: layers.love.y, scale: layers.love.scale },
     previewMode: previewMode,
-    activeLayer: activeLayer
+    activeLayer: activeLayer,
+    bgHoleActive: bgHoleActive
   };
 }
 
+/* Додати стан у історію */
 function pushHistory(){
   history.push(makeSnapshot());
-  if(history.length > MAX_HISTORY) history.shift();
+  if(history.length > MAX_HISTORY) history.shift(); // якщо забагато — стираємо старі
 }
 
+/* Відновити стан з історії */
 function applySnapshot(snapshot){
   previewMode = !!snapshot.previewMode;
   activeLayer = snapshot.activeLayer || null;
-  const jobs = [];
+  bgHoleActive = !!snapshot.bgHoleActive;
+
+  const jobs = []; // асинхронні завантаження зображень
 
   ['bg','love'].forEach(key => {
     const s = snapshot[key];
     if(s && s.src){
       const img = new Image();
-      const p = new Promise(res => {
+      const p = new Promise((res) => {
         img.onload = () => {
           layers[key].img = img;
           layers[key].src = s.src;
@@ -90,11 +163,16 @@ function applySnapshot(snapshot){
           layers[key].scale = s.scale;
           res();
         };
-        img.onerror = () => { layers[key].img = null; layers[key].src = null; res(); };
+        img.onerror = () => { // якщо картинка не завантажилась
+          layers[key].img = null;
+          layers[key].src = null;
+          res();
+        };
       });
       img.src = s.src;
       jobs.push(p);
     } else {
+      // якщо зображення відсутнє
       layers[key].img = null;
       layers[key].src = null;
       layers[key].x = s ? s.x : canvas.width/2;
@@ -109,7 +187,10 @@ function applySnapshot(snapshot){
   return Promise.resolve();
 }
 
-// Відмалювання шару
+/* Ініціалізація: зберігаємо стартовий стан */
+pushHistory();
+
+/* Функція малювання шару */
 function drawLayerTo(ctxTarget, layer){
   if(!layer || !layer.img) return;
   const w = layer.img.width * layer.scale;
@@ -117,66 +198,83 @@ function drawLayerTo(ctxTarget, layer){
   ctxTarget.drawImage(layer.img, layer.x - w/2, layer.y - h/2, w, h);
 }
 
-// малюємо всі шари
+/* Малюємо фото love з опцією clip по колу */
+function drawLove(ctxTarget, clip=false){
+  const layer = layers.love;
+  if(!layer || !layer.img) return;
+  const w = layer.img.width * layer.scale;
+  const h = layer.img.height * layer.scale;
+  ctxTarget.save();
+  if (clip && mask.r > 0){
+    ctxTarget.beginPath();
+    ctxTarget.arc(mask.cx, mask.cy, mask.r, 0, Math.PI*2);
+    ctxTarget.clip();
+  }
+  ctxTarget.drawImage(layer.img, layer.x - w/2, layer.y - h/2, w, h);
+  ctxTarget.restore();
+}
+
+/* Малюємо фон з "діркою" */
+function drawBgWithHole(ctxTarget){
+  if(!layers.bg.img) return;
+
+  if(!bgHoleActive || mask.r <= 0){
+    drawLayerTo(ctxTarget, layers.bg); // без дірки
+    return;
+  }
+
+  // малюємо у тимчасовий canvas
+  const off = document.createElement('canvas');
+  off.width = canvas.width;
+  off.height = canvas.height;
+  const octx = off.getContext('2d');
+
+  drawLayerTo(octx, layers.bg);
+
+  // пробиваємо круглу дірку
+  octx.globalCompositeOperation = 'destination-out';
+  octx.beginPath();
+  octx.arc(mask.cx, mask.cy, mask.r, 0, Math.PI*2);
+  octx.fill();
+  octx.globalCompositeOperation = 'source-over';
+
+  ctxTarget.drawImage(off, 0, 0);
+}
+
+/* Загальне перемальовування */
 function drawAll(){
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-  if(previewMode){
-    const tmp = document.createElement('canvas');
-    tmp.width = canvas.width; tmp.height = canvas.height;
-    const tctx = tmp.getContext('2d');
-
-    // малюємо фон
-    if(layers.bg.img){
-      tctx.save();
-      const r = Math.min(canvas.width, canvas.height) / 2;
-      tctx.beginPath();
-      tctx.arc(layers.bg.x, layers.bg.y, r, 0, Math.PI*2);
-      tctx.clip();
-      const w = layers.bg.img.width * layers.bg.scale;
-      const h = layers.bg.img.height * layers.bg.scale;
-      tctx.drawImage(layers.bg.img, layers.bg.x - w/2, layers.bg.y - h/2, w, h);
-      tctx.restore();
-    }
-
-    // малюємо love
-    if(layers.love.img){
-      tctx.save();
-      const r = Math.min(canvas.width, canvas.height) / 2;
-      tctx.beginPath();
-      tctx.arc(layers.love.x, layers.love.y, r, 0, Math.PI*2);
-      tctx.clip();
-      const w = layers.love.img.width * layers.love.scale;
-      const h = layers.love.img.height * layers.love.scale;
-      tctx.drawImage(layers.love.img, layers.love.x - w/2, layers.love.y - h/2, w, h);
-      tctx.restore();
-    }
-
-    // переносимо на основний canvas
-    ctx.drawImage(tmp, 0, 0);
-    if(template.complete) ctx.drawImage(template, 0, 0, canvas.width, canvas.height);
-
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  if(!previewMode){
+    drawBgWithHole(ctx);
+    drawLove(ctx, false);
   } else {
-    drawLayerTo(ctx, layers.bg);
-    drawLayerTo(ctx, layers.love);
-    if(template.complete) ctx.drawImage(template, 0, 0, canvas.width, canvas.height);
+    drawLove(ctx, true);
+    drawBgWithHole(ctx);
+  }
+  if(template.complete) ctx.drawImage(template, 0, 0, canvas.width, canvas.height);
+}
+
+/* Перемикач кнопок Preview/Download */
+function toggleButtons(){
+  if(previewMode){
+    previewBtn.style.display = 'none';
+    downloadBtn.style.display = 'inline-block';
+  } else {
+    previewBtn.style.display = 'inline-block';
+    downloadBtn.style.display = 'none';
   }
 }
 
-// Кнопки та слайдер
-function toggleButtons(){
-  previewBtn.style.display = previewMode ? 'none' : 'inline-block';
-  downloadBtn.style.display = previewMode ? 'inline-block' : 'none';
-}
-
+/* Завантаження картинки у шар */
 function handleFileLoad(file, key){
   if(!file) return;
   const reader = new FileReader();
   reader.onload = e => {
+    const data = e.target.result;
     const img = new Image();
     img.onload = () => {
       layers[key].img = img;
-      layers[key].src = e.target.result;
+      layers[key].src = data;
       layers[key].x = canvas.width/2;
       layers[key].y = canvas.height/2;
       layers[key].scale = 1;
@@ -185,39 +283,64 @@ function handleFileLoad(file, key){
       pushHistory();
       drawAll();
     };
-    img.src = e.target.result;
+    img.src = data;
   };
   reader.readAsDataURL(file);
 }
 
+/* Обробка завантаження ФОНУ */
 bgLoader.addEventListener('change', e => handleFileLoad(e.target.files[0], 'bg'));
-loveLoader.addEventListener('change', e => handleFileLoad(e.target.files[0], 'love'));
 
-scaleSlider.addEventListener('input', () => {
-  if(!activeLayer) return;
-  layers[activeLayer].scale = parseFloat(scaleSlider.value);
-  drawAll();
+/* Обробка завантаження LOVE */
+loveLoader.addEventListener('change', e => {
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    const data = ev.target.result;
+    const img = new Image();
+    img.onload = () => {
+      bgHoleActive = true; // вмикаємо виріз дірки
+      layers.love.img = img;
+      layers.love.src = data;
+      layers.love.x = canvas.width/2;
+      layers.love.y = canvas.height/2;
+      layers.love.scale = 1;
+      activeLayer = 'love';
+      scaleSlider.value = 1;
+      pushHistory();
+      drawAll();
+    };
+    img.src = data;
+  };
+  reader.readAsDataURL(file);
 });
-scaleSlider.addEventListener('change', () => { if(!activeLayer) return; pushHistory(); });
 
-// Drag & Touch
-let dragging = false, dragStartX = 0, dragStartY = 0;
+/* --- ДРАГ І DROP для пересування шару --- */
 canvas.addEventListener('mousedown', e => {
-  if(!activeLayer) return;
+  if(previewMode || !activeLayer) return;
   dragging = true;
   dragStartX = e.offsetX - layers[activeLayer].x;
   dragStartY = e.offsetY - layers[activeLayer].y;
 });
 canvas.addEventListener('mousemove', e => {
-  if(!dragging || !activeLayer) return;
+  if(previewMode || !dragging || !activeLayer) return;
   layers[activeLayer].x = e.offsetX - dragStartX;
   layers[activeLayer].y = e.offsetY - dragStartY;
   drawAll();
 });
-canvas.addEventListener('mouseup', () => { if(dragging){ dragging=false; pushHistory(); } });
-canvas.addEventListener('mouseleave', () => { if(dragging){ dragging=false; pushHistory(); } });
+canvas.addEventListener('mouseup', () => {
+  if(previewMode) return;
+  if(dragging){ dragging=false; pushHistory(); }
+});
+canvas.addEventListener('mouseleave', () => {
+  if(previewMode) return;
+  if(dragging){ dragging=false; pushHistory(); }
+});
+
+/* --- TOUCH підтримка --- */
 canvas.addEventListener('touchstart', e => {
-  if(!activeLayer) return;
+  if(previewMode || !activeLayer) return;
   const t = e.touches[0];
   const rect = canvas.getBoundingClientRect();
   dragging = true;
@@ -226,23 +349,28 @@ canvas.addEventListener('touchstart', e => {
   e.preventDefault();
 });
 canvas.addEventListener('touchmove', e => {
-  if(!dragging || !activeLayer) return;
+  if(previewMode || !dragging || !activeLayer) return;
   const t = e.touches[0];
   const rect = canvas.getBoundingClientRect();
   layers[activeLayer].x = t.clientX - rect.left - dragStartX;
   layers[activeLayer].y = t.clientY - rect.top - dragStartY;
-  drawAll(); e.preventDefault();
+  drawAll();
+  e.preventDefault();
 });
-canvas.addEventListener('touchend', () => { if(dragging){ dragging=false; pushHistory(); } });
+canvas.addEventListener('touchend', () => {
+  if(previewMode) return;
+  if(dragging){ dragging=false; pushHistory(); }
+});
 
-// Undo
+/* --- UNDO --- */
 undoBtn.addEventListener('click', () => {
   if(history.length <= 1) return;
-  history.pop();
-  applySnapshot(history[history.length-1]);
+  history.pop(); // видаляємо поточний
+  const prev = history[history.length-1];
+  applySnapshot(prev);
 });
 
-// Preview
+/* --- PREVIEW --- */
 previewBtn.addEventListener('click', () => {
   previewMode = true;
   pushHistory();
@@ -250,7 +378,7 @@ previewBtn.addEventListener('click', () => {
   drawAll();
 });
 
-// Download
+/* --- DOWNLOAD --- */
 downloadBtn.addEventListener('click', () => {
   const link = document.createElement('a');
   link.download = 'composition.png';
@@ -258,9 +386,105 @@ downloadBtn.addEventListener('click', () => {
   link.click();
 });
 
-template.onload = () => { drawAll(); };
-pushHistory();
-applySnapshot(history[0]);
+
+/*Коли шаблон завантажився — обчислюємо координати дірки */
+template.onload = function(){
+  let tempCanvas = document.createElement("canvas");
+  tempCanvas.width = canvas.width;
+  tempCanvas.height = canvas.height;
+  let tctx = tempCanvas.getContext("2d");
+  tctx.drawImage(template, 0, 0, canvas.width, canvas.height);
+
+  let imgData = tctx.getImageData(0, 0, canvas.width, canvas.height);
+  let data = imgData.data;
+
+  let xs = [], ys = [];
+
+  for(let y=0; y<canvas.height; y++){
+    for(let x=0; x<canvas.width; x++){
+      let alpha = data[(y*canvas.width + x)*4 + 3]; // альфа-канал
+      if(alpha < 50){ // якщо піксель прозорий
+        xs.push(x);
+        ys.push(y);
+      }
+    }
+  }
+
+  if(xs.length > 0){
+    // середина всіх прозорих точок
+    let avgX = xs.reduce((a,b)=>a+b,0)/xs.length;
+    let avgY = ys.reduce((a,b)=>a+b,0)/ys.length;
+    mask.cx = avgX;
+    mask.cy = avgY;
+
+    // максимальна відстань = радіус
+    let maxDist = 0;
+    for(let i=0; i<xs.length; i++){
+      let dx = xs[i]-avgX, dy = ys[i]-avgY;
+      let dist = Math.sqrt(dx*dx + dy*dy);
+      if(dist > maxDist) maxDist = dist;
+    }
+    mask.r = maxDist;
+  }
+
+  drawAll();
+};
+/* Стартове перемальовування */
+applySnapshot(history[0] || makeSnapshot());
+
+/* Блокування/розблокування елементів */
+function setDisabled(state) {
+  const controls = document.querySelectorAll("input:not(#background):not(#love), #scaleSlider");
+  controls.forEach(ctrl => {
+    if (state) {
+      ctrl.disabled = true;
+      ctrl.classList.add("disabled");
+    } else {
+      ctrl.disabled = false;
+      ctrl.classList.remove("disabled");
+    }
+  });
+}
+
+/* Прив’язка кнопок для блокування */
+document.getElementById("previewBtn").addEventListener("click", () => {
+  setDisabled(true);
+});
+document.getElementById("undoBtn").addEventListener("click", () => {
+  setDisabled(false);
+});
+//Виріз
+function roundWin() {
+        const canvas = document.getElementById('myCanvas');
+        const ictx = canvas.getContext('2d');
+        const img = new Image();
+
+        // Замініть на шлях до вашого зображення
+        img.src = 'images/LoveStone.png';
+
+        img.onload = () => {
+            // Встановлюємо розміри Canvas як у зображення
+            canvas.width = img.width;
+            canvas.height = img.height;
+
+            // Крок 1: Малюємо початкове зображення на Canvas
+            ictx.drawImage(img, 0, 0);
+
+            // Крок 2: Налаштовуємо параметри для кола
+            const centerX = (canvas.width / 2)+6;
+            const centerY = (canvas.height / 2)-115;
+            const radius = 98;
+
+            // Крок 3: Створюємо прозорий ефект
+          ictx.globalCompositeOperation = 'destination-out';
+
+            // Крок 4: Малюємо коло, яке зробить область прозорою
+            ictx.beginPath();
+            ictx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+            ictx.fillStyle = 'red'; // Колір не має значення, оскільки використовуємо 'destination-out'
+            ictx.fill();
+        };
+}
 </script>
 </body>
 </html>
