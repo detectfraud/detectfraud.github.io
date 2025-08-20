@@ -64,7 +64,6 @@
 
     <!-- Полотно для малювання -->
     <canvas id="canvas" width="900" height="600" style="border:1px solid #ccc;"></canvas>
-<canvas id="myCanvas" width="900" height="600" style="display:none;"></canvas>
     <!-- Панель управління -->
     <div id="controls">
       <!-- Завантаження фону -->
@@ -455,7 +454,7 @@ document.getElementById("undoBtn").addEventListener("click", () => {
 });
 //Виріз
 function roundWin() {
-        const canvas = document.getElementById('myCanvas');
+        const canvas = document.getElementById('canvas');
         const ictx = canvas.getContext('2d');
         const img = new Image();
 
