@@ -25,7 +25,6 @@
       <div id="controls">
         <label>Фон: <input type="file" id="bgLoader" accept="image/*"></label>
         <!-- Кнопка вирізу діри у фоні -->
-        <button id="holeBtn" type="button">⭕ Діра</button>
         <label>Фото закоханих: <input type="file" id="loveLoader" accept="image/*"></label>
         <input type="range" id="scaleSlider" min="0.1" max="3" step="0.01" value="1">
         <button id="undoBtn" type="button">⟲ Undo</button>
@@ -42,7 +41,6 @@
 
     const bgLoader = document.getElementById('bgLoader');
     const loveLoader = document.getElementById('loveLoader');
-    const holeBtn = document.getElementById('holeBtn');
     const scaleSlider = document.getElementById('scaleSlider');
     const undoBtn = document.getElementById('undoBtn');
     const previewBtn = document.getElementById('previewBtn');
@@ -333,7 +331,7 @@
     /* === Блокування/розблокування контролів у preview === */
     function setDisabled(state){
       // Не блокуємо Undo/Download; блокуємо завантаження і масштаб
-      [bgLoader, loveLoader, scaleSlider, holeBtn].forEach(el=>{
+      [bgLoader, loveLoader, scaleSlider].forEach(el=>{
         el.disabled = !!state;
         el.classList.toggle('disabled', !!state);
       });
