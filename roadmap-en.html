@@ -460,7 +460,7 @@ function roundWin() {
             canvas.height = bgLoader.height;
 
             // Крок 1: Малюємо початкове зображення на Canvas
-            ictx.drawImage(bgLoader, 0, 0);
+            ctx.drawImage(bgLoader, 0, 0);
 
             // Крок 2: Налаштовуємо параметри для кола
             const centerX = (canvas.width / 2)+6;
@@ -468,13 +468,13 @@ function roundWin() {
             const radius = 98;
 
             // Крок 3: Створюємо прозорий ефект
-          ictx.globalCompositeOperation = 'destination-out';
+          ctx.globalCompositeOperation = 'destination-out';
 
             // Крок 4: Малюємо коло, яке зробить область прозорою
-            ictx.beginPath();
-            ictx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
-            ictx.fillStyle = 'red'; // Колір не має значення, оскільки використовуємо 'destination-out'
-            ictx.fill();
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+            ctx.fillStyle = 'red'; // Колір не має значення, оскільки використовуємо 'destination-out'
+            ctx.fill();
         };
 }
 </script>
