@@ -23,10 +23,9 @@
 
       <!-- Панель управління -->
       <div id="controls">
-        <label>Фон: <input type="file" id="bgLoader" accept="image/*"></label>
-        <!-- Кнопка вирізу діри у фоні -->
-        <label>Фото закоханих: <input type="file" id="loveLoader" accept="image/*"></label>
-        <input type="range" id="scaleSlider" min="0.1" max="3" step="0.01" value="1">
+        <label>Фон: <input type="file" id="bgLoader" accept="image/*"></label><br><br>
+        <label>Фото закоханих: <input type="file" id="loveLoader" accept="image/*"></label><br><br>
+        <input type="range" id="scaleSlider" min="0.1" max="3" step="0.01" value="1"><br><br>
         <button id="undoBtn" type="button">⟲ Undo</button>
         <button id="previewBtn" type="button">👁 Перегляд</button>
         <button id="downloadBtn" type="button" style="display:none;">📥 Завантажити</button>
@@ -38,7 +37,6 @@
     /* === БАЗА === */
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
-
     const bgLoader = document.getElementById('bgLoader');
     const loveLoader = document.getElementById('loveLoader');
     const scaleSlider = document.getElementById('scaleSlider');
