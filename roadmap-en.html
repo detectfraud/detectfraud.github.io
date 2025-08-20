@@ -1,12 +1,4 @@
-<!-- можна використовувати -->
 <!DOCTYPE html>
-<html lang="uk">
-<head>
-<meta charset="UTF-8">
-<title>Камінь любові — редактор</title>
-<style>
-  body { text-align:center; font-family:sans-serif; }
-  .venwin { background: #fff; border-radius:10px; padding:10px; display:inline-block; }<!DOCTYPE html>
 <html lang="uk">
 <head>
 <meta charset="UTF-8">
@@ -271,65 +263,3 @@ applySnapshot(history[0]);
 </script>
 </body>
 </html>
-
-  canvas { border:3px solid #bbb; border-radius:6px; box-shadow:0 6px 18px rgba(0,0,0,.1); display:block; margin:10px auto; }
-  #controls{ margin-top:10px; display:flex; gap:10px; align-items:center; justify-content:center; flex-wrap:wrap; }
-  #scaleSlider{ width:420px; }
-  button{ padding:8px 12px; }
-</style>
-</head>
-<body>
-
-
-<fieldset class="venwin" style="height:auto;">
-  <center>
-    <span style="color:#990000;font-size:x-large;">Камінь любові</span><br><br>
-    <canvas id="canvas" width="900" height="600" style="border:1px solid #ccc;"></canvas>
-
-
-    <div id="controls">
-      <label>Фон: <input type="file" id="bgLoader" accept="image/*"></label>
-      <label>Фото закоханих: <input type="file" id="loveLoader" accept="image/*"></label>
-      <input type="range" id="scaleSlider" min="0.1" max="3" step="0.01" value="1">
-      <button id="undoBtn">⟲ Undo</button>
-      <button id="previewBtn">👁 Перегляд</button>
-      <button id="downloadBtn" style="display:none;">📥 Завантажити</button>
-    </div>
-  </center>
-</fieldset>
-
-
-<script>
-const canvas = document.getElementById('canvas');
-const ctx = canvas.getContext('2d');
-const bgLoader = document.getElementById('bgLoader');
-const loveLoader = document.getElementById('loveLoader');
-const scaleSlider = document.getElementById('scaleSlider');
-const undoBtn = document.getElementById('undoBtn');
-const previewBtn = document.getElementById('previewBtn');
-const downloadBtn = document.getElementById('downloadBtn');
-
-
-// шаблон (поверх)
-const template = new Image();
-template.src = 'images/LoveStone.png';
-
-
-// модель шарів: зберігаємо img (Image) і dataURL у src для історії
-let layers = {
-  bg: { img: null, src: null, x: canvas.width/2, y: canvas.height/2, scale: 1 },
-  love: { img: null, src: null, x: canvas.width/2, y: canvas.height/2, scale: 1 }
-};
-
-
-let activeLayer = null; // 'bg' або 'love'
-let previewMode = false;
-
-
-// історія: масив снєпшотів { bg:{src,x,y,scale}, love:{...}, previewMode, activeLayer }
-const history = [];
-const MAX_HISTORY = 20;
-
-
-function makeSnapshot(){
-  return {
