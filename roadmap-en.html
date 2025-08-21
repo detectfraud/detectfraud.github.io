@@ -2,7 +2,7 @@
 <html lang="uk">
 <head>
   <meta charset="UTF-8" />
-  <title>Конструктор колажу — камінь любові</title>
+  <title>Камінь любові — редактор</title>
   <style>
     body{ text-align:center; font-family:sans-serif; }
     .venwin{ background:#fff; border-radius:10px; padding:10px; display:inline-block; }
@@ -10,7 +10,7 @@
     #controls{ margin-top:10px; display:flex; gap:10px; align-items:center; justify-content:center; flex-wrap:wrap; }
     #scaleSlider{ width:420px; }
     button{ padding:8px 12px; }
-    #lost{background-image: url(images/love_stone.jpg);}
+       #lost{background-image: url(images/love_stone.jpg);}
     .disabled{ pointer-events:none; opacity:.5; filter:grayscale(100%); }
   </style>
 </head>
@@ -232,16 +232,6 @@
           layers.love.scale = 1;
           activeLayer = 'love';
           scaleSlider.value = 1;
-
-//
-lost.addEventListener('change', e=>handleFileLoad(e.target.files[0], 'bg'));
-    loveLoader.addEventListener('change', e=>{
-      const file = e.target.files[0]; if(!file) return;
-      const reader = new FileReader();
-      reader.onload = ev=>{
-        const data = ev.target.result;
-        const img = new Image();
-        img.onload = ()=>{
 
           // Дірка у фоні має бути вже активована (через кнопку «Діра»),
           // але якщо користувач забув — увімкнемо:
