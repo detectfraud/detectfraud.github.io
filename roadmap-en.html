@@ -8,7 +8,7 @@
     body{ text-align:center; font-family:sans-serif; }
     .venwin{ background:#fff; border-radius:10px; padding:10px; display:inline-block; }
     canvas{ border:3px solid #bbb; border-radius:6px; box-shadow:0 6px 18px rgba(0,0,0,.1); display:block; margin:10px auto; }
-    #controls{ margin-top:10px; display:flex; gap:10px; align-items:center; justify-content:center; flex-wrap:wrap; }
+   /* #controls{ margin-top:10px; display:flex; gap:10px; align-items:center; justify-content:center; flex-wrap:wrap; } */
     #scaleSlider{ width:420px; }
     button{ padding:8px 12px; }
     .disabled{ pointer-events:none; opacity:.5; filter:grayscale(100%); }
@@ -21,11 +21,11 @@
       <!-- Полотно -->
       <canvas id="canvas" width="900" height="600" style="border:1px solid #ccc;"></canvas>
 </center>
-      <!-- Панель управління --> <div id="controls"></div>      
+      <!-- Панель управління -->      
         <br><input type="range" id="scaleSlider" min="0.1" max="3" step="0.01" value="1"><br><br>
         <label>Фон:&nbsp;&nbsp;<input type="file" id="bgLoader" accept="image/*"></label><br><br>
         <label>Фото:&nbsp;<input type="file" id="loveLoader" accept="image/*"></label><br><br>
-    <div id="controls"></div> <br>
+    <br>
 <button id="lost" type="button">images</button> 
       <img src="images/love_stone.jpg" style="border-radius: 3%; width: 30%;" />
  <label>Клятва:&nbsp;<input  id="Lovo" type="file"></label>
