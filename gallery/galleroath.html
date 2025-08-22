@@ -87,14 +87,18 @@
 
 <script>
   // Масив картинок-клятв (приклади, заміни своїми)
-  const images = ["https://detectfraud.github.io/gallery/Oath_Eternity.png","https://detectfraud.github.io/gallery/Oath_Fidelity.png","https://detectfraud.github.io/gallery/Oath_Hearts.png","https://detectfraud.github.io/gallery/Oath_Joy.png","https://detectfraud.github.io/gallery/Oath_Love.png","https://detectfraud.github.io/gallery/Oath_Strength.png","https://detectfraud.github.io/gallery/Oath_Tenderness.png","https://detectfraud.github.io/gallery/Oath_Trust.png","https://detectfraud.github.io/gallery/Oath_Unity.png","https://detectfraud.github.io/gallery/Oath_Heart.png"];
+  const png = ".png";
+const url = "https://detectfraud.github.io/gallery/";
+const images = ["Eternity","Fidelity","Hearts","Joy","Love","Strength","Tenderness","Trust","Unity","Heart"];
+const fullImages = images.map(name => url +name + png);
+  
   let startIndex = 0;
   const thumbsContainer = document.getElementById("thumbs");
   const overlay = document.getElementById("overlay");
 
   function renderThumbnails() {
     thumbsContainer.innerHTML = "";
-    const slice = images.slice(startIndex, startIndex + 3);
+    const slice = fullImages.slice(startIndex, startIndex + 3);
     slice.forEach(src => {
       const img = document.createElement("img");
       img.src = src;
@@ -104,12 +108,12 @@
   }
 
   function prevSlide() {
-    startIndex = (startIndex - 3 + images.length) % images.length;
+    startIndex = (startIndex - 3 + fullImages.length) % fullImages.length;
     renderThumbnails();
   }
 
   function nextSlide() {
-    startIndex = (startIndex + 3) % images.length;
+    startIndex = (startIndex + 3) % fullImages.length;
     renderThumbnails();
   }
 
