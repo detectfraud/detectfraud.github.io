@@ -108,13 +108,15 @@ body {
     <span class="arrow" onclick="prevSlide()">&#10094;</span>
     <div class="thumbnails" id="thumbs"></div>
     <span class="arrow" onclick="nextSlide()">&#10095;</span>
+    &nbsp;&nbsp;&nbsp;&nbsp;<div class="books" id="book"></div>
   </div>
 <br><br><br><br>
   <script>
   const png = ".png";
-  const url = "https://detectfraud.github.io/gallery/";
+    const url = "https://detectfraud.github.io/gallery/";
   const images = ["Eternity","Fidelity","Joy","Love","Strength","Tenderness","Trust","Unity","Heart"];
   const fullImages = images.map(name => url + name + png);
+     const book = "https://detectfraud.github.io/images/LoveStones.png";
   
   let startIndex = 0;
   const thumbsContainer = document.getElementById("thumbs");
