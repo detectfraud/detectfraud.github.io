@@ -32,29 +32,34 @@
       justify-content: center;
     }
 
-    .thumbnails img {
+    /* Мініатюра */
+    .thumb {
       width: 180px;
       height: 120px;
       object-fit: cover;
       border-radius: 8px;
       cursor: pointer;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      box-shadow: 0 0 6px rgba(0,0,0,0.3);
     }
 
-.thumbnails img:hover {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  width: 825px;   /* реальний розмір твоїх картинок */
-  height: 510px;
-  transform: translate(-50%, -50%);
-  z-index: 9999;
-  box-shadow: 0 0 25px rgba(0,0,0,0.7);
-  background: #fff;
-  border: 5px solid #fff;
-  border-radius: 12px;
-}
+    /* Повнорозмірна картинка */
+    .imagbox {
+      position: absolute;
+      top: -28%;
+      left: -175%;
+      transform: translate(-50%, -50%) scale(0.1);
+      cursor: pointer;
+      opacity: 0;
+      transition: 0.8s;
+      z-index: 99999999;
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.7);
+    }
 
+    .imagbox:hover {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
 
     /* Колаж з шаблоном */
     .collage {
@@ -76,6 +81,11 @@
       border-radius: 8px;
       box-shadow: 0 0 8px rgba(0,0,0,0.4);
     }
+
+    /* Контейнер для мініатюри + великої */
+    .thumb-wrapper {
+      position: relative;
+    }
   </style>
 </head>
 <body>
@@ -94,11 +104,10 @@
   </div>
 <br><br><br><br>
   <script>
-  // Масив картинок-клятв (приклади, заміни своїми)
   const png = ".png";
-const url = "https://detectfraud.github.io/gallery/";
-const images = ["Eternity","Fidelity","Hearts","Joy","Love","Strength","Tenderness","Trust","Unity","Heart"];
-const fullImages = images.map(name => url +name + png);
+  const url = "https://detectfraud.github.io/gallery/";
+  const images = ["Eternity","Fidelity","Hearts","Joy","Love","Strength","Tenderness","Trust","Unity","Heart"];
+  const fullImages = images.map(name => url + name + png);
   
   let startIndex = 0;
   const thumbsContainer = document.getElementById("thumbs");
@@ -108,10 +117,22 @@ const fullImages = images.map(name => url +name + png);
     thumbsContainer.innerHTML = "";
     const slice = fullImages.slice(startIndex, startIndex + 3);
     slice.forEach(src => {
-      const img = document.createElement("img");
-      img.src = src;
-      img.onclick = () => setOverlay(src);
-      thumbsContainer.appendChild(img);
+      const wrapper = document.createElement("div");
+      wrapper.className = "thumb-wrapper";
+
+      const thumb = document.createElement("img");
+      thumb.className = "thumb";
+      thumb.src = src;
+      thumb.onclick = () => setOverlay(src);
+
+      const big = document.createElement("img");
+      big.className = "imagbox";
+      big.src = src;
+      big.onclick = () => setOverlay(src);
+
+      wrapper.appendChild(thumb);
+      wrapper.appendChild(big);
+      thumbsContainer.appendChild(wrapper);
     });
   }
 
@@ -135,4 +156,3 @@ const fullImages = images.map(name => url +name + png);
 
 </body>
 </html>
-
