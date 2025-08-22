@@ -92,29 +92,6 @@ body {
   border-radius: 8px;
   box-shadow: 0 0 8px rgba(0,0,0,0.4);
 }
-
- /* Контейнер мініатюри + велика картинка */
-.book-wrapper {
-  position: relative;
-}
-
-/* Мініатюра */
-.book {
-  width: 180px;
-  height: 120px;
-  object-fit: cover;
-  border-radius: 8px;
-  cursor: pointer;
-  box-shadow: 0 0 6px rgba(0,0,0,0.3);
-  transition: all 0.3s ease;
-  z-index: 1;
-}
-
-/* Збільшення при наведенні на мініатюру */
-.book-wrapper:hover .imagbox {
-  opacity: 1;
-  transform: translate(-50%, -50%) scale(0.5);
-} 
 </style>
 
 </head>
@@ -131,8 +108,8 @@ body {
     <span class="arrow" onclick="prevSlide()">&#10094;</span>
     <div class="thumbnails" id="thumbs"></div>
     <span class="arrow" onclick="nextSlide()">&#10095;</span>
-    
-  </div>&nbsp;&nbsp;&nbsp;&nbsp;<div class="books" id="book"></div>
+    &nbsp;&nbsp;&nbsp;&nbsp;<div class="books" id="book"></div>
+  </div>
 <br><br><br><br>
   <script>
   const png = ".png";
