@@ -15,6 +15,7 @@ body {
   align-items: center;
   justify-content: center;
   margin-top: 20px;
+  gap: 40px; /* відстань між галереєю та книгою */
 }
 
 .arrow {
@@ -51,10 +52,10 @@ body {
 
 /* Велика картинка (спочатку прихована) */
 .imagbox {
-  position: fixed;         /* поверх всього */
+  position: fixed;         
   top: 50%;
   left: 50%;
-  width: 825px;            /* оригінальний розмір */
+  width: 825px;            
   height: 510px;
   transform: translate(-50%, -50%) scale(0.1);
   opacity: 0;
@@ -62,14 +63,14 @@ body {
   z-index: 9999;
   border-radius: 12px;
   box-shadow: 0 0 25px rgba(0,0,0,0.7);
-  pointer-events: none;     /* щоб не заважала hover */
+  pointer-events: none;     
   background: #fff;
 }
 
-/* Збільшення при наведенні на мініатюру */
+/* Збільшення при наведенні */
 .thumb-wrapper:hover .imagbox {
   opacity: 1;
-  transform: translate(-50%, -50%) scale(0.5);
+  transform: translate(-50%, -50%) scale(1);
 }
 
 /* Колаж з шаблоном */
@@ -88,79 +89,96 @@ body {
   position: absolute;
   bottom: 10px;
   right: 10px;
-  width: 200px; /* розмір клятви у колажі */
+  width: 200px;
   border-radius: 8px;
   box-shadow: 0 0 8px rgba(0,0,0,0.4);
+}
+
+/* Блок "книга" */
+#book {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#book img.thumb {
+  width: 220px;
+  height: auto;
 }
 </style>
 </head>
 <body>
 <!-- Колаж -->
-   <div class="collage">
-    <img src="template.jpg" alt="Свиток" class="template">
-    <img id="overlay" class="overlay" src="" alt="">
-  </div>
+<div class="collage">
+  <img src="template.jpg" alt="Свиток" class="template">
+  <img id="overlay" class="overlay" src="" alt="">
+</div>
 <br><br>
-  <h2>Клятви закоханих</h2>
+<h2>Клятви закоханих</h2>
 <br><br>
-  <div class="gallery-container">
-    <span class="arrow" onclick="prevSlide()">&#10094;</span>
-    <div class="thumbnails" id="thumbs"></div>
-    <span class="arrow" onclick="nextSlide()">&#10095;</span>
-    &nbsp;&nbsp;&nbsp;&nbsp;<div class="books" id="book"></div>
+<div class="gallery-container">
+  <!-- Галерея -->
+  <span class="arrow" onclick="prevSlide()">&#10094;</span>
+  <div class="thumbnails" id="thumbs"></div>
+  <span class="arrow" onclick="nextSlide()">&#10095;</span>
+
+  <!-- Книга -->
+  <div class="thumb-wrapper" id="book">
+    <img src="https://detectfraud.github.io/images/LoveStones.png" class="thumb" alt="Книга любові">
+    <img src="https://detectfraud.github.io/images/LoveStones.png" class="imagbox" alt="Книга любові">
   </div>
+</div>
+
 <br><br><br><br>
-  <script>
-  const png = ".png";
-    const url = "https://detectfraud.github.io/gallery/";
-  const images = ["Eternity","Fidelity","Joy","Love","Strength","Tenderness","Trust","Unity","Heart"];
-  const fullImages = images.map(name => url + name + png);
-     const book = "https://detectfraud.github.io/images/LoveStones.png";
-  
-  let startIndex = 0;
-  const thumbsContainer = document.getElementById("thumbs");
-  const overlay = document.getElementById("overlay");
+<script>
+const png = ".png";
+const url = "https://detectfraud.github.io/gallery/";
+const images = ["Eternity","Fidelity","Joy","Love","Strength","Tenderness","Trust","Unity","Heart"];
+const fullImages = images.map(name => url + name + png);
 
-  function renderThumbnails() {
-    thumbsContainer.innerHTML = "";
-    const slice = fullImages.slice(startIndex, startIndex + 3);
-    slice.forEach(src => {
-      const wrapper = document.createElement("div");
-      wrapper.className = "thumb-wrapper";
+let startIndex = 0;
+const thumbsContainer = document.getElementById("thumbs");
+const overlay = document.getElementById("overlay");
 
-      const thumb = document.createElement("img");
-      thumb.className = "thumb";
-      thumb.src = src;
-      thumb.onclick = () => setOverlay(src);
+function renderThumbnails() {
+  thumbsContainer.innerHTML = "";
+  const slice = fullImages.slice(startIndex, startIndex + 3);
+  slice.forEach(src => {
+    const wrapper = document.createElement("div");
+    wrapper.className = "thumb-wrapper";
 
-      const big = document.createElement("img");
-      big.className = "imagbox";
-      big.src = src;
-      big.onclick = () => setOverlay(src);
+    const thumb = document.createElement("img");
+    thumb.className = "thumb";
+    thumb.src = src;
+    thumb.onclick = () => setOverlay(src);
 
-      wrapper.appendChild(thumb);
-      wrapper.appendChild(big);
-      thumbsContainer.appendChild(wrapper);
-    });
-  }
+    const big = document.createElement("img");
+    big.className = "imagbox";
+    big.src = src;
+    big.onclick = () => setOverlay(src);
 
-  function prevSlide() {
-    startIndex = (startIndex - 3 + fullImages.length) % fullImages.length;
-    renderThumbnails();
-  }
+    wrapper.appendChild(thumb);
+    wrapper.appendChild(big);
+    thumbsContainer.appendChild(wrapper);
+  });
+}
 
-  function nextSlide() {
-    startIndex = (startIndex + 3) % fullImages.length;
-    renderThumbnails();
-  }
-
-  function setOverlay(src) {
-    overlay.src = src;
-  }
-
-  // Початковий рендер
+function prevSlide() {
+  startIndex = (startIndex - 3 + fullImages.length) % fullImages.length;
   renderThumbnails();
-</script>
+}
 
+function nextSlide() {
+  startIndex = (startIndex + 3) % fullImages.length;
+  renderThumbnails();
+}
+
+function setOverlay(src) {
+  overlay.src = src;
+}
+
+// Початковий рендер
+renderThumbnails();
+</script>
 </body>
 </html>
