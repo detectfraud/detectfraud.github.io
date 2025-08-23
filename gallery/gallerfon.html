@@ -2,7 +2,7 @@
 <html lang="uk">
 <head>
   <meta charset="UTF-8">
-  <title>Камінь любові — Галерея фонів</title>
+  <title>Камінь любові — Галерея клятв</title>
 <style>
 body {
   font-family: sans-serif;
@@ -12,9 +12,16 @@ body {
 
 .gallery-container {
   display: flex;
-  align-items: center;
+  align-items: center;   /* вирівнювання по центру */
   justify-content: center;
+  gap: 40px; /* відступ між галереями */
   margin-top: 20px;
+}
+
+.gallery-block {
+  display: flex;
+  align-items: center;   /* стрілки та картинки по центру */
+  gap: 10px;
 }
 
 .arrow {
@@ -22,9 +29,11 @@ body {
   cursor: pointer;
   user-select: none;
   padding: 10px;
+  line-height: 1;
 }
 
-.thumbnails {
+
+.thumbnails, .books {
   display: flex;
   gap: 10px;
   overflow: hidden;
@@ -66,10 +75,10 @@ body {
   background: #fff;
 }
 
-/* Збільшення при наведенні на мініатюру */
+/* Збільшення при наведенні */
 .thumb-wrapper:hover .imagbox {
   opacity: 1;
-  transform: translate(-50%, -50%) scale(0.5);
+  transform: translate(-50%, -50%) scale(0.6);
 }
 
 /* Колаж з шаблоном */
@@ -80,7 +89,7 @@ body {
 }
 
 .collage img.template {
-  max-width: 600px;
+  max-width: 900px;  height: auto;
   border-radius: 12px;
 }
 
@@ -88,77 +97,103 @@ body {
   position: absolute;
   bottom: 10px;
   right: 10px;
-  width: 200px; /* розмір клятви у колажі */
+  width: 500px; /*200px розмір клятви у колажі */
   border-radius: 8px;
   box-shadow: 0 0 8px rgba(0,0,0,0.4);
 }
+#book img {
+  width: 30%;
+  height: auto;  /* пропорційне зменшення */
+} 
 </style>
 </head>
 <body>
 <!-- Колаж -->
-   <div class="collage">
-    <img src="template.jpg" alt="Свиток" class="template">
-    <img id="overlay" class="overlay" src="" alt="">
-  </div>
+<div class="collage" id="collage">
+  <img src="template.jpg" alt="Свиток" class="template">
+</div>
+
 <br><br>
-  <h2>Галерея фонів</h2>
+<h2>Клятви закоханих</h2>
 <br><br>
-  <div class="gallery-container">
+
+<div class="gallery-container">
+  <!-- Перша галерея -->
+  <div class="gallery-block">
     <span class="arrow" onclick="prevSlide()">&#10094;</span>
     <div class="thumbnails" id="thumbs"></div>
     <span class="arrow" onclick="nextSlide()">&#10095;</span>
   </div>
-<br><br><br><br>
-  <script>
+
+  <!-- Друга галерея (статична) -->
+  <div id="book"></div>
+</div>
+
+
+<script>
 const png = ".png";
 const url = "https://detectfraud.github.io/gallery/";
-//const images = ["nature(1)","nature(2)","nature(3)","nature(4)","nature(5)","nature(6)","nature(7)","nature(8)","nature(9)"];
-    const images = ["Eternity","Fidelity","Joy","Love","Strength","Tenderness","Trust","Unity","Heart"];
-const fullImages = images.map(name => url +name + png);
-  
-  let startIndex = 0;
-  const thumbsContainer = document.getElementById("thumbs");
-  const overlay = document.getElementById("overlay");
+const images = ["Eternity","Fidelity","Joy","Love","Strength","Tenderness","Trust","Unity","Heart"];
+const fullImages = images.map(name => url + name + png);
 
-  function renderThumbnails() {
-    thumbsContainer.innerHTML = "";
-    const slice = fullImages.slice(startIndex, startIndex + 3);
-    slice.forEach(src => {
-      const wrapper = document.createElement("div");
-      wrapper.className = "thumb-wrapper";
+const bookImages = [
+  "https://detectfraud.github.io/images/LoveStones.png"
+];
 
-      const thumb = document.createElement("img");
-      thumb.className = "thumb";
-      thumb.src = src;
-      thumb.onclick = () => setOverlay(src);
+let startIndex = 0;
+const thumbsContainer = document.getElementById("thumbs");
+const bookContainer = document.getElementById("book");
+const collage = document.getElementById("collage");
 
-      const big = document.createElement("img");
-      big.className = "imagbox";
-      big.src = src;
-      big.onclick = () => setOverlay(src);
+function renderThumbnails() {
+  thumbsContainer.innerHTML = "";
+  const slice = fullImages.slice(startIndex, startIndex + 3);
+  slice.forEach(src => createThumb(src, thumbsContainer));
+}
 
-      wrapper.appendChild(thumb);
-      wrapper.appendChild(big);
-      thumbsContainer.appendChild(wrapper);
-    });
-  }
+function renderBooks() {
+  bookContainer.innerHTML = "";
+  bookImages.forEach(src => createThumb(src, bookContainer));
+}
 
-  function prevSlide() {
-    startIndex = (startIndex - 3 + fullImages.length) % fullImages.length;
-    renderThumbnails();
-  }
+function createThumb(src, container) {
+  const wrapper = document.createElement("div");
+  wrapper.className = "thumb-wrapper";
 
-  function nextSlide() {
-    startIndex = (startIndex + 3) % fullImages.length;
-    renderThumbnails();
-  }
+  const thumb = document.createElement("img");
+  thumb.className = "thumb";
+  thumb.src = src;
+  thumb.onclick = () => addOverlay(src);
 
-  function setOverlay(src) {
-    overlay.src = src;
-  }
+  const big = document.createElement("img");
+  big.className = "imagbox";
+  big.src = src;
 
-  // Початковий рендер
+  wrapper.appendChild(thumb);
+  wrapper.appendChild(big);
+  container.appendChild(wrapper);
+}
+
+function prevSlide() {
+  startIndex = (startIndex - 3 + fullImages.length) % fullImages.length;
   renderThumbnails();
+}
+
+function nextSlide() {
+  startIndex = (startIndex + 3) % fullImages.length;
+  renderThumbnails();
+}
+
+function addOverlay(src) {
+  const newImg = document.createElement("img");
+  newImg.src = src;
+  newImg.classList.add("overlay");
+  collage.appendChild(newImg);
+}
+
+// Початковий рендер
+renderThumbnails();
+renderBooks();
 </script>
 
 </body>
