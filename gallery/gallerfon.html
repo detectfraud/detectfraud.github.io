@@ -2,7 +2,7 @@
 <html lang="uk">
 <head>
   <meta charset="UTF-8">
-  <title>Камінь любові — Галерея клятв</title>
+  <title>Камінь любові — Галерея фонів</title>
 <style>
 body {
   font-family: sans-serif;
@@ -101,10 +101,6 @@ body {
   border-radius: 8px;
   box-shadow: 0 0 8px rgba(0,0,0,0.4);
 }
-#book img {
-  width: 30%;
-  height: auto;  /* пропорційне зменшення */
-} 
 </style>
 </head>
 <body>
@@ -124,21 +120,13 @@ body {
     <div class="thumbnails" id="thumbs"></div>
     <span class="arrow" onclick="nextSlide()">&#10095;</span>
   </div>
-
-  <!-- Друга галерея (статична) -->
-  <div id="book"></div>
 </div>
-
 
 <script>
 const png = ".png";
 const url = "https://detectfraud.github.io/gallery/";
 const images = ["Eternity","Fidelity","Joy","Love","Strength","Tenderness","Trust","Unity","Heart"];
 const fullImages = images.map(name => url + name + png);
-
-const bookImages = [
-  "https://detectfraud.github.io/images/LoveStones.png"
-];
 
 let startIndex = 0;
 const thumbsContainer = document.getElementById("thumbs");
