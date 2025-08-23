@@ -12,10 +12,16 @@ body {
 
 .gallery-container {
   display: flex;
-  align-items: flex-start;
+  align-items: center;   /* вирівнювання по центру */
   justify-content: center;
-  margin-top: 20px;
   gap: 40px; /* відступ між галереями */
+  margin-top: 20px;
+}
+
+.gallery-block {
+  display: flex;
+  align-items: center;   /* стрілки та картинки по центру */
+  gap: 10px;
 }
 
 .arrow {
@@ -23,7 +29,9 @@ body {
   cursor: pointer;
   user-select: none;
   padding: 10px;
+  line-height: 1;
 }
+
 
 .thumbnails, .books {
   display: flex;
@@ -107,15 +115,16 @@ body {
 
 <div class="gallery-container">
   <!-- Перша галерея -->
-  <div>
+  <div class="gallery-block">
     <span class="arrow" onclick="prevSlide()">&#10094;</span>
     <div class="thumbnails" id="thumbs"></div>
     <span class="arrow" onclick="nextSlide()">&#10095;</span>
-  </div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  </div>
 
-  <!-- Друга галерея (book) -->
+  <!-- Друга галерея (статична) -->
   <div id="book"></div>
 </div>
+
 
 <script>
 const png = ".png";
