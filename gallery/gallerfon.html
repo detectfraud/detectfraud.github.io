@@ -25,11 +25,11 @@ body {
   gap: 10px;
 }
 
-/* Блок із мініатюрами та стрілками */
+/* Контейнер з мініатюрами і стрілками */
 .gallery-block > div {
   display: flex;
   align-items: center;
-  gap: 5px; /* зменшено відстань між стрілками та мініатюрами */
+  justify-content: center;
 }
 
 /* Стрілки */
@@ -37,12 +37,17 @@ body {
   font-size: 20px;
   cursor: pointer;
   user-select: none;
-  padding: 5px; /* зменшено паддінг */
+  padding: 3px;
   line-height: 1;
   display: flex;
   align-items: center;
   justify-content: center;
 }
+
+/* Наближення стрілок до мініатюр */
+.arrow:first-child { margin-right: -108px; }  /* зліва від мініатюр */
+.arrow:last-child { margin-left: -108px; }   /* справа від мініатюр */
+
 
 
 .thumbnails {
