@@ -12,15 +12,16 @@ body {
 
 .gallery-container {
   display: flex;
-  align-items: center;   /* вирівнювання по центру */
+  align-items: flex-start; /* щоб заголовок був над картинками */
   justify-content: center;
-  gap: 40px; /* відступ між галереями */
+  gap: 40px;
   margin-top: 20px;
 }
 
 .gallery-block {
   display: flex;
-  align-items: center;   /* стрілки та картинки по центру */
+  flex-direction: column; /* тепер заголовок + галерея */
+  align-items: center;
   gap: 10px;
 }
 
@@ -32,8 +33,7 @@ body {
   line-height: 1;
 }
 
-
-.thumbnails, .books {
+.thumbnails {
   display: flex;
   gap: 10px;
   overflow: hidden;
@@ -41,7 +41,7 @@ body {
   justify-content: center;
 }
 
-/* Контейнер мініатюри + велика картинка */
+/* Контейнер мініатюри */
 .thumb-wrapper {
   position: relative;
 }
@@ -58,120 +58,104 @@ body {
   z-index: 1;
 }
 
-/* Велика картинка (спочатку прихована) */
-.imagbox {
-  position: fixed;         /* поверх всього */
-  top: 50%;
-  left: 50%;
-  width: 825px;            /* оригінальний розмір */
-  height: 510px;
-  transform: translate(-50%, -50%) scale(0.1);
-  opacity: 0;
-  transition: all 0.5s ease;
-  z-index: 9999;
-  border-radius: 12px;
-  box-shadow: 0 0 25px rgba(0,0,0,0.7);
-  pointer-events: none;     /* щоб не заважала hover */
-  background: #fff;
-}
-
-/* Збільшення при наведенні */
-.thumb-wrapper:hover .imagbox {
-  opacity: 1;
-  transform: translate(-50%, -50%) scale(0.6);
-}
-
-/* Колаж з шаблоном */
+/* Колаж */
 .collage {
   position: relative;
   display: inline-block;
   margin-top: 40px;
 }
 
-.collage img.template {
-  max-width: 900px;  height: auto;
-  border-radius: 12px;
-}
-
 .collage img.overlay {
   position: absolute;
   bottom: 10px;
   right: 10px;
-  width: 500px; /*200px розмір клятви у колажі */
+  width: 500px;
   border-radius: 8px;
   box-shadow: 0 0 8px rgba(0,0,0,0.4);
 }
-  #fot {
-    display: inline-block;
-    cursor: pointer;
-    border-radius: 8px;
-    height: 120px;
-    width: 180px;
-    background-image: url(https://detectfraud.github.io/gallery/Para.png);
-    background-repeat: no-repeat;
-    background-size: contain;
-  }
-  #fot:hover {mix-blend-mode: luminosity;}
-  #fot:active {mix-blend-mode: exclusion;}
+
+/* Кнопка фото закоханих */
+#fot {
+  display: inline-block;
+  cursor: pointer;
+  border-radius: 8px;
+  height: 120px;
+  width: 180px;
+  background-image: url(https://detectfraud.github.io/gallery/Para.png);
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+#fot:hover {mix-blend-mode: luminosity;}
+#fot:active {mix-blend-mode: exclusion;}
 </style>
-  
 </head>
 <body>
 <!-- Колаж -->
 <div class="collage" id="collage">
   <canvas id="canvas" width="900" height="600" style="border:1px solid #ccc;"></canvas>
- <!-- <img src="template.jpg" alt="Свиток" class="template"> -->
 </div>
+
 <br><br>
 
-
 <div class="gallery-container">
-  <h3>Фон</h3>
   <!-- Перша галерея -->
   <div class="gallery-block">
-    <span class="arrow" onclick="prevSlide()">&#10094;</span>
-    <div class="thumbnails" id="thumbs"></div>
-    <span class="arrow" onclick="nextSlide()">&#10095;</span>
+    <h3>Фон</h3>
+    <div style="display:flex; align-items:center; gap:10px;">
+      <span class="arrow" onclick="prevSlide()">&#10094;</span>
+      <div class="thumbnails" id="thumbs"></div>
+      <span class="arrow" onclick="nextSlide()">&#10095;</span>
+    </div>
   </div>
-      <div><label id="fot" title="Фото закоханих"></label></div>
+  <div><label id="fot" title="Фото закоханих"></label></div>
 </div>
+
+<!-- приховані input -->
+<input type="file" id="bgLoader" style="display:none">
+<input type="file" id="loveLoader" style="display:none">
+
 <script>
 const jpg = ".jpeg";
 const url = "https://detectfraud.github.io/gallery/";
-const images = ["nature(1)","nature(2)","nature(3)","nature(4)","nature(5)","nature(6)","nature(7)","nature(8)","nature(9)","Fon"];
-const fullImages = images.map(name => url + name + jpg);
+const images = [
+  "nature(1)","nature(2)","nature(3)",
+  "nature(4)","nature(5)","nature(6)",
+  "nature(7)","nature(8)","nature(9)",
+  "Fon"
+];
+let fullImages = images.map(name => url + name + jpg);
 
 let startIndex = 0;
 const thumbsContainer = document.getElementById("thumbs");
-const bookContainer = document.getElementById("book");
 const collage = document.getElementById("collage");
+const bgLoader = document.getElementById("bgLoader");
+const loveLoader = document.getElementById("loveLoader");
 
+// Рендер мініатюр
 function renderThumbnails() {
   thumbsContainer.innerHTML = "";
   const slice = fullImages.slice(startIndex, startIndex + 3);
   slice.forEach(src => createThumb(src, thumbsContainer));
 }
 
-function renderBooks() {
-  bookContainer.innerHTML = "";
-  bookImages.forEach(src => createThumb(src, bookContainer));
-}
-
 function createThumb(src, container) {
   const wrapper = document.createElement("div");
   wrapper.className = "thumb-wrapper";
 
+  const imgName = src.split("/").pop().split(".")[0]; // назва файлу без розширення
+
   const thumb = document.createElement("img");
   thumb.className = "thumb";
   thumb.src = src;
-  thumb.onclick = () => addOverlay(src);
 
-  const big = document.createElement("img");
-  big.className = "imagbox";
-  big.src = src;
+  if (imgName === "Fon") {
+    thumb.title = "Завантажити свій фон";
+    thumb.onclick = () => bgLoader.click(); // відкриває пошук фону
+  } else {
+    thumb.onclick = () => addOverlay(src);
+  }
 
   wrapper.appendChild(thumb);
-  wrapper.appendChild(big);
   container.appendChild(wrapper);
 }
 
@@ -192,10 +176,36 @@ function addOverlay(src) {
   collage.appendChild(newImg);
 }
 
+// Завантаження власного фону
+bgLoader.addEventListener("change", e => {
+  const file = e.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = ev => {
+      document.body.style.backgroundImage = `url(${ev.target.result})`;
+      document.body.style.backgroundSize = "cover";
+    };
+    reader.readAsDataURL(file);
+  }
+});
+
+// Кнопка для фото закоханих
+document.getElementById("fot").onclick = () => loveLoader.click();
+
+// Завантаження фото закоханих
+loveLoader.addEventListener("change", e => {
+  const file = e.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = ev => {
+      addOverlay(ev.target.result);
+    };
+    reader.readAsDataURL(file);
+  }
+});
+
 // Початковий рендер
 renderThumbnails();
-renderBooks();
 </script>
-
 </body>
 </html>
