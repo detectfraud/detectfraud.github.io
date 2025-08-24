@@ -12,32 +12,35 @@ body {
 
 .gallery-container {
   display: flex;
-  align-items: flex-start; /* щоб заголовок був над картинками */
+  align-items: flex-start;
   justify-content: center;
-  gap: 40px;
-  margin-top: 20px;
+  gap: 5%;              /* заміна з px на відсотки */
+  margin-top: 2%;
+  flex-wrap: wrap;      /* дозволяє перенос на мобільних */
+  max-width: 100%;
 }
 
 .gallery-block {
   display: flex;
-  flex-direction: column; /* тепер заголовок + галерея */
+  flex-direction: column;
   align-items: center;
-  gap: 10px;
+  gap: 1em;             /* замість px */
 }
 
 .arrow {
-  font-size: 40px;
+  font-size: 6vw;       /* шрифт залежить від ширини екрану */
   cursor: pointer;
   user-select: none;
-  padding: 10px;
+  padding: 1vw;
   line-height: 1;
 }
 
 .thumbnails {
   display: flex;
-  gap: 10px;
+  gap: 2%;
   overflow: hidden;
-  width: 600px;
+  width: 80%;           /* тепер % від контейнера */
+  max-width: 600px;     /* обмеження для великих екранів */
   justify-content: center;
 }
 
@@ -48,8 +51,10 @@ body {
 
 /* Мініатюра */
 .thumb {
-  width: 180px;
-  height: 120px;
+  width: 30vw;          /* залежить від ширини екрану */
+  max-width: 180px;
+  height: auto;         /* щоб зберегти пропорції */
+  aspect-ratio: 3/2;    /* фіксоване співвідношення */
   object-fit: cover;
   border-radius: 8px;
   cursor: pointer;
@@ -62,14 +67,15 @@ body {
 .collage {
   position: relative;
   display: inline-block;
-  margin-top: 40px;
+  margin-top: 5%;
 }
 
 .collage img.overlay {
   position: absolute;
-  bottom: 10px;
-  right: 10px;
-  width: 500px;
+  bottom: 2%;
+  right: 2%;
+  width: 40vw;          /* адаптивна ширина */
+  max-width: 500px;
   border-radius: 8px;
   box-shadow: 0 0 8px rgba(0,0,0,0.4);
 }
@@ -79,21 +85,26 @@ body {
   display: inline-block;
   cursor: pointer;
   border-radius: 8px;
-  height: 120px;
-  width: 180px;
+  height: auto;
+  width: 30vw;           /* адаптивна */
+  max-width: 180px;
+  aspect-ratio: 3/2;
   background-image: url(https://detectfraud.github.io/gallery/Para.png);
   background-repeat: no-repeat;
   background-size: contain;
 }
-#fot:hover {mix-blend-mode: luminosity;}
-#fot:active {mix-blend-mode: exclusion;}
+#fot:hover { mix-blend-mode: luminosity; }
+#fot:active { mix-blend-mode: exclusion; }
+
 /* Велика картинка (popup-ефект) */
 .imagbox {
   position: fixed;         
   top: 50%;
   left: 50%;
-  width: 825px;            
-  height: 510px;
+  width: 80vw;             /* тепер % від вікна */
+  max-width: 825px;
+  height: auto;
+  max-height: 90vh;
   transform: translate(-50%, -50%) scale(0.1);
   opacity: 0;
   transition: all 0.5s ease;
@@ -109,8 +120,8 @@ body {
   opacity: 1;
   transform: translate(-50%, -50%) scale(0.6);
 }
-  
 </style>
+
 </head>
 <body>
 <!-- Колаж -->
