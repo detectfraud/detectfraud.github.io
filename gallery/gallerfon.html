@@ -101,6 +101,15 @@ body {
   border-radius: 8px;
   box-shadow: 0 0 8px rgba(0,0,0,0.4);
 }
+  #fot {
+    display: inline-block;
+    cursor: pointer;
+    height: 120px;
+    width: 180px;
+    background-image: url(XXX);
+    background-repeat: no-repeat;
+    background-size: contain;
+  }  
 </style>
 </head>
 <body>
@@ -120,7 +129,7 @@ body {
     <div class="thumbnails" id="thumbs"></div>
     <span class="arrow" onclick="nextSlide()">&#10095;</span>
   </div>
- <div><label>Ваше фото:&nbsp;<input type="file" id="loveLoader"></label></div>
+      <div><label id="fot" title="Фото закоханих"></label></div>
 </div>
 <script>
 const jpg = ".jpeg";
