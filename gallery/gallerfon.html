@@ -33,15 +33,22 @@ body {
   line-height: 1;
 }
 .gallery-container {
-  width: 80%;      /* контейнер займає 80% від ширини батьківського елемента */
-  max-width: 1200px; /* обмеження, щоб не розтягувався на великих екранах */
-  margin: 0 auto;  /* центрування по горизонталі */
+  width: 80%;      /* займатиме 80% ширини батьківського блоку */
+  max-width: 1200px; /* обмеження, щоб не розтягувалось занадто */
+  margin: 0 auto;  /* по центру */
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
 }
+
 .gallery-container img {
-  width: 100%;     /* картинка розтягується під ширину контейнера */
-  height: auto;    /* пропорції зберігаються */
-  max-width: 200px; /* але не більша ніж 200px */
+  width: 100%;       /* картинка розтягується по контейнеру */
+  height: auto;      /* пропорції зберігаються */
+  max-width: 200px;  /* кожна мініатюра не більше 200px */
+  border-radius: 8px;
 }
+
 
 .thumbnails {
   display: flex;
