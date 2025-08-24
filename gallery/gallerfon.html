@@ -87,6 +87,29 @@ body {
 }
 #fot:hover {mix-blend-mode: luminosity;}
 #fot:active {mix-blend-mode: exclusion;}
+/* Велика картинка (popup-ефект) */
+.imagbox {
+  position: fixed;         
+  top: 50%;
+  left: 50%;
+  width: 825px;            
+  height: 510px;
+  transform: translate(-50%, -50%) scale(0.1);
+  opacity: 0;
+  transition: all 0.5s ease;
+  z-index: 9999;
+  border-radius: 12px;
+  box-shadow: 0 0 25px rgba(0,0,0,0.7);
+  pointer-events: none;    
+  background: #fff;
+}
+
+/* При наведенні на мініатюру показуємо popup */
+.thumb-wrapper:hover .imagbox {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(0.6);
+}
+  
 </style>
 </head>
 <body>
@@ -148,22 +171,28 @@ function createThumb(src, container) {
   const wrapper = document.createElement("div");
   wrapper.className = "thumb-wrapper";
 
-  const imgName = src.split("/").pop().split(".")[0]; // назва файлу без розширення
+  const imgName = src.split("/").pop().split(".")[0];
 
   const thumb = document.createElement("img");
   thumb.className = "thumb";
   thumb.src = src;
 
+  const big = document.createElement("img");
+  big.className = "imagbox";
+  big.src = src;
+
   if (imgName === "Fon") {
     thumb.title = "Завантажити свій фон";
-    thumb.onclick = () => bgLoader.click(); // відкриває пошук фону
+    thumb.onclick = () => bgLoader.click();
   } else {
     thumb.onclick = () => addOverlay(src);
   }
 
   wrapper.appendChild(thumb);
+  wrapper.appendChild(big);   // ← ДОДАВ повернення popup
   container.appendChild(wrapper);
 }
+
 
 function prevSlide() {
   startIndex = (startIndex - 3 + fullImages.length) % fullImages.length;
