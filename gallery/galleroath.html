@@ -260,12 +260,12 @@ loveLoader.addEventListener("change", e => {
   }
 });
 
-// Початковий рендер
+// Початковий рендер 
 renderThumbnails();
 
 /* === Галерея клятв === */
 const png = ".png";
-const vows = ["Eternity","Fidelity","Joy","Love","Strength","Tenderness","Trust","Unity","Heart"];
+const vows = ["LoveStones","Eternity","Fidelity","Joy","Love","Strength","Tenderness","Trust","Unity","Heart","LoveStones"];
 const fullVows = vows.map(name => url + name + png);
 
 const bookImages = [
@@ -278,7 +278,7 @@ const bookContainer = document.getElementById("book");
 
 function renderVows() {
   thumbsVows.innerHTML = "";
-  const slice = fullVows.slice(vowIndex, vowIndex + 3);
+  const slice = fullVows.slice(vowIndex, vowIndex + 4);
   slice.forEach(src => createThumb(src, thumbsVows, true));
 }
 function renderBooks() {
