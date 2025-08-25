@@ -116,8 +116,13 @@ body {
   opacity: 1;
   transform: translate(-50%, -50%) scale(0.6);
 }
-
 .photo-block { margin-left: 100px; }
+/* зробити стрілки поверх мініатюр */
+.arrow, .arow {
+  position: relative;
+  z-index: 3;   /* > 1 у .thumb */
+}
+
 </style>
 
 </head>
