@@ -285,11 +285,11 @@ function renderBooks() {
   });
 }
 function prevVow() {
-  vowIndex = (vowIndex - 3 + fullVows.length) % fullVows.length;
+  vowIndex = (vowIndex - 4 + fullVows.length) % fullVows.length;
   renderVows();
 }
 function nextVow() {
-  vowIndex = (vowIndex + 3) % fullVows.length;
+  vowIndex = (vowIndex + 4) % fullVows.length;
   renderVows();
 }
 
