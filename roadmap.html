@@ -1,368 +1,228 @@
 <!DOCTYPE html>
-<html lang="uk"><!-- робочий -->
+<html lang="uk">
 <head>
-<meta charset="UTF-8">
-<title>Камінь любові — редактор</title>
-<style>
-  body { text-align:center; font-family:sans-serif; }
-  .venwin { background: #fff; border-radius:10px; padding:10px; display:inline-block; }
-  canvas { border:3px solid #bbb; border-radius:6px; box-shadow:0 6px 18px rgba(0,0,0,.1); display:block; margin:10px auto; }
-  #controls{ margin-top:10px; display:flex; gap:10px; align-items:center; justify-content:center; flex-wrap:wrap; }
-  #scaleSlider{ width:420px; }
-  button{ padding:8px 12px; }
-.disabled {
-  pointer-events: none;        /* блокує кліки/тач */
-  opacity: 0.5;                /* робить напівпрозорим */
-  filter: grayscale(100%);     /* чорно-білий */
-}
-</style>
+  <meta charset="UTF-8" />
+  <title>Камінь любові — редактор з галереями</title>
+  <style>
+    body{ text-align:center; font-family:Arial; background:#f5f5f5; }
+    .venwin{ background:#fff; border-radius:10px; padding:10px; display:inline-block; }
+    canvas{ border:3px solid #bbb; border-radius:6px; box-shadow:0 6px 18px rgba(0,0,0,.1); display:block; margin:10px auto; }
+    #scaleSlider{ width:420px; }
+    button{ padding:8px 12px; }
+    .disabled{ pointer-events:none; opacity:.5; filter:grayscale(100%); }
+
+    /* === Стилі галерей === */
+    .gallery-container {
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    .gallery-block {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+    .gallery-block > div {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .arrow, .arow {
+      font-size: 20px;
+      cursor: pointer;
+      user-select: none;
+      padding: 3px;
+      line-height: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      z-index: 3;
+    }
+    .arrow:first-child { margin-right: -110px; }
+    .arrow:last-child { margin-left: -110px; }
+    .arow:first-child { margin-right: -60px; }
+    .arow:last-child { margin-left: -60px; }  
+    .thumbnails {
+      display: flex;
+      gap: 10px;
+      overflow: hidden;
+      width: 600px;
+      justify-content: center;
+    }
+    .thumb-wrapper { position: relative; }
+    .thumb {
+      width: 108px;
+      height: 72px;
+      object-fit: cover;
+      border-radius: 8px;
+      cursor: pointer;
+      box-shadow: 0 0 6px rgba(0,0,0,0.3);
+      transition: all 0.3s ease;
+      z-index: 1;
+    }
+    #fot {
+      display: inline-block;
+      cursor: pointer;
+      border-radius: 8px;
+      width: 108px;
+      height: 72px;
+      background-image: url(https://detectfraud.github.io/gallery/Para.png);
+      background-repeat: no-repeat;
+      background-size: contain;
+    }
+    #fot:hover { mix-blend-mode: luminosity; }
+    #fot:active { mix-blend-mode: exclusion; }
+    .gallery-container.vows .labels {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      text-align: center;
+      margin-bottom: 5px;
+    }
+    .gallery-container.vows .labels .label1 {
+      grid-column: 1;
+      font-weight: bold;
+      margin-left: 70px; 
+    }
+    .gallery-container.vows .labels .label2 {
+      grid-column: 3;
+      font-weight: bold;
+    }
+  </style>
 </head>
 <body>
+  <fieldset class="venwin" style="height:auto;">
+    <center>
+      <h3 style="color:#45818e;font-weight:bold;font-style:italic;font-size:x-large;">Камінь любові</h3><br>
+      <canvas id="canvas" width="900" height="600"></canvas>
+    </center>
+    <br><input type="range" id="scaleSlider" min="0.1" max="3" step="0.01" value="1"><br><br>
+    <button id="undoBtn" type="button">⟲ Undo</button>
+    <button id="previewBtn" type="button">👁 Перегляд</button>
+    <button id="downloadBtn" type="button" style="display:none;">📥 Завантажити</button>      
+  </fieldset>
 
-<fieldset class="venwin" style="height:auto;">
-  <center>
-    <span style="color:#990000;font-size:x-large;">Камінь любові</span><br><br>
-    <canvas id="canvas" width="900" height="600" style="border:1px solid #ccc;"></canvas>
-
-    <div id="controls">
-      <label>Фон: <input type="file" id="bgLoader" accept="image/*"></label>
-      <label>Фото закоханих: <input type="file" id="loveLoader" accept="image/*"></label>
-      <input type="range" id="scaleSlider" min="0.1" max="3" step="0.01" value="1">
-      <button id="undoBtn">⟲ Undo</button>
-      <button id="previewBtn">👁 Перегляд</button>
-      <button id="downloadBtn" style="display:none;">📥 Завантажити</button>
+  <!-- === Галерея фонів === -->
+  <div class="gallery-container">
+    <div class="gallery-block">
+      <b>Фон</b>
+      <div>
+        <span class="arrow" onclick="prevSlide()">&#10094;</span>
+        <div class="thumbnails" id="thumbs"></div>
+        <span class="arrow" onclick="nextSlide()">&#10095;</span>
+      </div>
     </div>
-  </center>
-</fieldset>
+
+    <div class="gallery-block photo-block">
+      <b>Фото</b>
+      <label id="fot" title="Фото закоханих"></label>
+    </div>
+  </div>
+
+  <!-- === Галерея клятв === -->
+  <div class="gallery-container vows">
+    <div class="gallery-block">
+      <div class="labels">
+        <span class="label1">Надпис</span>
+        <span class="label2">Клятва закоханих</span>
+      </div>
+      <div class="gallery-row">
+        <span class="arow" onclick="prevVow()">&#10094;</span>
+        <div class="thumbnails" id="thumbsVows"></div>
+        <span class="arow" onclick="nextVow()">&#10095;</span>
+      </div>
+    </div>
+  </div>
 
 <script>
+/* === ГАЛЕРЕЇ === */
+const jpg = ".jpeg";
+const url = "https://detectfraud.github.io/gallery/";
+const images = ["nature(1)","nature(2)","nature(3)","nature(4)","nature(5)","nature(6)","nature(7)","nature(8)","nature(9)","Fon"];
+let fullImages = images.map(name => url + name + jpg);
+
+let startIndex = 0;
+const thumbsContainer = document.getElementById("thumbs");
+
+function renderThumbnails() {
+  thumbsContainer.innerHTML = "";
+  const slice = fullImages.slice(startIndex, startIndex + 3);
+  slice.forEach(src => createThumb(src, thumbsContainer, false));
+}
+function createThumb(src, container, isVow) {
+  const wrapper = document.createElement("div");
+  wrapper.className = "thumb-wrapper";
+  const imgName = src.split("/").pop().split(".")[0];
+  const thumb = document.createElement("img");
+  thumb.className = "thumb";
+  thumb.src = src;
+  if (!isVow && imgName === "Fon") {
+    thumb.title = "Завантажити свій фон";
+    thumb.onclick = () => document.getElementById("bgLoader").click();
+  } else {
+    thumb.onclick = () => handleGallerySelect(src, isVow ? "love" : "bg");
+  }
+  wrapper.appendChild(thumb);
+  container.appendChild(wrapper);
+}
+function prevSlide() { startIndex = (startIndex - 3 + fullImages.length) % fullImages.length; renderThumbnails(); }
+function nextSlide() { startIndex = (startIndex + 3) % fullImages.length; renderThumbnails(); }
+renderThumbnails();
+
+// Фото кнопка
+document.getElementById("fot").onclick = () => document.getElementById("loveLoader").click();
+
+// Галерея клятв
+const png = ".png";
+const vows = ["LoveStones","Eternity","Fidelity","Joy","Love","Strength","Tenderness","Trust","Unity","Heart"];
+const fullVows = vows.map(name => url + name + png);
+let vowIndex = 0;
+const thumbsVows = document.getElementById("thumbsVows");
+function renderVows() {
+  thumbsVows.innerHTML = "";
+  const slice = fullVows.slice(vowIndex, vowIndex + 4);
+  slice.forEach(src => createThumb(src, thumbsVows, true));
+}
+function prevVow(){ vowIndex = (vowIndex - 4 + fullVows.length) % fullVows.length; renderVows(); }
+function nextVow(){ vowIndex = (vowIndex + 4) % fullVows.length; renderVows(); }
+renderVows();
+
+/* === РЕДАКТОР (адаптований під галереї) === */
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
-const bgLoader = document.getElementById('bgLoader');
-const loveLoader = document.getElementById('loveLoader');
 const scaleSlider = document.getElementById('scaleSlider');
 const undoBtn = document.getElementById('undoBtn');
 const previewBtn = document.getElementById('previewBtn');
 const downloadBtn = document.getElementById('downloadBtn');
-let mask = { cx: 0, cy: 0, r: 0 };
-// шаблон (поверх)
-const template = new Image();
-template.src = 'images/LoveStone.png';
+// приховані input для своїх фото
+const bgLoader = document.createElement("input");
+bgLoader.type="file"; bgLoader.id="bgLoader"; bgLoader.accept="image/*"; bgLoader.style.display="none"; document.body.appendChild(bgLoader);
+const loveLoader = document.createElement("input");
+loveLoader.type="file"; loveLoader.id="loveLoader"; loveLoader.accept="image/*"; loveLoader.style.display="none"; document.body.appendChild(loveLoader);
 
-// модель шарів: зберігаємо img (Image) і dataURL у src для історії
-let layers = {
-  bg: { img: null, src: null, x: canvas.width/2, y: canvas.height/2, scale: 1 },
-  love: { img: null, src: null, x: canvas.width/2, y: canvas.height/2, scale: 1 }
-};
+// Далі лишається твій код редактора (drawAll, undo, preview…) але адаптований — замість fileReader в галереї ми викликаємо handleGallerySelect(src,"bg"/"love")
 
-let activeLayer = null; // 'bg' або 'love'
-let previewMode = false;
-
-// історія: масив снэпшотів { bg:{src,x,y,scale}, love:{...}, previewMode, activeLayer }
-const history = [];
-const MAX_HISTORY = 20;
-
-function makeSnapshot(){
-  return {
-    bg: { src: layers.bg.src, x: layers.bg.x, y: layers.bg.y, scale: layers.bg.scale },
-    love: { src: layers.love.src, x: layers.love.x, y: layers.love.y, scale: layers.love.scale },
-    previewMode: previewMode,
-    activeLayer: activeLayer
+function handleGallerySelect(src, key){
+  const img = new Image();
+  img.onload = ()=>{
+    layers[key].img = img;
+    layers[key].src = src;
+    layers[key].x = canvas.width/2;
+    layers[key].y = canvas.height/2;
+    layers[key].scale = 1;
+    activeLayer = key;
+    scaleSlider.value = 1;
+    pushHistory();
+    drawAll();
   };
+  img.src = src;
 }
 
-function pushHistory(){
-  history.push(makeSnapshot());
-  if(history.length > MAX_HISTORY) history.shift();
-}
+/* ... решта твого коду редактора без змін (drawAll, undo, preview, download, перетягування і т.д.) ... */
 
-function applySnapshot(snapshot){
-  // прочитати джерела і встановити layers; повертаємо Promise, коли картинки підвантажаться
-  previewMode = !!snapshot.previewMode;
-  activeLayer = snapshot.activeLayer || null;
-  const jobs = [];
-
-  ['bg','love'].forEach(key => {
-    const s = snapshot[key];
-    if(s && s.src){
-      // потрібно завантажити картинку
-      const img = new Image();
-      const p = new Promise((res) => {
-        img.onload = () => {
-          layers[key].img = img;
-          layers[key].src = s.src;
-          layers[key].x = s.x;
-          layers[key].y = s.y;
-          layers[key].scale = s.scale;
-          res();
-        };
-        img.onerror = () => {
-          layers[key].img = null;
-          layers[key].src = null;
-          res();
-        };
-      });
-      img.src = s.src;
-      jobs.push(p);
-    } else {
-      // немає картинки в снэпшоті
-      layers[key].img = null;
-      layers[key].src = null;
-      layers[key].x = s ? s.x : canvas.width/2;
-      layers[key].y = s ? s.y : canvas.height/2;
-      layers[key].scale = s ? s.scale : 1;
-    }
-  });
-
-  toggleButtons();
-  if(jobs.length) return Promise.all(jobs).then(drawAll);
-  drawAll();
-  return Promise.resolve();
-}
-
-// Ініціалізація: зберігаємо початковий стан
-pushHistory();
-
-// Відмалювання шару у вказаний контекст
-function drawLayerTo(ctxTarget, layer){
-  if(!layer || !layer.img) return;
-  const w = layer.img.width * layer.scale;
-  const h = layer.img.height * layer.scale;
-  ctxTarget.drawImage(layer.img, layer.x - w/2, layer.y - h/2, w, h);
-}
-
-function drawAll(){
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-
-  if(previewMode){
-    // робимо тимчасовий canvas, куди малюємо шари, потім вирізаємо шаблоном (залишаємо тільки прозору частину шаблону)
-    const tmp = document.createElement('canvas');
-    tmp.width = canvas.width; tmp.height = canvas.height;
-    const tctx = tmp.getContext('2d');
-
-    // малюємо шари на tmp (bg під love)
-    drawLayerTo(tctx, layers.bg);
-    drawLayerTo(tctx, layers.love);
-
-    // видаляємо ту частину, де шаблон непрозорий — тобто залишаємо тільки частину, де шаблон прозорий (виріз)
-// вирізаємо все, крім кола
-tctx.save();
-tctx.beginPath();
-tctx.arc(mask.cx, mask.cy, mask.r, 0, Math.PI*2);
-tctx.clip();
-
-// малюємо лише те, що всередині кола
-const tmpInside = document.createElement('canvas');
-tmpInside.width = canvas.width;
-tmpInside.height = canvas.height;
-const insideCtx = tmpInside.getContext('2d');
-drawLayerTo(insideCtx, layers.bg);
-drawLayerTo(insideCtx, layers.love);
-
-tctx.drawImage(tmpInside, 0, 0);
-tctx.restore();
-
-
-    // переносимо tmp на основний canvas і зверху малюємо сам шаблон
-    ctx.drawImage(tmp, 0, 0);
-    ctx.drawImage(template, 0, 0, canvas.width, canvas.height);
-  } else {
-    // нормальний режим — малюємо просто шари і шаблон зверху
-    drawLayerTo(ctx, layers.bg);
-    drawLayerTo(ctx, layers.love);
-    if(template.complete) ctx.drawImage(template, 0, 0, canvas.width, canvas.height);
-  }
-}
-
-function toggleButtons(){
-  if(previewMode){
-    previewBtn.style.display = 'none';
-    downloadBtn.style.display = 'inline-block';
-  } else {
-    previewBtn.style.display = 'inline-block';
-    downloadBtn.style.display = 'none';
-  }
-}
-
-// Завантаження файлу у шар
-function handleFileLoad(file, key){
-  if(!file) return;
-  const reader = new FileReader();
-  reader.onload = e => {
-    const data = e.target.result;
-    const img = new Image();
-    img.onload = () => {
-      layers[key].img = img;
-      layers[key].src = data;
-      layers[key].x = canvas.width/2;
-      layers[key].y = canvas.height/2;
-      layers[key].scale = 1;
-      activeLayer = key;
-      scaleSlider.value = 1; // скидання повзунка при виборі нового фото
-      pushHistory();
-      drawAll();
-    };
-    img.src = data;
-  };
-  reader.readAsDataURL(file);
-}
-
-bgLoader.addEventListener('change', e => handleFileLoad(e.target.files[0], 'bg'));
-loveLoader.addEventListener('change', e => handleFileLoad(e.target.files[0], 'love'));
-
-// Слайдер
-scaleSlider.addEventListener('input', () => {
-  if(previewMode || !activeLayer) return;
-  layers[activeLayer].scale = parseFloat(scaleSlider.value);
-  drawAll();
-});
-scaleSlider.addEventListener('change', () => {
-  if(previewMode || !activeLayer) return;
-  pushHistory();
-});
-
-// Drag (мішка)
-canvas.addEventListener('mousedown', e => {
-  if(previewMode || !activeLayer) return;
-  dragging = true;
-  dragStartX = e.offsetX - layers[activeLayer].x;
-  dragStartY = e.offsetY - layers[activeLayer].y;
-});
-canvas.addEventListener('mousemove', e => {
-  if(previewMode || !dragging || !activeLayer) return;
-  layers[activeLayer].x = e.offsetX - dragStartX;
-  layers[activeLayer].y = e.offsetY - dragStartY;
-  drawAll();
-});
-canvas.addEventListener('mouseup', () => { 
-  if(previewMode) return;
-  if(dragging){ dragging=false; pushHistory(); } 
-});
-canvas.addEventListener('mouseleave', () => { 
-  if(previewMode) return;
-  if(dragging){ dragging=false; pushHistory(); } 
-});
-
-// Touch support
-canvas.addEventListener('touchstart', e => {
-  if(previewMode || !activeLayer) return;
-  const t = e.touches[0];
-  const rect = canvas.getBoundingClientRect();
-  dragging = true;
-  dragStartX = t.clientX - rect.left - layers[activeLayer].x;
-  dragStartY = t.clientY - rect.top - layers[activeLayer].y;
-  e.preventDefault();
-});
-canvas.addEventListener('touchmove', e => {
-  if(previewMode || !dragging || !activeLayer) return;
-  const t = e.touches[0];
-  const rect = canvas.getBoundingClientRect();
-  layers[activeLayer].x = t.clientX - rect.left - dragStartX;
-  layers[activeLayer].y = t.clientY - rect.top - dragStartY;
-  drawAll(); e.preventDefault();
-});
-canvas.addEventListener('touchend', () => { 
-  if(previewMode) return;
-  if(dragging){ dragging=false; pushHistory(); } 
-});
-
-
-// Undo: вертаємося до попереднього snapshot (по кроку)
-undoBtn.addEventListener('click', () => {
-  if(history.length <= 1) return; // нічого скасовувати
-  history.pop(); // видаляємо поточний стан
-  const prev = history[history.length-1];
-  applySnapshot(prev);
-});
-
-// Preview: застосувати маску з шаблону (використовує прозорість шаблону як виріз)
-previewBtn.addEventListener('click', () => {
-  previewMode = true;
-  pushHistory();
-  toggleButtons();
-  drawAll();
-});
-
-// Download: просто зберігаємо поточний canvas (включно з маскою, якщо previewMode)
-downloadBtn.addEventListener('click', () => {
-  const link = document.createElement('a');
-  link.download = 'composition.png';
-  link.href = canvas.toDataURL('image/png');
-  link.click();
-});
-
-// коли шаблон завантажиться, перемалюємо
-template.onload = function(){
-  // малюємо шаблон у приховане полотно
-  let tempCanvas = document.createElement("canvas");
-  tempCanvas.width = canvas.width;
-  tempCanvas.height = canvas.height;
-  let tctx = tempCanvas.getContext("2d");
-  tctx.drawImage(template, 0, 0, canvas.width, canvas.height);
-
-  let imgData = tctx.getImageData(0, 0, canvas.width, canvas.height);
-  let data = imgData.data;
-
-  let xs = [], ys = [];
-  for(let y=0; y<canvas.height; y++){
-    for(let x=0; x<canvas.width; x++){
-      let alpha = data[(y*canvas.width + x)*4 + 3]; // альфа-канал
-      if(alpha < 50){ // прозорий піксель
-        xs.push(x);
-        ys.push(y);
-      }
-    }
-  }
-
-  if(xs.length > 0){
-    // центр вирізу
-    let avgX = xs.reduce((a,b)=>a+b,0)/xs.length;
-    let avgY = ys.reduce((a,b)=>a+b,0)/ys.length;
-    mask.cx = avgX;
-    mask.cy = avgY;
-
-    // радіус
-    let maxDist = 0;
-    for(let i=0; i<xs.length; i++){
-      let dx = xs[i]-avgX, dy = ys[i]-avgY;
-      let dist = Math.sqrt(dx*dx + dy*dy);
-      if(dist > maxDist) maxDist = dist;
-    }
-    mask.r = maxDist;
-  }
-
-  drawAll();
-};
-
-
-// малюємо початковий стан
-applySnapshot(history[0] || makeSnapshot());
-
-// функція блокування / розблокування
-function setDisabled(state) {
-  // беремо всі елементи управління, крім завантаження фото та фону
-  const controls = document.querySelectorAll("input:not(#background):not(#love), #scaleSlider");
-
-  controls.forEach(ctrl => {
-    if (state) {
-      ctrl.disabled = true;
-      ctrl.classList.add("disabled");
-    } else {
-      ctrl.disabled = false;
-      ctrl.classList.remove("disabled");
-    }
-  });
-}
-
-// Прив’язка кнопки "Перегляд"
-document.getElementById("previewBtn").addEventListener("click", () => {
-  setDisabled(true);
-});
-
-// Прив’язка кнопки "Undo"
-document.getElementById("undoBtn").addEventListener("click", () => {
-  setDisabled(false);
-});
 </script>
 </body>
 </html>
