@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <title>Камінь любові — Галереї</title>
 <style>
-/* === Галерея фонів === */
+/* === Єдиний стиль для обох галерей === */
 body {
   font-family: sans-serif;
   text-align: center;
@@ -92,8 +92,8 @@ body {
   background-repeat: no-repeat;
   background-size: contain;
 }
-#fot:hover {mix-blend-mode: luminosity;}
-#fot:active {mix-blend-mode: exclusion;}
+#fot:hover { mix-blend-mode: luminosity; }
+#fot:active { mix-blend-mode: exclusion; }
 
 .imagbox {
   position: fixed;
@@ -117,44 +117,8 @@ body {
 }
 
 .photo-block { margin-left: 150px; }
-
-/* === Галерея клятв (CSS підключений після фонів, має пріоритет) === */
-.gallery-container.vows {
-  align-items: center;
-  gap: 40px;
-}
-
-.gallery-container.vows .gallery-block {
-  flex-direction: row;
-  align-items: center;
-  gap: 10px;
-}
-
-.gallery-container.vows .arrow {
-  font-size: 40px;
-  padding: 10px;
-}
-
-.gallery-container.vows .thumb {
-  width: 180px;
-  height: 120px;
-}
-
-.collage img.template {
-  max-width: 900px;
-  height: auto;
-  border-radius: 12px;
-}
-
-.collage img.overlay.vow {
-  width: 200px;  /* менший розмір клятви у колажі */
-}
-
-#book img {
-  width: 30%;
-  height: auto;
-}
 </style>
+
 </head>
 <body>
 
