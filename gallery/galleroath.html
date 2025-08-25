@@ -273,7 +273,7 @@ const thumbsVows = document.getElementById("thumbsVows");
 
 function renderVows() {
   thumbsVows.innerHTML = "";
-  const slice = fullVows.slice(vowIndex, vowIndex + 4);
+  const slice = fullVows.slice(vowIndex, vowIndex + 3);
   slice.forEach(src => createThumb(src, thumbsVows, true));
 }
 function renderBooks() {
@@ -285,11 +285,11 @@ function renderBooks() {
   });
 }
 function prevVow() {
-  vowIndex = (vowIndex - 4 + fullVows.length) % fullVows.length;
+  vowIndex = (vowIndex - 3 + fullVows.length) % fullVows.length;
   renderVows();
 }
 function nextVow() {
-  vowIndex = (vowIndex + 4) % fullVows.length;
+  vowIndex = (vowIndex + 3) % fullVows.length;
   renderVows();
 }
 
