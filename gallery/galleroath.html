@@ -32,7 +32,7 @@ body {
   justify-content: center;
 }
 
-.arrow, .arrown {
+.arrow, .arow {
   font-size: 20px;
   cursor: pointer;
   user-select: none;
@@ -45,8 +45,8 @@ body {
 
 .arrow:first-child { margin-right: -60px; }
 .arrow:last-child { margin-left: -70px; }
-.arrown:first-child { margin-right: -60px; }
-.arrown:last-child { margin-left: -60px; }  
+.arown:first-child { margin-right: -60px; }
+.arown:last-child { margin-left: -60px; }  
 
 .thumbnails {
   display: flex;
@@ -150,9 +150,9 @@ body {
   <div class="gallery-block">
     <b>Клятва</b>
     <div>
-      <span class="arrown" onclick="prevVow()">&#10094;</span>
+      <span class="arown" onclick="prevVow()">&#10094;</span>
       <div class="thumbnails" id="thumbsVows"></div>
-      <span class="arrown" onclick="nextVow()">&#10095;</span>
+      <span class="arown" onclick="nextVow()">&#10095;</span>
     </div>
   </div>
 </div>
@@ -264,10 +264,6 @@ const png = ".png";
 const vows = ["LoveStones","Eternity","Fidelity","Joy","LoveStones","Love","Strength","Tenderness","LoveStones","Trust","Unity","Heart"];
 const fullVows = vows.map(name => url + name + png);
 
-const bookImages = [
-  "https://detectfraud.github.io/images/LoveStones.png"
-];
-
 let vowIndex = 0;
 const thumbsVows = document.getElementById("thumbsVows");
 /*const bookContainer = document.getElementById("book"); */
@@ -277,14 +273,7 @@ function renderVows() {
   const slice = fullVows.slice(vowIndex, vowIndex + 4);
   slice.forEach(src => createThumb(src, thumbsVows, true));
 }
-function renderBooks() {
-  bookContainer.innerHTML = "";
-  bookImages.forEach(src => {
-    const img = document.createElement("img");
-    img.src = src;
-    bookContainer.appendChild(img);
-  });
-}
+
 function prevVow() {
   vowIndex = (vowIndex - 4 + fullVows.length) % fullVows.length;
   renderVows();
@@ -295,7 +284,7 @@ function nextVow() {
 }
 
 renderVows();
-renderBooks();
+
 </script>
 </body>
 </html>
