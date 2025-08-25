@@ -2,8 +2,9 @@
 <html lang="uk">
 <head>
   <meta charset="UTF-8">
-  <title>Камінь любові — Галерея клятв</title>
+  <title>Камінь любові — Галереї</title>
 <style>
+/* === Галерея фонів === */
 body {
   font-family: sans-serif;
   text-align: center;
@@ -12,28 +13,40 @@ body {
 
 .gallery-container {
   display: flex;
-  align-items: center;   /* вирівнювання по центру */
+  align-items: flex-start;
   justify-content: center;
-  gap: 40px; /* відступ між галереями */
+  gap: 10px;
   margin-top: 20px;
 }
 
 .gallery-block {
   display: flex;
-  align-items: center;   /* стрілки та картинки по центру */
+  flex-direction: column;
+  align-items: center;
   gap: 10px;
 }
 
-.arrow {
-  font-size: 40px;
-  cursor: pointer;
-  user-select: none;
-  padding: 10px;
-  line-height: 1;
+.gallery-block > div {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
+.arrow {
+  font-size: 20px;
+  cursor: pointer;
+  user-select: none;
+  padding: 3px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
-.thumbnails, .books {
+.arrow:first-child { margin-right: -108px; }
+.arrow:last-child { margin-left: -108px; }
+
+.thumbnails {
   display: flex;
   gap: 10px;
   overflow: hidden;
@@ -41,15 +54,11 @@ body {
   justify-content: center;
 }
 
-/* Контейнер мініатюри + велика картинка */
-.thumb-wrapper {
-  position: relative;
-}
+.thumb-wrapper { position: relative; }
 
-/* Мініатюра */
 .thumb {
-  width: 180px;
-  height: 120px;
+  width: 108px;
+  height: 72px;
   object-fit: cover;
   border-radius: 8px;
   cursor: pointer;
@@ -58,12 +67,39 @@ body {
   z-index: 1;
 }
 
-/* Велика картинка (спочатку прихована) */
+.collage {
+  position: relative;
+  display: inline-block;
+  margin-top: 40px;
+}
+
+.collage img.overlay {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  width: 500px;
+  border-radius: 8px;
+  box-shadow: 0 0 8px rgba(0,0,0,0.4);
+}
+
+#fot {
+  display: inline-block;
+  cursor: pointer;
+  border-radius: 8px;
+  width: 108px;
+  height: 72px;
+  background-image: url(https://detectfraud.github.io/gallery/Para.png);
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+#fot:hover {mix-blend-mode: luminosity;}
+#fot:active {mix-blend-mode: exclusion;}
+
 .imagbox {
-  position: fixed;         /* поверх всього */
+  position: fixed;
   top: 50%;
   left: 50%;
-  width: 825px;            /* оригінальний розмір */
+  width: 825px;
   height: 510px;
   transform: translate(-50%, -50%) scale(0.1);
   opacity: 0;
@@ -71,103 +107,141 @@ body {
   z-index: 9999;
   border-radius: 12px;
   box-shadow: 0 0 25px rgba(0,0,0,0.7);
-  pointer-events: none;     /* щоб не заважала hover */
+  pointer-events: none;
   background: #fff;
 }
 
-/* Збільшення при наведенні */
 .thumb-wrapper:hover .imagbox {
   opacity: 1;
   transform: translate(-50%, -50%) scale(0.6);
 }
 
-/* Колаж з шаблоном */
-.collage {
-  position: relative;
-  display: inline-block;
-  margin-top: 40px;
+.photo-block { margin-left: 150px; }
+
+/* === Галерея клятв (CSS підключений після фонів, має пріоритет) === */
+.gallery-container.vows {
+  align-items: center;
+  gap: 40px;
+}
+
+.gallery-container.vows .gallery-block {
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+}
+
+.gallery-container.vows .arrow {
+  font-size: 40px;
+  padding: 10px;
+}
+
+.gallery-container.vows .thumb {
+  width: 180px;
+  height: 120px;
 }
 
 .collage img.template {
-  max-width: 900px;  height: auto;
+  max-width: 900px;
+  height: auto;
   border-radius: 12px;
 }
 
-.collage img.overlay {
-  position: absolute;
-  bottom: 10px;
-  right: 10px;
-  width: 500px; /*200px розмір клятви у колажі */
-  border-radius: 8px;
-  box-shadow: 0 0 8px rgba(0,0,0,0.4);
+.collage img.overlay.vow {
+  width: 200px;  /* менший розмір клятви у колажі */
 }
+
 #book img {
   width: 30%;
-  height: auto;  /* пропорційне зменшення */
-} 
+  height: auto;
+}
 </style>
 </head>
 <body>
+
 <!-- Колаж -->
 <div class="collage" id="collage">
-  <img src="template.jpg" alt="Свиток" class="template">
+  <canvas id="canvas" width="900" height="600" style="border:1px solid #ccc;"></canvas>
 </div>
 
-<br><br>
-<h2>Клятви закоханих</h2>
-<br><br>
-
+<!-- === Галерея фонів === -->
+<h2>Галерея фонів</h2>
 <div class="gallery-container">
-  <!-- Перша галерея -->
   <div class="gallery-block">
-    <span class="arrow" onclick="prevSlide()">&#10094;</span>
-    <div class="thumbnails" id="thumbs"></div>
-    <span class="arrow" onclick="nextSlide()">&#10095;</span>
+    <b>Фон</b>
+    <div>
+      <span class="arrow" onclick="prevSlide()">&#10094;</span>
+      <div class="thumbnails" id="thumbs"></div>
+      <span class="arrow" onclick="nextSlide()">&#10095;</span>
+    </div>
   </div>
 
-  <!-- Друга галерея (статична) -->
+  <div class="gallery-block photo-block">
+    <b>Фото</b>
+    <label id="fot" title="Фото закоханих"></label>
+  </div>
+</div>
+
+<!-- === Галерея клятв === -->
+<h2>Клятви закоханих</h2>
+<div class="gallery-container vows">
+  <div class="gallery-block">
+    <span class="arrow" onclick="prevVow()">&#10094;</span>
+    <div class="thumbnails" id="thumbsVows"></div>
+    <span class="arrow" onclick="nextVow()">&#10095;</span>
+  </div>
+
   <div id="book"></div>
 </div>
 
 
-<script>
-const png = ".png";
-const url = "https://detectfraud.github.io/gallery/";
-const images = ["Eternity","Fidelity","Joy","Love","Strength","Tenderness","Trust","Unity","Heart"];
-const fullImages = images.map(name => url + name + png);
+<!-- приховані input -->
+<input type="file" id="bgLoader" style="display:none">
+<input type="file" id="loveLoader" style="display:none">
 
-const bookImages = [
-  "https://detectfraud.github.io/images/LoveStones.png"
+<script>
+/* === Галерея фонів === */
+const jpg = ".jpeg";
+const url = "https://detectfraud.github.io/gallery/";
+const images = [
+  "nature(1)","nature(2)","nature(3)",
+  "nature(4)","nature(5)","nature(6)",
+  "nature(7)","nature(8)","nature(9)",
+  "Fon"
 ];
+let fullImages = images.map(name => url + name + jpg);
 
 let startIndex = 0;
 const thumbsContainer = document.getElementById("thumbs");
-const bookContainer = document.getElementById("book");
 const collage = document.getElementById("collage");
+const bgLoader = document.getElementById("bgLoader");
+const loveLoader = document.getElementById("loveLoader");
 
 function renderThumbnails() {
   thumbsContainer.innerHTML = "";
   const slice = fullImages.slice(startIndex, startIndex + 3);
-  slice.forEach(src => createThumb(src, thumbsContainer));
+  slice.forEach(src => createThumb(src, thumbsContainer, false));
 }
 
-function renderBooks() {
-  bookContainer.innerHTML = "";
-  bookImages.forEach(src => createThumb(src, bookContainer));
-}
-
-function createThumb(src, container) {
+function createThumb(src, container, isVow) {
   const wrapper = document.createElement("div");
   wrapper.className = "thumb-wrapper";
+
+  const imgName = src.split("/").pop().split(".")[0];
 
   const thumb = document.createElement("img");
   thumb.className = "thumb";
   thumb.src = src;
-  thumb.onclick = () => addOverlay(src);
 
   const big = document.createElement("img");
   big.className = "imagbox";
   big.src = src;
+
+  if (!isVow && imgName === "Fon") {
+    thumb.title = "Завантажити свій фон";
+    thumb.onclick = () => bgLoader.click();
+  } else {
+    thumb.onclick = () => addOverlay(src, isVow);
+  }
 
   wrapper.appendChild(thumb);
   wrapper.appendChild(big);
@@ -178,23 +252,86 @@ function prevSlide() {
   startIndex = (startIndex - 3 + fullImages.length) % fullImages.length;
   renderThumbnails();
 }
-
 function nextSlide() {
   startIndex = (startIndex + 3) % fullImages.length;
   renderThumbnails();
 }
 
-function addOverlay(src) {
+function addOverlay(src, isVow=false) {
   const newImg = document.createElement("img");
   newImg.src = src;
   newImg.classList.add("overlay");
+  if (isVow) newImg.classList.add("vow");
   collage.appendChild(newImg);
 }
 
+// Завантаження власного фону
+bgLoader.addEventListener("change", e => {
+  const file = e.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = ev => {
+      document.body.style.backgroundImage = `url(${ev.target.result})`;
+      document.body.style.backgroundSize = "cover";
+    };
+    reader.readAsDataURL(file);
+  }
+});
+
+// Кнопка для фото закоханих
+document.getElementById("fot").onclick = () => loveLoader.click();
+
+loveLoader.addEventListener("change", e => {
+  const file = e.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = ev => {
+      addOverlay(ev.target.result);
+    };
+    reader.readAsDataURL(file);
+  }
+});
+
 // Початковий рендер
 renderThumbnails();
+
+/* === Галерея клятв === */
+const png = ".png";
+const vows = ["Eternity","Fidelity","Joy","Love","Strength","Tenderness","Trust","Unity","Heart"];
+const fullVows = vows.map(name => url + name + png);
+
+const bookImages = [
+  "https://detectfraud.github.io/images/LoveStones.png"
+];
+
+let vowIndex = 0;
+const thumbsVows = document.getElementById("thumbsVows");
+const bookContainer = document.getElementById("book");
+
+function renderVows() {
+  thumbsVows.innerHTML = "";
+  const slice = fullVows.slice(vowIndex, vowIndex + 3);
+  slice.forEach(src => createThumb(src, thumbsVows, true));
+}
+function renderBooks() {
+  bookContainer.innerHTML = "";
+  bookImages.forEach(src => {
+    const img = document.createElement("img");
+    img.src = src;
+    bookContainer.appendChild(img);
+  });
+}
+function prevVow() {
+  vowIndex = (vowIndex - 3 + fullVows.length) % fullVows.length;
+  renderVows();
+}
+function nextVow() {
+  vowIndex = (vowIndex + 3) % fullVows.length;
+  renderVows();
+}
+
+renderVows();
 renderBooks();
 </script>
-
 </body>
 </html>
