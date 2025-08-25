@@ -122,19 +122,21 @@ body {
   position: relative;
   z-index: 3;   /* > 1 у .thumb */
 }
-/* Рядок підписів */
-.captions {
+.gallery-container.vows .labels {
   display: grid;
-  grid-template-columns: repeat(4, 1fr); /* 4 позиції */
+  grid-template-columns: repeat(4, 1fr); /* 4 мініатюри */
   text-align: center;
   margin-bottom: 5px;
-  font-weight: bold;
 }
 
-/* Щоб підпис був чітко над своїм місцем */
-.captions span {
-  display: block;
+.gallery-container.vows .labels .label1 {
+  grid-column: 1; /* над першою мініатюрою */
 }
+
+.gallery-container.vows .labels .label2 {
+  grid-column: 3; /* над третьою мініатюрою */
+}
+
 
 </style>
 
@@ -166,15 +168,11 @@ body {
 <!-- === Галерея клятв === -->
 <div class="gallery-container vows">
   <div class="gallery-block">
-    <!-- Рядок підписів -->
-    <div class="captions">
-      <span>Надпис</span>
-      <span></span> <!-- пусте місце для 2-ї мініатюри -->
-      <span>Клятва закоханих</span>
-      <span></span> <!-- пусте місце для 4-ї (якщо є) -->
+    <div class="labels">
+      <span class="label1">Надпис</span>
+      <span class="label2">Клятва закоханих</span>
     </div>
 
-    <!-- Галерея з мініатюрами -->
     <div class="gallery-row">
       <span class="arow" onclick="prevVow()">&#10094;</span>
       <div class="thumbnails" id="thumbsVows"></div>
@@ -183,9 +181,7 @@ body {
   </div>
 </div>
 
-
-
-<!-- приховані input -->
+  <!-- приховані input -->
 <input type="file" id="bgLoader" style="display:none">
 <input type="file" id="loveLoader" style="display:none">
 
