@@ -272,7 +272,7 @@ const thumbsVows = document.getElementById("thumbsVows");
 
 function renderVows() {
   thumbsVows.innerHTML = "";
-  const slice = fullVows.slice(vowIndex, vowIndex + 3);
+  const slice = fullVows.slice(vowIndex, vowIndex + 4);
   slice.forEach(src => createThumb(src, thumbsVows, true));
 }
 function renderBooks() {
