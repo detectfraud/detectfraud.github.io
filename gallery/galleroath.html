@@ -122,6 +122,19 @@ body {
   position: relative;
   z-index: 3;   /* > 1 у .thumb */
 }
+/* Рядок підписів */
+.captions {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr); /* 4 позиції */
+  text-align: center;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+/* Щоб підпис був чітко над своїм місцем */
+.captions span {
+  display: block;
+}
 
 </style>
 
@@ -153,14 +166,23 @@ body {
 <!-- === Галерея клятв === -->
 <div class="gallery-container vows">
   <div class="gallery-block">
-    <b>Надпис</b><b>Клятва</b>
-    <div>
+    <!-- Рядок підписів -->
+    <div class="captions">
+      <span>Надпис</span>
+      <span></span> <!-- пусте місце для 2-ї мініатюри -->
+      <span>Клятва закоханих</span>
+      <span></span> <!-- пусте місце для 4-ї (якщо є) -->
+    </div>
+
+    <!-- Галерея з мініатюрами -->
+    <div class="gallery-row">
       <span class="arow" onclick="prevVow()">&#10094;</span>
       <div class="thumbnails" id="thumbsVows"></div>
       <span class="arow" onclick="nextVow()">&#10095;</span>
     </div>
   </div>
 </div>
+
 
 
 <!-- приховані input -->
