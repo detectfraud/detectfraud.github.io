@@ -1,154 +1,41 @@
-<!-- Collage (21:20 26.08.25) -->
+<!-- Collage (11:26 26.08.25) -->
 <!DOCTYPE html>
 <html lang="uk">
 <head>
 <meta charset="UTF-8" />
 <title>Камінь любові — редактор</title>
 <style>
-/* === Стилі === */
-body {
-  font-family: sans-serif;
-  text-align: center;
-  background: #f5f5f5;
-}
+body { font-family: sans-serif; text-align:center; background:#f5f5f5; }
+.venwin { background:#fff; border-radius:10px; padding:10px; display:inline-block; }
+canvas { border:3px solid #bbb; border-radius:6px; box-shadow:0 6px 18px rgba(0,0,0,.1); display:block; margin:10px auto; }
+#scaleSlider { width:420px; }
+button { padding:8px 12px; }
+.disabled { pointer-events:none; opacity:.5; filter:grayscale(100%); }
 
-.venwin {
-  background: #fff;
-  border-radius: 10px;
-  padding: 10px;
-  display: inline-block;
-}
+.gallery-container { display:flex; align-items:flex-start; justify-content:center; gap:10px; margin-top:20px; }
+.gallery-block { display:flex; flex-direction:column; align-items:center; gap:10px; }
+.gallery-block > div { display:flex; align-items:center; justify-content:center; }
+.arrow, .arow { font-size:20px; cursor:pointer; user-select:none; padding:3px; line-height:1; display:flex; align-items:center; justify-content:center; position:relative; z-index:3; }
+.arrow:first-child { margin-right:-110px; } arrow:last-child { margin-left:-110px; }
+.arow:first-child { margin-right:-60px; }
+.arow:last-child { margin-left:-60px; }
+.thumbnails { display:flex; gap:10px; overflow:hidden; width:600px; justify-content:center; }
+.thumb-wrapper { position:relative; }
+.thumb { width:108px; height:72px; object-fit:cover; border-radius:8px; cursor:pointer; box-shadow:0 0 6px rgba(0,0,0,0.3); transition:all 0.3s ease; z-index:1; }
+.collage { position:relative; display:inline-block; margin-top:40px; }
+.collage img.overlay { position:absolute; bottom:10px; right:10px; width:500px; border-radius:8px; box-shadow:0 0 8px rgba(0,0,0,0.4); }
 
-canvas {
-  border: 3px solid #bbb;
-  border-radius: 6px;
-  box-shadow: 0 6px 18px rgba(0,0,0,.1);
-  display: block;
-  margin: 10px auto;
-}
+#fot { display:inline-block; cursor:pointer; border-radius:8px; width:108px; height:72px; background-image:url(https://detectfraud.github.io/gallery/Para.png); background-repeat:no-repeat; background-size:contain; }
+#fot:hover { mix-blend-mode:luminosity; }
+#fot:active { mix-blend-mode:exclusion; }
 
-#scaleSlider { width: 420px; }
-button { padding: 8px 12px; }
-.disabled { pointer-events: none; opacity: .5; filter: grayscale(100%); }
+.imagbox { position:fixed; top:50%; left:50%; width:825px; height:510px; transform:translate(-50%,-50%) scale(0.1); opacity:0; transition:all 0.5s ease; z-index:9999; border-radius:12px; box-shadow:0 0 25px rgba(0,0,0,0.7); pointer-events:none; background:#fff; }
+.thumb-wrapper:hover .imagbox { opacity:1; transform:translate(-50%,-50%) scale(0.6); }
+.photo-block { margin-left:100px; }
 
-/* Галереї */
-.gallery-container {
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  gap: 10px;
-  margin-top: 20px;
-}
-
-.gallery-block {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-}
-
-.gallery-block > div { display: flex; align-items: center; justify-content: center; }
-
-.arrow, .arow {
-  font-size: 20px;
-  cursor: pointer;
-  user-select: none;
-  padding: 3px;
-  line-height: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  z-index: 3;
-}
-
-.arrow:first-child { margin-right: -110px; }
-.arrow:last-child { margin-left: -110px; }
-.arow:first-child { margin-right: -60px; }
-.arow:last-child { margin-left: -60px; }
-
-.thumbnails {
-  display: flex;
-  gap: 10px;
-  overflow: hidden;
-  width: 600px;
-  justify-content: center;
-}
-
-.thumb-wrapper { position: relative; }
-
-.thumb {
-  width: 108px;
-  height: 72px;
-  object-fit: cover;
-  border-radius: 8px;
-  cursor: pointer;
-  box-shadow: 0 0 6px rgba(0,0,0,0.3);
-  transition: all 0.3s ease;
-  z-index: 1;
-}
-
-.collage {
-  position: relative;
-  display: inline-block;
-  margin-top: 40px;
-}
-
-.collage img.overlay {
-  position: absolute;
-  bottom: 10px;
-  right: 10px;
-  width: 500px;
-  border-radius: 8px;
-  box-shadow: 0 0 8px rgba(0,0,0,0.4);
-}
-
-#fot {
-  display: inline-block;
-  cursor: pointer;
-  border-radius: 8px;
-  width: 108px;
-  height: 72px;
-  background-image: url(https://detectfraud.github.io/gallery/Para.png);
-  background-repeat: no-repeat;
-  background-size: contain;
-}
-
-#fot:hover { mix-blend-mode: luminosity; }
-#fot:active { mix-blend-mode: exclusion; }
-
-.imagbox {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  width: 825px;
-  height: 510px;
-  transform: translate(-50%, -50%) scale(0.1);
-  opacity: 0;
-  transition: all 0.5s ease;
-  z-index: 9999;
-  border-radius: 12px;
-  box-shadow: 0 0 25px rgba(0,0,0,0.7);
-  pointer-events: none;
-  background: #fff;
-}
-
-.thumb-wrapper:hover .imagbox {
-  opacity: 1;
-  transform: translate(-50%, -50%) scale(0.6);
-}
-
-.photo-block { margin-left: 100px; }
-
-.gallery-container.vows .labels {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  text-align: center;
-  margin-bottom: 5px;
-}
-
-.gallery-container.vows .labels .label1 { grid-column: 1; font-weight: bold; margin-left: 70px; }
-.gallery-container.vows .labels .label2 { grid-column: 3; font-weight: bold; }
+.gallery-container.vows .labels { display:grid; grid-template-columns:repeat(4,1fr); text-align:center; margin-bottom:5px; }
+.gallery-container.vows .labels .label1 { grid-column:1; font-weight:bold; margin-left:70px; }
+.gallery-container.vows .labels .label2 { grid-column:3; font-weight:bold; }
 </style>
 </head>
 <body>
@@ -218,13 +105,12 @@ const url = "https://detectfraud.github.io/gallery/";
 const images = ["nature(1)","nature(2)","nature(3)","nature(4)","nature(5)","nature(6)","nature(7)","nature(8)","nature(9)","Fon"];
 const fullImages = images.map(name => url + name + ".jpeg");
 let startIndex = 0;
-
 function renderThumbnails(){ thumbs.innerHTML=""; fullImages.slice(startIndex,startIndex+3).forEach(src=>createThumb(src, thumbs, false)); }
 function createThumb(src, container, isVow){
-  const wrapper = document.createElement("div"); wrapper.className="thumb-wrapper";
-  const imgName = src.split("/").pop().split(".")[0];
-  const thumb = document.createElement("img"); thumb.className="thumb"; thumb.src=src;
-  const big = document.createElement("img"); big.className="imagbox"; big.src=src;
+  const wrapper=document.createElement("div"); wrapper.className="thumb-wrapper";
+  const imgName=src.split("/").pop().split(".")[0];
+  const thumb=document.createElement("img"); thumb.className="thumb"; thumb.src=src;
+  const big=document.createElement("img"); big.className="imagbox"; big.src=src;
   if(!isVow && imgName==="Fon"){ thumb.title="Завантажити свій фон"; thumb.onclick=()=>bgLoader.click(); }
   else thumb.onclick=()=>addOverlay(src,isVow);
   wrapper.appendChild(thumb); wrapper.appendChild(big); container.appendChild(wrapper);
@@ -234,20 +120,19 @@ function nextSlide(){ startIndex=(startIndex+3)%fullImages.length; renderThumbna
 
 /* === Галерея клятв === */
 const vows=["LoveStones","Eternity","Fidelity","Joy","LoveStones","Love","Strength","Tenderness","LoveStones","Trust","Unity","Heart"];
-const fullVows = vows.map(name=>url+name+".png");
+const fullVows=vows.map(name=>url+name+".png");
 let vowIndex=0;
 function renderVows(){ thumbsVows.innerHTML=""; fullVows.slice(vowIndex,vowIndex+4).forEach(src=>createThumb(src, thumbsVows, true)); }
 function prevVow(){ vowIndex=(vowIndex-4+fullVows.length)%fullVows.length; renderVows(); }
 function nextVow(){ vowIndex=(vowIndex+4)%fullVows.length; renderVows(); }
 
-/* === Шари і маска === */
+/* === Шари і маска (кругла діра) === */
 const template=new Image(); template.src='images/composit.png';
 const HOLE_OFFSET_X=6, HOLE_OFFSET_Y=-115, HOLE_RADIUS=98;
-let mask={cx:0, cy:0, r:0};
-function setDefaultMask(){ mask.cx=canvas.width/2+HOLE_OFFSET_X; mask.cy=canvas.height/2+HOLE_OFFSET_Y; mask.r=HOLE_RADIUS; }
+let mask={cx:canvas.width/2+HOLE_OFFSET_X, cy:canvas.height/2+HOLE_OFFSET_Y, r:HOLE_RADIUS};
 
 let layers={ bg:{img:null,src:null,x:canvas.width/2,y:canvas.height/2,scale:1}, love:{img:null,src:null,x:canvas.width/2,y:canvas.height/2,scale:1} };
-let activeLayer=null, previewMode=false, bgHoleActive=false;
+let activeLayer=null, previewMode=false, bgHoleActive=true;
 const history=[]; const MAX_HISTORY=20;
 function makeSnapshot(){ return { bg:{...layers.bg}, love:{...layers.love}, previewMode, activeLayer, bgHoleActive }; }
 function pushHistory(){ history.push(makeSnapshot()); if(history.length>MAX_HISTORY) history.shift(); }
@@ -292,12 +177,11 @@ undoBtn.addEventListener('click',()=>{ if(history.length<=1) return; history.pop
 previewBtn.addEventListener('click',()=>{ previewMode=true; pushHistory(); toggleButtons(); drawAll(); });
 downloadBtn.addEventListener('click',()=>{ const link=document.createElement('a'); link.download='composition.png'; link.href=canvas.toDataURL('image/png'); link.click(); });
 
-template.onload=()=>{ setDefaultMask(); drawAll(); };
+template.onload=()=>{ drawAll(); };
 renderThumbnails(); renderVows();
 applySnapshot(history[0]||makeSnapshot());
 
 function setDisabled(state){ [thumbs,loveLoader,scaleSlider].forEach(el=>{ el.disabled=!!state; el.classList.toggle('disabled',!!state); }); }
-
 function addOverlay(src,isVow=false){ const newImg=document.createElement("img"); newImg.src=src; newImg.classList.add("overlay"); if(isVow) newImg.classList.add("vow"); collage.appendChild(newImg); }
 
 </script>
