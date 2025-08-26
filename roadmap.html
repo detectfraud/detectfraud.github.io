@@ -66,7 +66,7 @@ button { padding:8px 12px; cursor:pointer; border-radius:8px; }
 </div>
 
 <!-- Галерея клятв -->
-<div class="gallery-container vows">
+<div class="gallery-container vows" id="vowse" style="display:none;">
   <div class="gallery-block">
     <div class="labels">
       <span class="label1">Надпис</span>
@@ -267,8 +267,8 @@ downloadBtn.addEventListener('click',()=>{ const link=document.createElement('a'
 template.onload=()=>{ drawAll(); };
 renderThumbnails(); renderVows();
 applySnapshot(history[0]||makeSnapshot());
-
-function setDisabled(state){ [thumbs,loveLoader,scaleSlider].forEach(el=>{ el.disabled=!!state; el.classList.toggle('disabled',!!state); }); }
+//,scaleSlider
+function setDisabled(state){ [thumbs,loveLoader].forEach(el=>{ el.disabled=!!state; el.classList.toggle('disabled',!!state); }); }
 function addOverlay(src,isVow=false){ const newImg=document.createElement("img"); newImg.src=src; newImg.classList.add("overlay"); if(isVow) newImg.classList.add("vow"); collage.appendChild(newImg); }
   
 document.getElementById('updateBtn').addEventListener('click', function () {
