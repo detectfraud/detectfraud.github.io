@@ -105,21 +105,103 @@ const collage = document.getElementById('collage');
 
 /* === Галерея фонів === */
 const url = "https://detectfraud.github.io/gallery/";
-const images = ["nature(1)","nature(2)","nature(3)","nature(4)","nature(5)","nature(6)","nature(7)","nature(8)","nature(9)","Fon"];
+const images = [
+  "nature(1)","nature(2)","nature(3)","nature(4)","nature(5)",
+  "nature(6)","nature(7)","nature(8)","nature(9)","Fon"
+];
 const fullImages = images.map(name => url + name + ".jpeg");
 let startIndex = 0;
-function renderThumbnails(){ thumbs.innerHTML=""; fullImages.slice(startIndex,startIndex+3).forEach(src=>createThumb(src, thumbs, false)); }
-function createThumb(src, container, isVow){
-  const wrapper=document.createElement("div"); wrapper.className="thumb-wrapper";
-  const imgName=src.split("/").pop().split(".")[0];
-  const thumb=document.createElement("img"); thumb.className="thumb"; thumb.src=src;
-  const big=document.createElement("img"); big.className="imagbox"; big.src=src;
-  if(!isVow && imgName==="Fon"){ thumb.title="Завантажити свій фон"; thumb.onclick=()=>bgLoader.click(); }
-  else thumb.onclick=()=>addOverlay(src,isVow);
-  wrapper.appendChild(thumb); wrapper.appendChild(big); container.appendChild(wrapper);
+
+function renderThumbnails(){
+  thumbs.innerHTML="";
+  fullImages.slice(startIndex,startIndex+3).forEach(src=>createThumb(src, thumbs, false));
 }
-function prevSlide(){ startIndex=(startIndex-3+fullImages.length)%fullImages.length; renderThumbnails(); }
-function nextSlide(){ startIndex=(startIndex+3)%fullImages.length; renderThumbnails(); }
+
+function createThumb(src, container, isVow){
+  const wrapper=document.createElement("div");
+  wrapper.className="thumb-wrapper";
+
+  const imgName=src.split("/").pop().split(".")[0];
+
+  const thumb=document.createElement("img");
+  thumb.className="thumb";
+  thumb.src=src;
+
+  const big=document.createElement("img");
+  big.className="imagbox";
+  big.src=src;
+
+  if(!isVow && imgName==="Fon"){
+    // клік = завантаження свого файлу
+    thumb.title="Завантажити свій фон";
+    thumb.onclick=()=>bgLoader.click();
+  } else {
+    // клік = вставка готового фону як "bg"
+    thumb.onclick=()=>handleFileFromGallery(src,"bg");
+  }
+
+  wrapper.appendChild(thumb);
+  wrapper.appendChild(big);
+  container.appendChild(wrapper);
+}
+
+function prevSlide(){
+  startIndex=(startIndex-3+fullImages.length)%fullImages.length;
+  renderThumbnails();
+}
+function nextSlide(){
+  startIndex=(startIndex+3)%fullImages.length;
+  renderThumbnails();
+}
+
+/* === Використати готовий фон із галереї === */
+function handleFileFromGallery(src,key){
+  const img=new Image();
+  img.crossOrigin="anonymous"; // щоб не було CORS-блоків
+  img.onload=()=>{
+    layers[key].img=img;
+    layers[key].src=src;
+    layers[key].x=canvas.width/2;
+    layers[key].y=canvas.height/2;
+    layers[key].scale=1;
+    activeLayer=key;
+    scaleSlider.value=1;
+    pushHistory();
+    drawAll();
+  };
+  img.src=src;
+}
+
+/* === Завантаження фото/фонів === */
+function handleFileLoad(file,key){
+  if(!file) return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const data=e.target.result;
+    const img=new Image();
+    img.onload=()=>{
+      layers[key].img=img;
+      layers[key].src=data;
+      layers[key].x=canvas.width/2;
+      layers[key].y=canvas.height/2;
+      layers[key].scale=1;
+      activeLayer=key;
+      scaleSlider.value=1;
+      pushHistory();
+      drawAll();
+    };
+    img.src=data;
+  };
+  reader.readAsDataURL(file);
+}
+
+bgLoader.addEventListener('change',e=>handleFileLoad(e.target.files[0],'bg'));
+loveLoader.addEventListener('change',e=>handleFileLoad(e.target.files[0],'love'));
+document.getElementById("fot").onclick=()=>loveLoader.click();
+
+// запуск галереї при старті
+renderThumbnails();
+
 
 /* === Галерея клятв === */
 const vows=["LoveStones","Eternity","Fidelity","Joy","LoveStones","Love","Strength","Tenderness","LoveStones","Trust","Unity","Heart"];
@@ -156,10 +238,7 @@ function drawAll(){ ctx.clearRect(0,0,canvas.width,canvas.height); if(!previewMo
 function toggleButtons(){ if(previewMode){ previewBtn.style.display='none'; downloadBtn.style.display='inline-block'; setDisabled(true); } else { previewBtn.style.display='inline-block'; downloadBtn.style.display='none'; setDisabled(false); } }
 
 /* === Завантаження фото/фонів === */
-function handleFileLoad(file,key){ if(!file) return; const reader=new FileReader(); reader.onload=e=>{ const data=e.target.result; const img=new Image(); img.onload=()=>{ layers[key].img=img; layers[key].src=data; layers[key].x=canvas.width/2; layers[key].y=canvas.height/2; layers[key].scale=1; activeLayer=key; scaleSlider.value=1; pushHistory(); drawAll(); }; img.src=data; }; reader.readAsDataURL(file); }
-bgLoader.addEventListener('change',e=>handleFileLoad(e.target.files[0],'bg'));
-loveLoader.addEventListener('change',e=>handleFileLoad(e.target.files[0],'love'));
-document.getElementById("fot").onclick=()=>loveLoader.click();
+
 
 /* === Масштабування === */
 scaleSlider.addEventListener('input',()=>{ if(!activeLayer) return; layers[activeLayer].scale=parseFloat(scaleSlider.value); drawAll(); });
