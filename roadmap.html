@@ -1,9 +1,9 @@
-      <!-- Редактор -->
+<!-- Виправлений файл: Редактор + інтегрована робота галерей -->
 <!DOCTYPE html>
 <html lang="uk">
 <head>
   <meta charset="UTF-8" />
-  <title>Камінь любові — редактор</title>
+  <title>Камінь любові — редактор (виправлено)</title>
   <style>
 /*редактор*/
 body {
@@ -226,14 +226,20 @@ button {
     /* === БАЗА === */
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
-    const thumbs = document.getElementById('thumbs');
+
+    // FIX: прибрав дублювання і використовую чіткі імена
+    const thumbsContainer = document.getElementById('thumbs');         // контейнер мініатюр фонів
+    const thumbsVows = document.getElementById('thumbsVows');         // контейнер клятв
+    const collage = document.getElementById('collage');
+
+    const bgLoader = document.getElementById('bgLoader');
     const loveLoader = document.getElementById('loveLoader');
     const scaleSlider = document.getElementById('scaleSlider');
     const undoBtn = document.getElementById('undoBtn');
     const previewBtn = document.getElementById('previewBtn');
     const downloadBtn = document.getElementById('downloadBtn');
 
-/* === Галерея фонів === */
+/* === Галерея фонів (дані) === */
 const jpg = ".jpeg";
 const url = "https://detectfraud.github.io/gallery/";
 const images = [
@@ -245,9 +251,6 @@ const images = [
 let fullImages = images.map(name => url + name + jpg);
 
 let startIndex = 0;
-const thumbsContainer = document.getElementById("thumbs");
-const collage = document.getElementById("collage");
-const bgLoader = document.getElementById("bgLoader");
 
 function renderThumbnails() {
   thumbsContainer.innerHTML = "";
@@ -273,7 +276,13 @@ function createThumb(src, container, isVow) {
     thumb.title = "Завантажити свій фон";
     thumb.onclick = () => bgLoader.click();
   } else {
-    thumb.onclick = () => addOverlay(src, isVow);
+    // FIX: замість додавання <img> в DOM, ми завантажуємо зображення прямо в шар редактора (canvas)
+    // Якщо thumb — фон => встановлюємо шар 'bg', якщо клятва (isVow) => встановлюємо 'love' шар
+    if(!isVow){
+      thumb.onclick = () => loadImageFromURL(src, 'bg');
+    } else {
+      thumb.onclick = () => loadImageFromURL(src, 'love');
+    }
   }
 
   wrapper.appendChild(thumb);
@@ -290,38 +299,26 @@ function nextSlide() {
   renderThumbnails();
 }
 
-function addOverlay(src, isVow=false) {
-  const newImg = document.createElement("img");
-  newImg.src = src;
-  newImg.classList.add("overlay");
-  if (isVow) newImg.classList.add("vow");
-  collage.appendChild(newImg);
-}
+// remove old addOverlay DOM-only function (we no longer use it)
 
-// Завантаження власного фону
+
+// FIX: замінюємо застосування document.body.bg на інтеграцію з canvas
 bgLoader.addEventListener("change", e => {
   const file = e.target.files[0];
   if (file) {
-    const reader = new FileReader();
-    reader.onload = ev => {
-      document.body.style.backgroundImage = `url(${ev.target.result})`;
-      document.body.style.backgroundSize = "cover";
-    };
-    reader.readAsDataURL(file);
+    // інтегруємо в шар bg через існуючий handleFileLoad
+    handleFileLoad(file, 'bg');
   }
 });
 
-// Кнопка для фото закоханих
+// Кнопка для фото закоханих (викликає інпут)
 document.getElementById("fot").onclick = () => loveLoader.click();
 
+// FIX: завантаження фото -> інтегруємо в шар 'love' через handleFileLoad
 loveLoader.addEventListener("change", e => {
   const file = e.target.files[0];
   if (file) {
-    const reader = new FileReader();
-    reader.onload = ev => {
-      addOverlay(ev.target.result);
-    };
-    reader.readAsDataURL(file);
+    handleFileLoad(file, 'love');
   }
 });
 
@@ -334,7 +331,6 @@ const vows = ["LoveStones","Eternity","Fidelity","Joy","LoveStones","Love","Stre
 const fullVows = vows.map(name => url + name + png);
 
 let vowIndex = 0;
-const thumbsVows = document.getElementById("thumbsVows");
 
 function renderVows() {
   thumbsVows.innerHTML = "";
@@ -369,7 +365,7 @@ renderVows();
       mask.r  = HOLE_RADIUS;
     }
 
-    // Шари
+    // Шари — зберігаємо так само bg і love (без ускладнень)
     let layers = {
       bg:   { img:null, src:null, x:canvas.width/2, y:canvas.height/2, scale:1 },
       love: { img:null, src:null, x:canvas.width/2, y:canvas.height/2, scale:1 }
@@ -394,7 +390,7 @@ renderVows();
       history.push(makeSnapshot());
       if(history.length > MAX_HISTORY) history.shift();
     }
-    function applySnapshot(s){
+    async function applySnapshot(s){
       previewMode = !!s.previewMode;
       activeLayer = s.activeLayer || null;
       bgHoleActive = !!s.bgHoleActive;
@@ -404,6 +400,7 @@ renderVows();
         const v = s[key];
         if(v && v.src){
           const img = new Image();
+          img.crossOrigin = "anonymous"; // FIX: додаємо crossOrigin, щоб мінімізувати CORS-проблеми
           const p = new Promise(res=>{
             img.onload = ()=>{
               layers[key].img = img;
@@ -424,9 +421,9 @@ renderVows();
       });
 
       toggleButtons();
-      if(jobs.length) return Promise.all(jobs).then(drawAll);
-      drawAll();
-      return Promise.resolve();
+      if(jobs.length) await Promise.all(jobs).then(drawAll);
+      else drawAll();
+      return;
     }
 
     // Початковий стан
@@ -501,13 +498,14 @@ renderVows();
       }
     }
 
-    /* === Завантаження файлів === */
+    /* === Завантаження файлів (файли з input) === */
     function handleFileLoad(file, key){
       if(!file) return;
       const reader = new FileReader();
       reader.onload = e=>{
         const data = e.target.result;
         const img = new Image();
+        img.crossOrigin = "anonymous"; // FIX: пробуємо уникнути CORS проблем для зовнішніх URL
         img.onload = ()=>{
           layers[key].img = img;
           layers[key].src = data;
@@ -524,35 +522,31 @@ renderVows();
       reader.readAsDataURL(file);
     }
 
-    bgLoader.addEventListener('change', e=>handleFileLoad(e.target.files[0], 'bg'));
-    loveLoader.addEventListener('change', e=>{
-      const file = e.target.files[0]; if(!file) return;
-      const reader = new FileReader();
-      reader.onload = ev=>{
-        const data = ev.target.result;
-        const img = new Image();
-        img.onload = ()=>{
-          // Love стає між шаблоном і фоном для редагування
-          layers.love.img = img;
-          layers.love.src = data;
-          layers.love.x = canvas.width/2;
-          layers.love.y = canvas.height/2;
-          layers.love.scale = 1;
-          activeLayer = 'love';
-          scaleSlider.value = 1;
-
-          // Дірка у фоні має бути вже активована (через кнопку «Діра»),
-          // але якщо користувач забув — увімкнемо:
-          if(mask.r <= 0) setDefaultMask();
-          bgHoleActive = true;
-
-          pushHistory();
-          drawAll();
-        };
-        img.src = data;
+    // FIX: додав завантаження по URL (для мініатюр галереї)
+    function loadImageFromURL(src, key){
+      if(!src) return;
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      img.onload = ()=>{
+        layers[key].img = img;
+        layers[key].src = src;
+        layers[key].x = canvas.width/2;
+        layers[key].y = canvas.height/2;
+        layers[key].scale = 1;
+        activeLayer = key;
+        scaleSlider.value = 1;
+        pushHistory();
+        drawAll();
       };
-      reader.readAsDataURL(file);
-    });
+      img.onerror = ()=>{
+        console.warn("Не вдалося завантажити зображення:", src);
+      };
+      img.src = src;
+    }
+
+    // Підключаємо change для інпутів (вже зроблені вище — додатково дублювати не треба)
+    bgLoader.addEventListener('change', e=>handleFileLoad(e.target.files[0], 'bg'));
+    loveLoader.addEventListener('change', e=>handleFileLoad(e.target.files[0], 'love'));
 
     /* === Масштаб === */
     scaleSlider.addEventListener('input', ()=>{
@@ -601,11 +595,11 @@ renderVows();
     canvas.addEventListener('touchend', stopDrag);
 
     /* === UNDO === */
-    undoBtn.addEventListener('click', ()=>{
+    undoBtn.addEventListener('click', async ()=>{
       if(history.length <= 1) return;
       history.pop();
       const prev = history[history.length-1];
-      applySnapshot(prev);
+      await applySnapshot(prev); // FIX: чекаємо завершення відновлення (applySnapshot може бути асинхронною)
     });
 
     /* === PREVIEW === */
@@ -633,12 +627,19 @@ renderVows();
     };
 
     // Стартове перемальовування
-    applySnapshot(history[0] || makeSnapshot());
+    (async ()=>{
+      await applySnapshot(history[0] || makeSnapshot());
+      renderThumbnails();
+      renderVows();
+    })();
 
     /* === Блокування/розблокування контролів у preview === */
     function setDisabled(state){
-      // Не блокуємо Undo/Download; блокуємо завантаження і масштаб
-      [thumbs, loveLoader, scaleSlider].forEach(el=>{
+      // FIX: замість спроби ставити disabled на div, відключаємо pointer-events у контейнерах галерей
+      thumbsContainer.style.pointerEvents = state ? 'none' : 'auto';
+      thumbsVows.style.pointerEvents = state ? 'none' : 'auto';
+
+      [bgLoader, loveLoader, scaleSlider].forEach(el=>{
         el.disabled = !!state;
         el.classList.toggle('disabled', !!state);
       });
