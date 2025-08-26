@@ -185,7 +185,12 @@ applySnapshot(history[0]||makeSnapshot());
 
 function setDisabled(state){ [thumbs,loveLoader,scaleSlider].forEach(el=>{ el.disabled=!!state; el.classList.toggle('disabled',!!state); }); }
 function addOverlay(src,isVow=false){ const newImg=document.createElement("img"); newImg.src=src; newImg.classList.add("overlay"); if(isVow) newImg.classList.add("vow"); collage.appendChild(newImg); }
-
+  
+document.getElementById('updateBtn').addEventListener('click', function () {
+    // Додаємо до URL унікальний параметр часу, щоб обійти кеш
+    const url = window.location.href.split('?')[0]; 
+    window.location.href = url + '?_=' + new Date().getTime();
+});
 </script>
 </body>
 </html>
