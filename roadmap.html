@@ -240,7 +240,7 @@ function drawLove(ctxTarget, clip=false){ const L=layers.love; if(!L||!L.img) re
 function drawBgWithHole(ctxTarget){ if(!layers.bg.img) return; if(!bgHoleActive||mask.r<=0){ drawLayerTo(ctxTarget,layers.bg); return; } const off=document.createElement('canvas'); off.width=canvas.width; off.height=canvas.height; const octx=off.getContext('2d'); drawLayerTo(octx,layers.bg); octx.globalCompositeOperation='destination-out'; octx.beginPath(); octx.arc(mask.cx,mask.cy,mask.r,0,Math.PI*2); octx.fill(); octx.globalCompositeOperation='source-over'; ctxTarget.drawImage(off,0,0); }
 function drawAll(){ ctx.clearRect(0,0,canvas.width,canvas.height); if(!previewMode){ drawBgWithHole(ctx); drawLove(ctx,false); } else { drawLove(ctx,true); drawBgWithHole(ctx); } if(template.complete) ctx.drawImage(template,0,0,canvas.width,canvas.height); }
 
-function toggleButtons(){ if(previewMode){ previewBtn.style.display='none';vowsi.style.display='none'; vowse.style.display='inline-block';downloadBtn.style.display='inline-block'; setDisabled(true); } else { previewBtn.style.display='inline-block';vowse.style.display='none'; vowsi.style.display='inline-block'; downloadBtn.style.display='none'; setDisabled(false); } }
+function toggleButtons(){ if(previewMode){ previewBtn.style.display='none';vowse.style.display='none'; vowsi.style.display='inline-block';vowsi.style.display='none'; vowse.style.display='inline-block';downloadBtn.style.display='inline-block'; setDisabled(true); } else { previewBtn.style.display='inline-block'; downloadBtn.style.display='none'; setDisabled(false); } }
 
 /* === Завантаження фото/фонів === */
 
