@@ -191,7 +191,7 @@ function handleFileLoad(file,key){
       layers[key].y=canvas.height/2;
       layers[key].scale=1;
       activeLayer=key;
-      scaleSlider.value=1;   // ✅ Скидання масштабу
+      scaleSlider.value=1;
       pushHistory();
       drawAll();
     };
@@ -221,52 +221,15 @@ const template=new Image(); template.src='images/composit.png';
 const HOLE_OFFSET_X=6, HOLE_OFFSET_Y=-115, HOLE_RADIUS=98;
 let mask={cx:canvas.width/2+HOLE_OFFSET_X, cy:canvas.height/2+HOLE_OFFSET_Y, r:HOLE_RADIUS};
 
-// ✅ Додали label1 та label2
-let layers={
-  bg:{img:null,src:null,x:canvas.width/2,y:canvas.height/2,scale:1},
-  love:{img:null,src:null,x:canvas.width/2,y:canvas.height/2,scale:1},
-  label1:{img:null,src:null,x:canvas.width/2,y:canvas.height-80,scale:1},
-  label2:{img:null,src:null,x:canvas.width/2,y:canvas.height-40,scale:1}
-};
-
+let layers={ bg:{img:null,src:null,x:canvas.width/2,y:canvas.height/2,scale:1}, love:{img:null,src:null,x:canvas.width/2,y:canvas.height/2,scale:1} };
 let activeLayer=null, previewMode=false, bgHoleActive=true;
 const history=[]; const MAX_HISTORY=20;
-
-// ✅ оновлений snapshot
-function makeSnapshot(){
-  return {
-    bg:{...layers.bg},
-    love:{...layers.love},
-    label1:{...layers.label1},
-    label2:{...layers.label2},
-    previewMode, activeLayer, bgHoleActive
-  };
-}
+function makeSnapshot(){ return { bg:{...layers.bg}, love:{...layers.love}, previewMode, activeLayer, bgHoleActive }; }
 function pushHistory(){ history.push(makeSnapshot()); if(history.length>MAX_HISTORY) history.shift(); }
-
-// ✅ оновлений applySnapshot
 function applySnapshot(s){
   previewMode=!!s.previewMode; activeLayer=s.activeLayer||null; bgHoleActive=!!s.bgHoleActive;
-  ['bg','love','label1','label2'].forEach(key=>{
-    const v=s[key];
-    if(v && v.src){
-      const img=new Image();
-      img.onload=()=>{
-        layers[key].img=img;
-        layers[key].src=v.src;
-        layers[key].x=v.x;
-        layers[key].y=v.y;
-        layers[key].scale=v.scale;
-        drawAll();
-      };
-      img.src=v.src;
-    } else {
-      layers[key].img=null;
-      layers[key].src=null;
-      layers[key].x=v? v.x: canvas.width/2;
-      layers[key].y=v? v.y: canvas.height/2;
-      layers[key].scale=v? v.scale:1;
-    }
+  ['bg','love'].forEach(key=>{
+    const v=s[key]; if(v && v.src){ const img=new Image(); img.onload=()=>{ layers[key].img=img; layers[key].src=v.src; layers[key].x=v.x; layers[key].y=v.y; layers[key].scale=v.scale; drawAll(); }; img.src=v.src; } else { layers[key].img=null; layers[key].src=null; layers[key].x=v? v.x: canvas.width/2; layers[key].y=v? v.y: canvas.height/2; layers[key].scale=v? v.scale:1; }
   });
   toggleButtons();
 }
@@ -275,23 +238,12 @@ function applySnapshot(s){
 function drawLayerTo(ctxTarget, layer){ if(!layer||!layer.img) return; const w=layer.img.width*layer.scale,h=layer.img.height*layer.scale; ctxTarget.drawImage(layer.img, layer.x-w/2, layer.y-h/2, w, h); }
 function drawLove(ctxTarget, clip=false){ const L=layers.love; if(!L||!L.img) return; const w=L.img.width*L.scale,h=L.img.height*L.scale; ctxTarget.save(); if(clip&&mask.r>0){ ctxTarget.beginPath(); ctxTarget.arc(mask.cx,mask.cy,mask.r,0,Math.PI*2); ctxTarget.clip(); } ctxTarget.drawImage(L.img,L.x-w/2,L.y-h/2,w,h); ctxTarget.restore(); }
 function drawBgWithHole(ctxTarget){ if(!layers.bg.img) return; if(!bgHoleActive||mask.r<=0){ drawLayerTo(ctxTarget,layers.bg); return; } const off=document.createElement('canvas'); off.width=canvas.width; off.height=canvas.height; const octx=off.getContext('2d'); drawLayerTo(octx,layers.bg); octx.globalCompositeOperation='destination-out'; octx.beginPath(); octx.arc(mask.cx,mask.cy,mask.r,0,Math.PI*2); octx.fill(); octx.globalCompositeOperation='source-over'; ctxTarget.drawImage(off,0,0); }
-
-// ✅ малюємо label1 та label2
-function drawAll(){
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  if(!previewMode){
-    drawBgWithHole(ctx);
-    drawLove(ctx,false);
-  } else {
-    drawLove(ctx,true);
-    drawBgWithHole(ctx);
-  }
-  if(layers.label1.img) drawLayerTo(ctx, layers.label1);
-  if(layers.label2.img) drawLayerTo(ctx, layers.label2);
-  if(template.complete) ctx.drawImage(template,0,0,canvas.width,canvas.height);
-}
+function drawAll(){ ctx.clearRect(0,0,canvas.width,canvas.height); if(!previewMode){ drawBgWithHole(ctx); drawLove(ctx,false); } else { drawLove(ctx,true); drawBgWithHole(ctx); } if(template.complete) ctx.drawImage(template,0,0,canvas.width,canvas.height); }
 
 function toggleButtons(){ if(previewMode){ previewBtn.style.display='none';vowse.style.display='none';photo-block.style.display='none'; vowsi.style.display='inline-block';vowsi.style.display='none'; vowse.style.display='inline-block';downloadBtn.style.display='inline-block'; setDisabled(true); } else { previewBtn.style.display='inline-block';photo-block.style.display='inline-block'; downloadBtn.style.display='none'; setDisabled(false); } }
+
+/* === Завантаження фото/фонів === */
+
 
 /* === Масштабування === */
 scaleSlider.addEventListener('input',()=>{ if(!activeLayer) return; layers[activeLayer].scale=parseFloat(scaleSlider.value); drawAll(); });
@@ -315,19 +267,15 @@ downloadBtn.addEventListener('click',()=>{ const link=document.createElement('a'
 template.onload=()=>{ drawAll(); };
 renderThumbnails(); renderVows();
 applySnapshot(history[0]||makeSnapshot());
-
+//,scaleSlider
 function setDisabled(state){ [thumbs,loveLoader].forEach(el=>{ el.disabled=!!state; el.classList.toggle('disabled',!!state); }); }
 function addOverlay(src,isVow=false){ const newImg=document.createElement("img"); newImg.src=src; newImg.classList.add("overlay"); if(isVow) newImg.classList.add("vow"); collage.appendChild(newImg); }
   
 document.getElementById('updateBtn').addEventListener('click', function () {
+    // Додаємо до URL унікальний параметр часу, щоб обійти кеш
     const url = window.location.href.split('?')[0]; 
     window.location.href = url + '?_=' + new Date().getTime();
 });
-
-// ✅ Завантаження label1 та label2
-document.getElementById('label1Loader').addEventListener('change',e=>handleFileLoad(e.target.files[0],'label1'));
-document.getElementById('label2Loader').addEventListener('change',e=>handleFileLoad(e.target.files[0],'label2'));
 </script>
-
 </body>
 </html>
