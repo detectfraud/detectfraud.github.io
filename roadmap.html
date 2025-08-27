@@ -5,8 +5,8 @@
 <meta charset="UTF-8" />
 <title>Камінь любові — редактор</title>
 <style>
-body { font-family: sans-serif; text-align:center;background:#f5f5f5; }  /*background:#f5f5f5;*/
-.venwin {  border-radius:10px;  display:inline-block;  }   /*padding:10px;*/
+body { font-family: sans-serif; text-align:center; background:url(https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjghIwEmgtr9VAIzGM4eS8BdLA1nptupwYDch46JvrMH9AILVqnNpUX_vxUtQe2Kr-eNLgXcUu_dfNCc7P45vPblF37xpoN8dbLsm9VHiMKmYf58ixmJeQHTY4R4hvGXj0nC7SqiD_2UWRGvIDgUrvZqoVqq8qT61yJB846igsv4ceY7Q/s1600/fon.png) repeat scroll top left; }  /*background:#f5f5f5;*/
+.venwin {  border-radius:10px;  display:inline-block; background:url(https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjghIwEmgtr9VAIzGM4eS8BdLA1nptupwYDch46JvrMH9AILVqnNpUX_vxUtQe2Kr-eNLgXcUu_dfNCc7P45vPblF37xpoN8dbLsm9VHiMKmYf58ixmJeQHTY4R4hvGXj0nC7SqiD_2UWRGvIDgUrvZqoVqq8qT61yJB846igsv4ceY7Q/s1600/fon.png) repeat scroll top left; }   /*padding:10px;*/
 canvas { border:3px solid #bbb; border-radius:6px; box-shadow:0 6px 18px rgba(0,0,0,.1); display:block; margin:10px auto; }
 #scaleSlider { width:420px;}
 button { padding:8px 12px; cursor:pointer; border-radius:8px; }
@@ -16,7 +16,7 @@ button { padding:8px 12px; cursor:pointer; border-radius:8px; }
 .gallery-block { display:flex; flex-direction:column; align-items:center; gap:10px; }
 .gallery-block > div { display:flex; align-items:center; justify-content:center; }
 .arrow, .arow { font-size:20px; cursor:pointer; user-select:none; padding:3px; line-height:1; display:flex; align-items:center; justify-content:center;  }
-.arrow:first-child { margin-right:-110px; } arrow:last-child { margin-left:-110px; }
+.arrow:first-child { margin-right:-110px; } .arrow:last-child { margin-left:-110px; }
 .arow:first-child { margin-right:-60px; }
 .arow:last-child { margin-left:-60px; }
 .thumbnails { display:flex; gap:10px; overflow:hidden; width:600px; justify-content:center; }
@@ -102,6 +102,10 @@ const previewBtn = document.getElementById('previewBtn');
 const downloadBtn = document.getElementById('downloadBtn');
 const bgLoader = document.getElementById('bgLoader');
 const collage = document.getElementById('collage');
+const vowse = document.getElementById('vowse');
+const vowsi = document.getElementById('vowsi');
+const photoBlock = document.querySelector('.photo-block');
+
 
 /* === Галерея фонів === */
 const url = "https://detectfraud.github.io/gallery/";
@@ -240,7 +244,26 @@ function drawLove(ctxTarget, clip=false){ const L=layers.love; if(!L||!L.img) re
 function drawBgWithHole(ctxTarget){ if(!layers.bg.img) return; if(!bgHoleActive||mask.r<=0){ drawLayerTo(ctxTarget,layers.bg); return; } const off=document.createElement('canvas'); off.width=canvas.width; off.height=canvas.height; const octx=off.getContext('2d'); drawLayerTo(octx,layers.bg); octx.globalCompositeOperation='destination-out'; octx.beginPath(); octx.arc(mask.cx,mask.cy,mask.r,0,Math.PI*2); octx.fill(); octx.globalCompositeOperation='source-over'; ctxTarget.drawImage(off,0,0); }
 function drawAll(){ ctx.clearRect(0,0,canvas.width,canvas.height); if(!previewMode){ drawBgWithHole(ctx); drawLove(ctx,false); } else { drawLove(ctx,true); drawBgWithHole(ctx); } if(template.complete) ctx.drawImage(template,0,0,canvas.width,canvas.height); }
 
-function toggleButtons(){ if(previewMode){ previewBtn.style.display='none';vowse.style.display='none';photo-block.style.display='none'; vowsi.style.display='inline-block';vowsi.style.display='none'; vowse.style.display='inline-block';downloadBtn.style.display='inline-block'; setDisabled(true); } else { previewBtn.style.display='inline-block';photo-block.style.display='inline-block'; downloadBtn.style.display='none'; setDisabled(false); } }
+function toggleButtons(){
+  if(previewMode){
+    // режим перегляду
+    previewBtn.style.display = 'none';
+    downloadBtn.style.display = 'inline-block';
+    if (vowsi) vowsi.style.display = 'none';
+    if (photoBlock) photoBlock.style.display = 'none';
+    if (vowse) vowse.style.display = 'inline-block';
+    setDisabled(true);
+  } else {
+    // режим редагування
+    previewBtn.style.display = 'inline-block';
+    downloadBtn.style.display = 'none';
+    if (vowsi) vowsi.style.display = 'inline-block';
+    if (photoBlock) photoBlock.style.display = 'inline-block';
+    if (vowse) vowse.style.display = 'none';
+    setDisabled(false);
+  }
+}
+
 
 /* === Завантаження фото/фонів === */
 
