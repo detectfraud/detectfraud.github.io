@@ -90,7 +90,7 @@ button { padding:8px 12px; cursor:pointer; border-radius:8px; }
 <input type="file" id="bgLoader" style="display:none">
 <input type="file" id="loveLoader" style="display:none">
 <script>
-/* === Collage JS === */
+/* === Collage JS v2 === */
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 const thumbs = document.getElementById('thumbs');
@@ -106,7 +106,6 @@ const vowse = document.getElementById('vowse');
 const vowsi = document.getElementById('vowsi');
 const photoBlock = document.querySelector('.photo-block');
 
-
 /* === Галерея фонів === */
 const url = "https://detectfraud.github.io/gallery/";
 const images = [
@@ -120,65 +119,34 @@ function renderThumbnails(){
   thumbs.innerHTML="";
   fullImages.slice(startIndex,startIndex+3).forEach(src=>createThumb(src, thumbs, false));
 }
-//
 function createThumb(src, container, isVow){
   const wrapper=document.createElement("div");
   wrapper.className="thumb-wrapper";
-
   const imgName=src.split("/").pop().split(".")[0];
-
   const thumb=document.createElement("img");
-  thumb.className="thumb";
-  thumb.src=src;
-
+  thumb.className="thumb"; thumb.src=src;
   const big=document.createElement("img");
-  big.className="imagbox";
-  big.src=src;
-
+  big.className="imagbox"; big.src=src;
   if(isVow){
-    // для клятв нічого не чіпаємо → працює через addOverlay
     thumb.onclick=()=>addOverlay(src,true);
   } else {
-    // це фонова галерея
-    if(imgName==="Fon"){
-      thumb.title="Завантажити свій фон";
-      thumb.onclick=()=>bgLoader.click();
-    } else {
-      thumb.onclick=()=>handleFileFromGallery(src,"bg");
-    }
+    if(imgName==="Fon"){ thumb.title="Завантажити свій фон"; thumb.onclick=()=>bgLoader.click(); }
+    else { thumb.onclick=()=>handleFileFromGallery(src,"bg"); }
   }
-
-  wrapper.appendChild(thumb);
-  wrapper.appendChild(big);
-  container.appendChild(wrapper);
+  wrapper.appendChild(thumb); wrapper.appendChild(big); container.appendChild(wrapper);
 }
-//
-
-function prevSlide(){
-  startIndex=(startIndex-3+fullImages.length)%fullImages.length;
-  renderThumbnails();
-}
-function nextSlide(){
-  startIndex=(startIndex+3)%fullImages.length;
-  renderThumbnails();
-}
+function prevSlide(){ startIndex=(startIndex-3+fullImages.length)%fullImages.length; renderThumbnails(); }
+function nextSlide(){ startIndex=(startIndex+3)%fullImages.length; renderThumbnails(); }
 
 /* === Використати готовий фон із галереї === */
 function handleFileFromGallery(src,key){
-  const img=new Image();
-  img.crossOrigin="anonymous"; // щоб не було CORS-блоків
+  const img=new Image(); img.crossOrigin="anonymous";
   img.onload=()=>{
-    layers[key].img=img;
-    layers[key].src=src;
-    layers[key].x=canvas.width/2;
-    layers[key].y=canvas.height/2;
-    layers[key].scale=1;
-    activeLayer=key;
-    scaleSlider.value=1;
-    pushHistory();
-    drawAll();
-  };
-  img.src=src;
+    layers[key].img=img; layers[key].src=src;
+    layers[key].x=canvas.width/2; layers[key].y=canvas.height/2;
+    layers[key].scale=1; activeLayer=key;
+    scaleSlider.value=1; pushHistory(); drawAll();
+  }; img.src=src;
 }
 
 /* === Завантаження фото/фонів === */
@@ -189,28 +157,21 @@ function handleFileLoad(file,key){
     const data=e.target.result;
     const img=new Image();
     img.onload=()=>{
-      layers[key].img=img;
-      layers[key].src=data;
-      layers[key].x=canvas.width/2;
-      layers[key].y=canvas.height/2;
-      layers[key].scale=1;
-      activeLayer=key;
-      scaleSlider.value=1;
-      pushHistory();
-      drawAll();
-    };
-    img.src=data;
-  };
-  reader.readAsDataURL(file);
+      layers[key].img=img; layers[key].src=data;
+      layers[key].x=canvas.width/2; layers[key].y=canvas.height/2;
+      layers[key].scale=1; activeLayer=key;
+      scaleSlider.value=1; pushHistory(); drawAll();
+    }; img.src=data;
+  }; reader.readAsDataURL(file);
 }
-
 bgLoader.addEventListener('change',e=>handleFileLoad(e.target.files[0],'bg'));
 loveLoader.addEventListener('change',e=>handleFileLoad(e.target.files[0],'love'));
 document.getElementById("fot").onclick=()=>loveLoader.click();
+// ✅ нові інпути для label1/label2
+document.getElementById('label1Loader').addEventListener('change',e=>handleFileLoad(e.target.files[0],'label1'));
+document.getElementById('label2Loader').addEventListener('change',e=>handleFileLoad(e.target.files[0],'label2'));
 
-// запуск галереї при старті
 renderThumbnails();
-
 
 /* === Галерея клятв === */
 const vows=["LoveStones","Eternity","Fidelity","Joy","LoveStones","Love","Strength","Tenderness","LoveStones","Trust","Unity","Heart"];
@@ -225,28 +186,75 @@ const template=new Image(); template.src='images/composit.png';
 const HOLE_OFFSET_X=6, HOLE_OFFSET_Y=-115, HOLE_RADIUS=98;
 let mask={cx:canvas.width/2+HOLE_OFFSET_X, cy:canvas.height/2+HOLE_OFFSET_Y, r:HOLE_RADIUS};
 
-let layers={ bg:{img:null,src:null,x:canvas.width/2,y:canvas.height/2,scale:1}, love:{img:null,src:null,x:canvas.width/2,y:canvas.height/2,scale:1} };
+// ✅ додали label1/label2
+let layers={
+  bg:{img:null,src:null,x:canvas.width/2,y:canvas.height/2,scale:1},
+  love:{img:null,src:null,x:canvas.width/2,y:canvas.height/2,scale:1},
+  label1:{img:null,src:null,x:canvas.width/2,y:canvas.height-80,scale:1},
+  label2:{img:null,src:null,x:canvas.width/2,y:canvas.height-40,scale:1}
+};
 let activeLayer=null, previewMode=false, bgHoleActive=true;
 const history=[]; const MAX_HISTORY=20;
-function makeSnapshot(){ return { bg:{...layers.bg}, love:{...layers.love}, previewMode, activeLayer, bgHoleActive }; }
+
+// ✅ makeSnapshot з label1/label2
+function makeSnapshot(){
+  return { bg:{...layers.bg}, love:{...layers.love}, label1:{...layers.label1}, label2:{...layers.label2}, previewMode, activeLayer, bgHoleActive };
+}
 function pushHistory(){ history.push(makeSnapshot()); if(history.length>MAX_HISTORY) history.shift(); }
+
+// ✅ applySnapshot з label1/label2
 function applySnapshot(s){
   previewMode=!!s.previewMode; activeLayer=s.activeLayer||null; bgHoleActive=!!s.bgHoleActive;
-  ['bg','love'].forEach(key=>{
-    const v=s[key]; if(v && v.src){ const img=new Image(); img.onload=()=>{ layers[key].img=img; layers[key].src=v.src; layers[key].x=v.x; layers[key].y=v.y; layers[key].scale=v.scale; drawAll(); }; img.src=v.src; } else { layers[key].img=null; layers[key].src=null; layers[key].x=v? v.x: canvas.width/2; layers[key].y=v? v.y: canvas.height/2; layers[key].scale=v? v.scale:1; }
+  ['bg','love','label1','label2'].forEach(key=>{
+    const v=s[key];
+    if(v && v.src){
+      const img=new Image();
+      img.onload=()=>{ layers[key].img=img; layers[key].src=v.src; layers[key].x=v.x; layers[key].y=v.y; layers[key].scale=v.scale; drawAll(); };
+      img.src=v.src;
+    } else {
+      layers[key].img=null; layers[key].src=null;
+      layers[key].x=v? v.x: canvas.width/2;
+      layers[key].y=v? v.y: canvas.height/2;
+      layers[key].scale=v? v.scale:1;
+    }
   });
   toggleButtons();
 }
 
 /* === Малювання === */
-function drawLayerTo(ctxTarget, layer){ if(!layer||!layer.img) return; const w=layer.img.width*layer.scale,h=layer.img.height*layer.scale; ctxTarget.drawImage(layer.img, layer.x-w/2, layer.y-h/2, w, h); }
-function drawLove(ctxTarget, clip=false){ const L=layers.love; if(!L||!L.img) return; const w=L.img.width*L.scale,h=L.img.height*L.scale; ctxTarget.save(); if(clip&&mask.r>0){ ctxTarget.beginPath(); ctxTarget.arc(mask.cx,mask.cy,mask.r,0,Math.PI*2); ctxTarget.clip(); } ctxTarget.drawImage(L.img,L.x-w/2,L.y-h/2,w,h); ctxTarget.restore(); }
-function drawBgWithHole(ctxTarget){ if(!layers.bg.img) return; if(!bgHoleActive||mask.r<=0){ drawLayerTo(ctxTarget,layers.bg); return; } const off=document.createElement('canvas'); off.width=canvas.width; off.height=canvas.height; const octx=off.getContext('2d'); drawLayerTo(octx,layers.bg); octx.globalCompositeOperation='destination-out'; octx.beginPath(); octx.arc(mask.cx,mask.cy,mask.r,0,Math.PI*2); octx.fill(); octx.globalCompositeOperation='source-over'; ctxTarget.drawImage(off,0,0); }
-function drawAll(){ ctx.clearRect(0,0,canvas.width,canvas.height); if(!previewMode){ drawBgWithHole(ctx); drawLove(ctx,false); } else { drawLove(ctx,true); drawBgWithHole(ctx); } if(template.complete) ctx.drawImage(template,0,0,canvas.width,canvas.height); }
+function drawLayerTo(ctxTarget, layer){
+  if(!layer||!layer.img) return;
+  const w=layer.img.width*layer.scale,h=layer.img.height*layer.scale;
+  ctxTarget.drawImage(layer.img, layer.x-w/2, layer.y-h/2, w, h);
+}
+function drawLove(ctxTarget, clip=false){
+  const L=layers.love; if(!L||!L.img) return;
+  const w=L.img.width*L.scale,h=L.img.height*L.scale;
+  ctxTarget.save();
+  if(clip&&mask.r>0){ ctxTarget.beginPath(); ctxTarget.arc(mask.cx,mask.cy,mask.r,0,Math.PI*2); ctxTarget.clip(); }
+  ctxTarget.drawImage(L.img,L.x-w/2,L.y-h/2,w,h);
+  ctxTarget.restore();
+}
+function drawBgWithHole(ctxTarget){
+  if(!layers.bg.img) return;
+  if(!bgHoleActive||mask.r<=0){ drawLayerTo(ctxTarget,layers.bg); return; }
+  const off=document.createElement('canvas'); off.width=canvas.width; off.height=canvas.height;
+  const octx=off.getContext('2d'); drawLayerTo(octx,layers.bg);
+  octx.globalCompositeOperation='destination-out'; octx.beginPath(); octx.arc(mask.cx,mask.cy,mask.r,0,Math.PI*2); octx.fill();
+  octx.globalCompositeOperation='source-over'; ctxTarget.drawImage(off,0,0);
+}
+// ✅ drawAll з label1/label2
+function drawAll(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  if(!previewMode){ drawBgWithHole(ctx); drawLove(ctx,false); }
+  else { drawLove(ctx,true); drawBgWithHole(ctx); }
+  if(layers.label1.img) drawLayerTo(ctx, layers.label1);
+  if(layers.label2.img) drawLayerTo(ctx, layers.label2);
+  if(template.complete) ctx.drawImage(template,0,0,canvas.width,canvas.height);
+}
 
 function toggleButtons(){
   if(previewMode){
-    // режим перегляду
     previewBtn.style.display = 'none';
     downloadBtn.style.display = 'inline-block';
     if (vowsi) vowsi.style.display = 'none';
@@ -254,7 +262,6 @@ function toggleButtons(){
     if (vowse) vowse.style.display = 'inline-block';
     setDisabled(true);
   } else {
-    // режим редагування
     previewBtn.style.display = 'inline-block';
     downloadBtn.style.display = 'none';
     if (vowsi) vowsi.style.display = 'inline-block';
@@ -264,10 +271,6 @@ function toggleButtons(){
   }
 }
 
-
-/* === Завантаження фото/фонів === */
-
-
 /* === Масштабування === */
 scaleSlider.addEventListener('input',()=>{ if(!activeLayer) return; layers[activeLayer].scale=parseFloat(scaleSlider.value); drawAll(); });
 
@@ -276,8 +279,7 @@ let dragging=false, dragStartX=0, dragStartY=0;
 canvas.addEventListener('mousedown',e=>{ if(previewMode||!activeLayer) return; dragging=true; dragStartX=e.offsetX-layers[activeLayer].x; dragStartY=e.offsetY-layers[activeLayer].y; });
 canvas.addEventListener('mousemove',e=>{ if(previewMode||!dragging||!activeLayer) return; layers[activeLayer].x=e.offsetX-dragStartX; layers[activeLayer].y=e.offsetY-dragStartY; drawAll(); });
 function stopDrag(){ if(previewMode) return; if(dragging){ dragging=false; pushHistory(); } }
-canvas.addEventListener('mouseup',stopDrag);
-canvas.addEventListener('mouseleave',stopDrag);
+canvas.addEventListener('mouseup',stopDrag); canvas.addEventListener('mouseleave',stopDrag);
 canvas.addEventListener('touchstart',e=>{ if(previewMode||!activeLayer) return; const t=e.touches[0],rect=canvas.getBoundingClientRect(); dragging=true; dragStartX=t.clientX-rect.left-layers[activeLayer].x; dragStartY=t.clientY-rect.top-layers[activeLayer].y; e.preventDefault(); });
 canvas.addEventListener('touchmove',e=>{ if(previewMode||!dragging||!activeLayer) return; const t=e.touches[0],rect=canvas.getBoundingClientRect(); layers[activeLayer].x=t.clientX-rect.left-dragStartX; layers[activeLayer].y=t.clientY-rect.top-dragStartY; drawAll(); e.preventDefault(); });
 canvas.addEventListener('touchend',stopDrag);
@@ -290,15 +292,15 @@ downloadBtn.addEventListener('click',()=>{ const link=document.createElement('a'
 template.onload=()=>{ drawAll(); };
 renderThumbnails(); renderVows();
 applySnapshot(history[0]||makeSnapshot());
-//,scaleSlider
+
 function setDisabled(state){ [thumbs,loveLoader].forEach(el=>{ el.disabled=!!state; el.classList.toggle('disabled',!!state); }); }
 function addOverlay(src,isVow=false){ const newImg=document.createElement("img"); newImg.src=src; newImg.classList.add("overlay"); if(isVow) newImg.classList.add("vow"); collage.appendChild(newImg); }
-  
+
 document.getElementById('updateBtn').addEventListener('click', function () {
-    // Додаємо до URL унікальний параметр часу, щоб обійти кеш
-    const url = window.location.href.split('?')[0]; 
-    window.location.href = url + '?_=' + new Date().getTime();
+  const url = window.location.href.split('?')[0];
+  window.location.href = url + '?_=' + new Date().getTime();
 });
 </script>
+
 </body>
 </html>
