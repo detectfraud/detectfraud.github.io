@@ -1,117 +1,327 @@
-<!-- Collage (27.08.25) v2.1 — додано label1/label2 -->
+<!-- Collage (7:46 27.08.25) — ВИПРАВЛЕНА ВЕРСІЯ -->
 <!DOCTYPE html>
 <html lang="uk">
 <head>
 <meta charset="UTF-8" />
 <title>Камінь любові — редактор</title>
 <style>
-/* стилі ті ж */
+/* (стилі як у тебе) */
 body { font-family: sans-serif; text-align:center; background:url(https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjghIwEmgtr9VAIzGM4eS8BdLA1nptupwYDch46JvrMH9AILVqnNpUX_vxUtQe2Kr-eNLgXcUu_dfNCc7P45vPblF37xpoN8dbLsm9VHiMKmYf58ixmJeQHTY4R4hvGXj0nC7SqiD_2UWRGvIDgUrvZqoVqq8qT61yJB846igsv4ceY7Q/s1600/fon.png) repeat scroll top left; }
-canvas { border:3px solid #bbb; border-radius:6px; display:block; margin:10px auto; }
+.venwin {  border-radius:10px;  display:inline-block; background:url(https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjghIwEmgtr9VAIzGM4eS8BdLA1nptupwYDch46JvrMH9AILVqnNpUX_vxUtQe2Kr-eNLgXcUu_dfNCc7P45vPblF37xpoN8dbLsm9VHiMKmYf58ixmJeQHTY4R4hvGXj0nC7SqiD_2UWRGvIDgUrvZqoVqq8qT61yJB846igsv4ceY7Q/s1600/fon.png) repeat scroll top left; }
+canvas { border:3px solid #bbb; border-radius:6px; box-shadow:0 6px 18px rgba(0,0,0,.1); display:block; margin:10px auto; }
 #scaleSlider { width:420px;}
 button { padding:8px 12px; cursor:pointer; border-radius:8px; }
 .disabled { pointer-events:none; opacity:.5; filter:grayscale(100%); }
+
+.gallery-container { display:flex; align-items:flex-start; justify-content:center; gap:10px; margin-top:20px; }
+.gallery-block { display:flex; flex-direction:column; align-items:center; gap:10px; }
+.gallery-block > div { display:flex; align-items:center; justify-content:center; }
+.arrow, .arow { font-size:20px; cursor:pointer; user-select:none; padding:3px; line-height:1; display:flex; align-items:center; justify-content:center;  }
+.arrow:first-child { margin-right:-110px; } .arrow:last-child { margin-left:-110px; }
+.arow:first-child { margin-right:-60px; }
+.arow:last-child { margin-left:-60px; }
+.thumbnails { display:flex; gap:10px; overflow:hidden; width:600px; justify-content:center; }
+.thumb-wrapper { position:relative; }
+.thumb { width:108px; height:72px; object-fit:cover; border-radius:8px; cursor:pointer; box-shadow:0 0 6px rgba(0,0,0,0.3); transition:all 0.3s ease; z-index:1; }
+.collage { position:relative; display:inline-block; margin-top:40px; }
+.collage img.overlay { position:absolute; bottom:10px; right:10px; width:500px; border-radius:8px; box-shadow:0 0 8px rgba(0,0,0,0.4); }
+
+#fot { display:inline-block; cursor:pointer; border-radius:8px; width:108px; height:72px; background-image:url(https://detectfraud.github.io/gallery/Para.png); background-repeat:no-repeat; background-size:contain; }
+#fot:hover { mix-blend-mode:luminosity; }
+#fot:active { mix-blend-mode:exclusion; }
+
+.imagbox { position:fixed; top:50%; left:50%; width:825px; height:510px; transform:translate(-50%,-50%) scale(0.1); opacity:0; transition:all 0.5s ease; z-index:9999; border-radius:12px; box-shadow:0 0 25px rgba(0,0,0,0.7); pointer-events:none; background:#fff; }
+.thumb-wrapper:hover .imagbox { opacity:1; transform:translate(-50%,-50%) scale(0.6); }
+.photo-block { margin-left:100px; }
+#updateBtn { margin-left:300px;font-weight:bold;color:red; }
+.gallery-container.vows .labels { display:grid; grid-template-columns:repeat(4,1fr); text-align:center; margin-bottom:5px; }
+.gallery-container.vows .labels .label1 { grid-column:1; font-weight:bold; margin-left:70px; }
+.gallery-container.vows .labels .label2 { grid-column:3; font-weight:bold; }
+.arrow, .arow {  position:relative; z-index:3; }
 </style>
 </head>
 <body>
 
-<fieldset class="venwin">
-  <div class="collage" id="collage">
-    <canvas id="canvas" width="900" height="600"></canvas>
-  </div>
-  <br><input type="range" id="scaleSlider" min="0.1" max="3" step="0.01" value="1"><br><br>
+<fieldset class="venwin" style="height:auto;">
+<div class="collage" id="collage">
+  <canvas id="canvas" width="900" height="600" style="border:1px solid #ccc;"></canvas>
+</div>
 
-  <button id="undoBtn">⟲ Undo</button>
-  <button id="previewBtn">👁 Перегляд</button>
-  <button id="downloadBtn" style="display:none;">📥 Завантажити</button>
+<br><input type="range" id="scaleSlider" min="0.1" max="3" step="0.01" value="1"><br><br>
+
+<!-- Галерея фонів -->
+<div class="gallery-container">
+  <div class="gallery-block" id="vowsi">
+    <b>Фон</b>
+    <div>
+      <span class="arrow" onclick="prevSlide()">&#10094;</span>
+      <div class="thumbnails" id="thumbs"></div>
+      <span class="arrow" onclick="nextSlide()">&#10095;</span>
+    </div>
+  </div>
+
+  <div class="gallery-block photo-block">
+    <b>Фото</b>
+    <label id="fot" title="Фото закоханих"></label>
+  </div>
+</div>
+
+<!-- Галерея клятв -->
+<div class="gallery-container vows" id="vowse" style="display:none;">
+  <div class="gallery-block">
+    <div class="labels">
+      <span class="label1">Надпис</span>
+      <span class="label2">Клятва закоханих</span>
+    </div>
+    <div class="gallery-row">
+      <span class="arow" onclick="prevVow()">&#10094;</span>
+      <div class="thumbnails" id="thumbsVows"></div>
+      <span class="arow" onclick="nextVow()">&#10095;</span>
+    </div>
+  </div>
+</div>
+<br><br>
+  <div>
+<button id="undoBtn" type="button">⟲ Undo</button>
+<button id="previewBtn" type="button">👁 Перегляд</button>
+<button id="downloadBtn" type="button" style="display:none;">📥 Завантажити</button>
+  <button id="updateBtn" type="button">UPDATE</button>
+</div>
 </fieldset>
 
-<!-- приховані завантажувачі -->
+<!-- Важливо: приховані інпути для label1/label2 (щоб не ламати скрипт) -->
 <input type="file" id="bgLoader" style="display:none">
 <input type="file" id="loveLoader" style="display:none">
 <input type="file" id="label1Loader" style="display:none">
 <input type="file" id="label2Loader" style="display:none">
 
 <script>
+/* === Collage JS v2 — виправлене (label1/label2) === */
+
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
+const thumbs = document.getElementById('thumbs');
+const thumbsVows = document.getElementById('thumbsVows');
+const loveLoader = document.getElementById('loveLoader');
 const scaleSlider = document.getElementById('scaleSlider');
 const undoBtn = document.getElementById('undoBtn');
 const previewBtn = document.getElementById('previewBtn');
 const downloadBtn = document.getElementById('downloadBtn');
 const bgLoader = document.getElementById('bgLoader');
-const loveLoader = document.getElementById('loveLoader');
+const collage = document.getElementById('collage');
+const vowse = document.getElementById('vowse');
+const vowsi = document.getElementById('vowsi');
+const photoBlock = document.querySelector('.photo-block');
 const label1Loader = document.getElementById('label1Loader');
 const label2Loader = document.getElementById('label2Loader');
 
-const template=new Image(); template.src='images/composit.png';
-const mask={cx:canvas.width/2+6, cy:canvas.height/2-115, r:98};
+/* === Галерея фонів (як було) === */
+const url = "https://detectfraud.github.io/gallery/";
+const images = [
+  "nature(1)","nature(2)","nature(3)","nature(4)","nature(5)",
+  "nature(6)","nature(7)","nature(8)","nature(9)","Fon"
+];
+const fullImages = images.map(name => url + name + ".jpeg");
+let startIndex = 0;
 
-/* === ДОДАНО label1/label2 === */
+function renderThumbnails(){
+  thumbs.innerHTML="";
+  fullImages.slice(startIndex,startIndex+3).forEach(src=>createThumb(src, thumbs, false));
+}
+function createThumb(src, container, isVow){
+  const wrapper=document.createElement("div");
+  wrapper.className="thumb-wrapper";
+  const imgName=src.split("/").pop().split(".")[0];
+  const thumb=document.createElement("img"); thumb.className="thumb"; thumb.src=src;
+  const big=document.createElement("img"); big.className="imagbox"; big.src=src;
+  if(isVow){
+    thumb.onclick=()=>addOverlay(src,true);
+  } else {
+    if(imgName==="Fon"){ thumb.title="Завантажити свій фон"; thumb.onclick=()=>bgLoader.click(); }
+    else { thumb.onclick=()=>handleFileFromGallery(src,"bg"); }
+  }
+  wrapper.appendChild(thumb); wrapper.appendChild(big); container.appendChild(wrapper);
+}
+function prevSlide(){ startIndex=(startIndex-3+fullImages.length)%fullImages.length; renderThumbnails(); }
+function nextSlide(){ startIndex=(startIndex+3)%fullImages.length; renderThumbnails(); }
+
+/* === Використати готовий фон із галереї === */
+function handleFileFromGallery(src,key){
+  const img=new Image(); img.crossOrigin="anonymous";
+  img.onload=()=>{
+    layers[key].img=img; layers[key].src=src;
+    layers[key].x=canvas.width/2; layers[key].y=canvas.height/2;
+    layers[key].scale=1; activeLayer=key;
+    scaleSlider.value=1; pushHistory(); drawAll();
+  }; img.src=src;
+}
+
+/* === Завантаження фото/фонів === */
+function handleFileLoad(file,key){
+  if(!file) return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const data=e.target.result;
+    const img=new Image();
+    img.onload=()=>{
+      layers[key].img=img; layers[key].src=data;
+      layers[key].x=canvas.width/2; layers[key].y=canvas.height/2;
+      layers[key].scale=1; activeLayer=key;
+      scaleSlider.value=1; pushHistory(); drawAll();
+    }; img.src=data;
+  }; reader.readAsDataURL(file);
+}
+
+/* Прив'язки інпутів (є перевірка на наявність елементів) */
+if (bgLoader) bgLoader.addEventListener('change',e=>handleFileLoad(e.target.files[0],'bg'));
+if (loveLoader) loveLoader.addEventListener('change',e=>handleFileLoad(e.target.files[0],'love'));
+if (label1Loader) label1Loader.addEventListener('change',e=>handleFileLoad(e.target.files[0],'label1'));
+if (label2Loader) label2Loader.addEventListener('change',e=>handleFileLoad(e.target.files[0],'label2'));
+document.getElementById("fot").onclick=()=> { if(loveLoader) loveLoader.click(); };
+
+/* запуск галереї при старті */
+renderThumbnails();
+
+/* === Галерея клятв === */
+const vows=["LoveStones","Eternity","Fidelity","Joy","LoveStones","Love","Strength","Tenderness","LoveStones","Trust","Unity","Heart"];
+const fullVows=vows.map(name=>url+name+".png");
+let vowIndex=0;
+function renderVows(){ thumbsVows.innerHTML=""; fullVows.slice(vowIndex,vowIndex+4).forEach(src=>createThumb(src, thumbsVows, true)); }
+function prevVow(){ vowIndex=(vowIndex-4+fullVows.length)%fullVows.length; renderVows(); }
+function nextVow(){ vowIndex=(vowIndex+4)%fullVows.length; renderVows(); }
+
+/* === Шари і маска (кругла діра) === */
+const template=new Image(); template.src='images/composit.png';
+const HOLE_OFFSET_X=6, HOLE_OFFSET_Y=-115, HOLE_RADIUS=98;
+let mask={cx:canvas.width/2+HOLE_OFFSET_X, cy:canvas.height/2+HOLE_OFFSET_Y, r:HOLE_RADIUS};
+
+/* ДОДАНО: label1 і label2 */
 let layers={
   bg:{img:null,src:null,x:canvas.width/2,y:canvas.height/2,scale:1},
   love:{img:null,src:null,x:canvas.width/2,y:canvas.height/2,scale:1},
   label1:{img:null,src:null,x:canvas.width/2,y:canvas.height-80,scale:1},
   label2:{img:null,src:null,x:canvas.width/2,y:canvas.height-40,scale:1}
 };
+
 let activeLayer=null, previewMode=false, bgHoleActive=true;
 const history=[]; const MAX_HISTORY=20;
 
-/* === Завантаження === */
-function handleFileLoad(file,key){
-  if(!file) return;
-  const reader=new FileReader();
-  reader.onload=e=>{
-    const img=new Image();
-    img.onload=()=>{
-      layers[key].img=img; layers[key].src=e.target.result;
-      layers[key].x=canvas.width/2; layers[key].y=canvas.height/2;
-      layers[key].scale=1; activeLayer=key;
-      scaleSlider.value=1;
-      pushHistory(); drawAll();
-    };
-    img.src=e.target.result;
-  };
-  reader.readAsDataURL(file);
+/* makeSnapshot враховує label1/label2 */
+function makeSnapshot(){
+  return { bg:{...layers.bg}, love:{...layers.love}, label1:{...layers.label1}, label2:{...layers.label2}, previewMode, activeLayer, bgHoleActive };
 }
-bgLoader.addEventListener('change',e=>handleFileLoad(e.target.files[0],'bg'));
-loveLoader.addEventListener('change',e=>handleFileLoad(e.target.files[0],'love'));
-label1Loader.addEventListener('change',e=>handleFileLoad(e.target.files[0],'label1'));
-label2Loader.addEventListener('change',e=>handleFileLoad(e.target.files[0],'label2'));
 
-/* === Undo / Snapshots === */
-function makeSnapshot(){ return {bg:{...layers.bg}, love:{...layers.love}, label1:{...layers.label1}, label2:{...layers.label2}, previewMode, activeLayer, bgHoleActive}; }
+/* Додаємо початковий стан в історію — важливо для Undo */
+pushHistory();
+
+/* applySnapshot з перевірками */
 function applySnapshot(s){
   if(!s) return;
   previewMode=!!s.previewMode; activeLayer=s.activeLayer||null; bgHoleActive=!!s.bgHoleActive;
-  ['bg','love','label1','label2'].forEach(k=>{
-    const v=s[k];
+
+  ['bg','love','label1','label2'].forEach(key=>{
+    const v = s[key];
     if(v && v.src){
-      const img=new Image();
-      img.onload=()=>{ layers[k].img=img; layers[k].src=v.src; layers[k].x=v.x; layers[k].y=v.y; layers[k].scale=v.scale; drawAll(); };
-      img.src=v.src;
-    } else { layers[k].img=null; layers[k].src=null; layers[k].x=v?v.x:canvas.width/2; layers[k].y=v?v.y:canvas.height/2; layers[k].scale=v?v.scale:1; }
+      const img = new Image();
+      img.onload = ()=>{ layers[key].img = img; layers[key].src = v.src; layers[key].x=v.x; layers[key].y=v.y; layers[key].scale=v.scale; drawAll(); };
+      img.src = v.src;
+    } else {
+      layers[key].img = null; layers[key].src = null;
+      layers[key].x = v ? v.x : canvas.width/2;
+      layers[key].y = v ? v.y : canvas.height/2;
+      layers[key].scale = v ? v.scale : 1;
+    }
   });
+
   toggleButtons();
 }
+
+/* pushHistory реалізація */
 function pushHistory(){ history.push(makeSnapshot()); if(history.length>MAX_HISTORY) history.shift(); }
-pushHistory();
 
 /* === Малювання === */
-function drawLayerTo(ctx,l){ if(!l||!l.img) return; const w=l.img.width*l.scale,h=l.img.height*l.scale; ctx.drawImage(l.img,l.x-w/2,l.y-h/2,w,h); }
-function drawLove(ctx,clip=false){ const L=layers.love;if(!L.img) return; const w=L.img.width*L.scale,h=L.img.height*L.scale; ctx.save(); if(clip){ ctx.beginPath(); ctx.arc(mask.cx,mask.cy,mask.r,0,Math.PI*2); ctx.clip(); } ctx.drawImage(L.img,L.x-w/2,L.y-h/2,w,h); ctx.restore(); }
-function drawBgWithHole(ctx){ if(!layers.bg.img) return; if(!bgHoleActive){drawLayerTo(ctx,layers.bg);return;} const off=document.createElement('canvas'); off.width=canvas.width; off.height=canvas.height; const octx=off.getContext('2d'); drawLayerTo(octx,layers.bg); octx.globalCompositeOperation='destination-out'; octx.beginPath(); octx.arc(mask.cx,mask.cy,mask.r,0,Math.PI*2); octx.fill(); ctx.drawImage(off,0,0); }
-function drawAll(){ ctx.clearRect(0,0,canvas.width,canvas.height); if(!previewMode){drawBgWithHole(ctx);drawLove(ctx,false);} else {drawLove(ctx,true);drawBgWithHole(ctx);} if(layers.label1.img) drawLayerTo(ctx,layers.label1); if(layers.label2.img) drawLayerTo(ctx,layers.label2); if(template.complete) ctx.drawImage(template,0,0,canvas.width,canvas.height); }
+function drawLayerTo(ctxTarget, layer){
+  if(!layer || !layer.img) return;
+  const w = layer.img.width * layer.scale;
+  const h = layer.img.height * layer.scale;
+  ctxTarget.drawImage(layer.img, layer.x - w/2, layer.y - h/2, w, h);
+}
+function drawLove(ctxTarget, clip=false){
+  const L = layers.love; if(!L || !L.img) return;
+  const w = L.img.width * L.scale, h = L.img.height * L.scale;
+  ctxTarget.save();
+  if(clip && mask.r > 0){ ctxTarget.beginPath(); ctxTarget.arc(mask.cx,mask.cy,mask.r,0,Math.PI*2); ctxTarget.clip(); }
+  ctxTarget.drawImage(L.img, L.x - w/2, L.y - h/2, w, h);
+  ctxTarget.restore();
+}
+function drawBgWithHole(ctxTarget){
+  if(!layers.bg.img) return;
+  if(!bgHoleActive || mask.r <= 0){ drawLayerTo(ctxTarget, layers.bg); return; }
+  const off = document.createElement('canvas'); off.width = canvas.width; off.height = canvas.height;
+  const octx = off.getContext('2d'); drawLayerTo(octx, layers.bg);
+  octx.globalCompositeOperation = 'destination-out'; octx.beginPath(); octx.arc(mask.cx,mask.cy,mask.r,0,Math.PI*2); octx.fill();
+  octx.globalCompositeOperation = 'source-over'; ctxTarget.drawImage(off,0,0);
+}
 
-/* === UI === */
-function toggleButtons(){ previewBtn.style.display=previewMode?'none':'inline-block'; downloadBtn.style.display=previewMode?'inline-block':'none'; }
-scaleSlider.addEventListener('input',()=>{ if(!activeLayer) return; layers[activeLayer].scale=parseFloat(scaleSlider.value); drawAll(); });
-undoBtn.addEventListener('click',()=>{ if(history.length<=1) return; history.pop(); applySnapshot(history[history.length-1]); });
-previewBtn.addEventListener('click',()=>{ previewMode=true; pushHistory(); toggleButtons(); drawAll(); });
-downloadBtn.addEventListener('click',()=>{ const link=document.createElement('a'); link.download='composition.png'; link.href=canvas.toDataURL('image/png'); link.click(); });
+/* drawAll: додаємо label1/label2 */
+function drawAll(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  if(!previewMode){ drawBgWithHole(ctx); drawLove(ctx,false); }
+  else { drawLove(ctx,true); drawBgWithHole(ctx); }
+  if(layers.label1.img) drawLayerTo(ctx, layers.label1);
+  if(layers.label2.img) drawLayerTo(ctx, layers.label2);
+  if(template.complete) ctx.drawImage(template,0,0,canvas.width,canvas.height);
+}
 
-template.onload=()=>drawAll();
-applySnapshot(history[0]);
+/* UI-контролери */
+function toggleButtons(){
+  if(previewMode){
+    previewBtn.style.display = 'none';
+    downloadBtn.style.display = 'inline-block';
+    if (vowsi) vowsi.style.display = 'none';
+    if (photoBlock) photoBlock.style.display = 'none';
+    if (vowse) vowse.style.display = 'inline-block';
+    setDisabled(true);
+  } else {
+    previewBtn.style.display = 'inline-block';
+    downloadBtn.style.display = 'none';
+    if (vowsi) vowsi.style.display = 'inline-block';
+    if (photoBlock) photoBlock.style.display = 'inline-block';
+    if (vowse) vowse.style.display = 'none';
+    setDisabled(false);
+  }
+}
+
+/* Масштаб */
+scaleSlider.addEventListener('input', ()=>{ if(!activeLayer) return; layers[activeLayer].scale = parseFloat(scaleSlider.value); drawAll(); });
+
+/* Drag/Touch */
+let dragging=false, dragStartX=0, dragStartY=0;
+canvas.addEventListener('mousedown', e=>{ if(previewMode || !activeLayer) return; dragging=true; dragStartX = e.offsetX - layers[activeLayer].x; dragStartY = e.offsetY - layers[activeLayer].y; });
+canvas.addEventListener('mousemove', e=>{ if(previewMode || !dragging || !activeLayer) return; layers[activeLayer].x = e.offsetX - dragStartX; layers[activeLayer].y = e.offsetY - dragStartY; drawAll(); });
+function stopDrag(){ if(previewMode) return; if(dragging){ dragging=false; pushHistory(); } }
+canvas.addEventListener('mouseup', stopDrag); canvas.addEventListener('mouseleave', stopDrag);
+canvas.addEventListener('touchstart', e=>{ if(previewMode || !activeLayer) return; const t=e.touches[0], rect=canvas.getBoundingClientRect(); dragging=true; dragStartX = t.clientX - rect.left - layers[activeLayer].x; dragStartY = t.clientY - rect.top - layers[activeLayer].y; e.preventDefault(); });
+canvas.addEventListener('touchmove', e=>{ if(previewMode || !dragging || !activeLayer) return; const t=e.touches[0], rect=canvas.getBoundingClientRect(); layers[activeLayer].x = t.clientX - rect.left - dragStartX; layers[activeLayer].y = t.clientY - rect.top - dragStartY; drawAll(); e.preventDefault(); });
+canvas.addEventListener('touchend', stopDrag);
+
+/* Undo / Preview / Download */
+undoBtn.addEventListener('click', ()=>{ if(history.length <= 1) return; history.pop(); applySnapshot(history[history.length-1]); });
+previewBtn.addEventListener('click', ()=>{ previewMode = true; pushHistory(); toggleButtons(); drawAll(); });
+downloadBtn.addEventListener('click', ()=>{ const link=document.createElement('a'); link.download='composition.png'; link.href = canvas.toDataURL('image/png'); link.click(); });
+
+template.onload = ()=>{ drawAll(); };
+renderVows();
+applySnapshot(history[0] || makeSnapshot());
+
+function setDisabled(state){ [thumbs, loveLoader].forEach(el=>{ if(!el) return; el.disabled = !!state; el.classList.toggle('disabled', !!state); }); }
+
+function addOverlay(src,isVow=false){ const newImg=document.createElement("img"); newImg.src = src; newImg.classList.add("overlay"); if(isVow) newImg.classList.add("vow"); collage.appendChild(newImg); }
+
+document.getElementById('updateBtn').addEventListener('click', function () {
+  const url = window.location.href.split('?')[0];
+  window.location.href = url + '?_=' + new Date().getTime();
+});
 </script>
 </body>
 </html>
