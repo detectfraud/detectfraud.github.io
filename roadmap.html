@@ -90,7 +90,7 @@ button { padding:8px 12px; cursor:pointer; border-radius:8px; }
 <input type="file" id="bgLoader" style="display:none">
 <input type="file" id="loveLoader" style="display:none">
 <script>
-/* === Collage JS === */
+/* === Collage JS (оновлений) === */
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 const thumbs = document.getElementById('thumbs');
@@ -105,8 +105,12 @@ const vowse = document.getElementById('vowse');
 const vowsi = document.getElementById('vowsi');
 const photoBlock = document.querySelector('.photo-block');
 
+/* === Галерея фонів === */
 const url = "https://detectfraud.github.io/gallery/";
-const images = ["nature(1)","nature(2)","nature(3)","nature(4)","nature(5)","nature(6)","nature(7)","nature(8)","nature(9)","Fon"];
+const images = [
+  "nature(1)","nature(2)","nature(3)","nature(4)","nature(5)",
+  "nature(6)","nature(7)","nature(8)","nature(9)","Fon"
+];
 const fullImages = images.map(name => url + name + ".jpeg");
 let startIndex = 0;
 
@@ -130,7 +134,9 @@ function createThumb(src, container, isVow){
     else{ thumb.onclick=()=>handleFileFromGallery(src,"bg"); }
   }
 
-  wrapper.appendChild(thumb); wrapper.appendChild(big); container.appendChild(wrapper);
+  wrapper.appendChild(thumb);
+  wrapper.appendChild(big);
+  container.appendChild(wrapper);
 }
 
 function prevSlide(){ startIndex=(startIndex-3+fullImages.length)%fullImages.length; renderThumbnails(); }
@@ -140,9 +146,10 @@ function nextSlide(){ startIndex=(startIndex+3)%fullImages.length; renderThumbna
 function handleFileFromGallery(src,key){
   const img=new Image(); img.crossOrigin="anonymous";
   img.onload=()=>{
-    layers[key].img=img; layers[key].src=src; layers[key].x=canvas.width/2; layers[key].y=canvas.height/2;
-    layers[key].scale=1; activeLayer=layers[key]; scaleSlider.value=1; pushHistory(); drawAll();
-  }; img.src=src;
+    layers[key].img=img; layers[key].src=src; layers[key].x=canvas.width/2; layers[key].y=canvas.height/2; layers[key].scale=1;
+    activeLayer = { type:key }; scaleSlider.value=1; pushHistory(); drawAll();
+  };
+  img.src=src;
 }
 
 /* === Завантаження фото/фонів === */
@@ -153,8 +160,8 @@ function handleFileLoad(file,key){
     const data=e.target.result;
     const img=new Image();
     img.onload=()=>{
-      layers[key].img=img; layers[key].src=data; layers[key].x=canvas.width/2; layers[key].y=canvas.height/2;
-      layers[key].scale=1; activeLayer=layers[key]; scaleSlider.value=1; pushHistory(); drawAll();
+      layers[key].img=img; layers[key].src=data; layers[key].x=canvas.width/2; layers[key].y=canvas.height/2; layers[key].scale=1;
+      activeLayer={ type:key }; scaleSlider.value=1; pushHistory(); drawAll();
     };
     img.src=data;
   };
@@ -175,16 +182,24 @@ function nextVow(){ vowIndex=(vowIndex+4)%fullVows.length; renderVows(); }
 
 /* === Шари і маска === */
 const template=new Image(); template.src='images/composit.png';
+const HOLE_OFFSET_X=6, HOLE_OFFSET_Y=-115, HOLE_RADIUS=98;
+let mask={cx:canvas.width/2+HOLE_OFFSET_X, cy:canvas.height/2+HOLE_OFFSET_Y, r:HOLE_RADIUS};
+
 let layers={ bg:{img:null,src:null,x:canvas.width/2,y:canvas.height/2,scale:1}, love:{img:null,src:null,x:canvas.width/2,y:canvas.height/2,scale:1} };
-let vowLayers=[]; // нові шари для клятв
+let vowLayers=[]; // клятви
 let activeLayer=null, previewMode=false, bgHoleActive=true;
 const history=[]; const MAX_HISTORY=20;
 
+/* === Snapshots для undo === */
 function makeSnapshot(){ 
-  return { bg:{...layers.bg}, love:{...layers.love}, vowLayers:vowLayers.map(l=>({...l})), previewMode, activeLayer, bgHoleActive }; 
+  return { 
+    bg:{...layers.bg}, 
+    love:{...layers.love}, 
+    vowLayers:vowLayers.map(l=>({...l})), 
+    previewMode, activeLayer, bgHoleActive 
+  }; 
 }
 function pushHistory(){ history.push(makeSnapshot()); if(history.length>MAX_HISTORY) history.shift(); }
-
 function applySnapshot(s){
   previewMode=!!s.previewMode; activeLayer=s.activeLayer||null; bgHoleActive=!!s.bgHoleActive;
   ['bg','love'].forEach(key=>{
@@ -192,62 +207,102 @@ function applySnapshot(s){
     if(v && v.src){ const img=new Image(); img.onload=()=>{ layers[key].img=img; layers[key].src=v.src; layers[key].x=v.x; layers[key].y=v.y; layers[key].scale=v.scale; drawAll(); }; img.src=v.src; } 
     else{ layers[key].img=null; layers[key].src=null; layers[key].x=v? v.x:canvas.width/2; layers[key].y=v? v.y:canvas.height/2; layers[key].scale=v? v.scale:1; }
   });
-  vowLayers = s.vowLayers ? s.vowLayers.map(l=>{ const img=new Image(); img.src=l.src; return {...l,img}; }) : [];
+  vowLayers = s.vowLayers.map(l=>{ const img=new Image(); img.src=l.src; return {...l,img}; });
   toggleButtons();
 }
 
-/* === Малювання шарів === */
+/* === Малювання === */
 function drawLayerTo(ctxTarget, layer){ if(!layer||!layer.img) return; const w=layer.img.width*layer.scale,h=layer.img.height*layer.scale; ctxTarget.drawImage(layer.img, layer.x-w/2, layer.y-h/2, w, h); }
-
+function drawLove(ctxTarget, clip=false){ const L=layers.love; if(!L||!L.img) return; const w=L.img.width*L.scale,h=L.img.height*L.scale; ctxTarget.save(); if(clip&&mask.r>0){ ctxTarget.beginPath(); ctxTarget.arc(mask.cx,mask.cy,mask.r,0,Math.PI*2); ctxTarget.clip(); } ctxTarget.drawImage(L.img,L.x-w/2,L.y-h/2,w,h); ctxTarget.restore(); }
+function drawBgWithHole(ctxTarget){ if(!layers.bg.img) return; if(!bgHoleActive||mask.r<=0){ drawLayerTo(ctxTarget,layers.bg); return; } const off=document.createElement('canvas'); off.width=canvas.width; off.height=canvas.height; const octx=off.getContext('2d'); drawLayerTo(octx,layers.bg); octx.globalCompositeOperation='destination-out'; octx.beginPath(); octx.arc(mask.cx,mask.cy,mask.r,0,Math.PI*2); octx.fill(); octx.globalCompositeOperation='source-over'; ctxTarget.drawImage(off,0,0); }
 function drawAll(){ 
   ctx.clearRect(0,0,canvas.width,canvas.height); 
-  drawLayerTo(ctx,layers.bg);
-  drawLayerTo(ctx,layers.love);
-  vowLayers.forEach(layer=>drawLayerTo(ctx,layer));
+  if(!previewMode){
+    drawBgWithHole(ctx);
+    drawLove(ctx,false);
+    vowLayers.forEach(layer=>drawLayerTo(ctx, layer));
+  } else {
+    drawLove(ctx,true);
+    drawBgWithHole(ctx);
+    vowLayers.forEach(layer=>drawLayerTo(ctx, layer));
+  }
   if(template.complete) ctx.drawImage(template,0,0,canvas.width,canvas.height); 
 }
 
 /* === Drag & Touch === */
 let dragging=false, dragStartX=0, dragStartY=0;
-canvas.addEventListener('mousedown',e=>{ if(previewMode||!activeLayer) return; dragging=true; dragStartX=e.offsetX-activeLayer.x; dragStartY=e.offsetY-activeLayer.y; });
-canvas.addEventListener('mousemove',e=>{ if(previewMode||!dragging||!activeLayer) return; activeLayer.x=e.offsetX-dragStartX; activeLayer.y=e.offsetY-dragStartY; drawAll(); });
+canvas.addEventListener('mousedown',e=>{ if(previewMode||!activeLayer) return; dragging=true; dragStartX=e.offsetX-getLayerX(activeLayer); dragStartY=e.offsetY-getLayerY(activeLayer); });
+canvas.addEventListener('mousemove',e=>{ if(previewMode||!dragging||!activeLayer) return; setLayerPos(activeLayer,e.offsetX-dragStartX,e.offsetY-dragStartY); drawAll(); });
 function stopDrag(){ if(previewMode) return; if(dragging){ dragging=false; pushHistory(); } }
 canvas.addEventListener('mouseup',stopDrag); canvas.addEventListener('mouseleave',stopDrag);
-canvas.addEventListener('touchstart',e=>{ if(previewMode||!activeLayer) return; const t=e.touches[0],rect=canvas.getBoundingClientRect(); dragging=true; dragStartX=t.clientX-rect.left-activeLayer.x; dragStartY=t.clientY-rect.top-activeLayer.y; e.preventDefault(); });
-canvas.addEventListener('touchmove',e=>{ if(previewMode||!dragging||!activeLayer) return; const t=e.touches[0],rect=canvas.getBoundingClientRect(); activeLayer.x=t.clientX-rect.left-dragStartX; activeLayer.y=t.clientY-rect.top-dragStartY; drawAll(); e.preventDefault(); });
+canvas.addEventListener('touchstart',e=>{ if(previewMode||!activeLayer) return; const t=e.touches[0],rect=canvas.getBoundingClientRect(); dragging=true; dragStartX=t.clientX-rect.left-getLayerX(activeLayer); dragStartY=t.clientY-rect.top-getLayerY(activeLayer); e.preventDefault(); });
+canvas.addEventListener('touchmove',e=>{ if(previewMode||!dragging||!activeLayer) return; const t=e.touches[0],rect=canvas.getBoundingClientRect(); setLayerPos(activeLayer,t.clientX-rect.left-dragStartX,t.clientY-rect.top-dragStartY); drawAll(); e.preventDefault(); });
 canvas.addEventListener('touchend',stopDrag);
 
 /* === Масштабування === */
-scaleSlider.addEventListener('input',()=>{ if(!activeLayer) return; activeLayer.scale=parseFloat(scaleSlider.value); drawAll(); });
+scaleSlider.addEventListener('input',()=>{
+  if(!activeLayer) return; 
+  setLayerScale(activeLayer,parseFloat(scaleSlider.value));
+  drawAll();
+});
 
 /* === Undo / Preview / Download === */
 undoBtn.addEventListener('click',()=>{ if(history.length<=1) return; history.pop(); applySnapshot(history[history.length-1]); });
 previewBtn.addEventListener('click',()=>{ previewMode=true; pushHistory(); toggleButtons(); drawAll(); });
 downloadBtn.addEventListener('click',()=>{ const link=document.createElement('a'); link.download='composition.png'; link.href=canvas.toDataURL('image/png'); link.click(); });
 
-function toggleButtons(){
-  if(previewMode){ previewBtn.style.display='none'; downloadBtn.style.display='inline-block'; if(vowsi) vowsi.style.display='none'; if(photoBlock) photoBlock.style.display='none'; if(vowse) vowse.style.display='inline-block'; setDisabled(true); }
-  else{ previewBtn.style.display='inline-block'; downloadBtn.style.display='none'; if(vowsi) vowsi.style.display='inline-block'; if(photoBlock) photoBlock.style.display='inline-block'; if(vowse) vowse.style.display='none'; setDisabled(false); }
-}
-
-function setDisabled(state){ [thumbs,loveLoader].forEach(el=>{ el.disabled=!!state; el.classList.toggle('disabled',!!state); }); }
+/* === Utility для шарів === */
+function getLayerX(layer){ return layer.type==='bg'||layer.type==='love'? layers[layer.type].x : layer.x; }
+function getLayerY(layer){ return layer.type==='bg'||layer.type==='love'? layers[layer.type].y : layer.y; }
+function setLayerPos(layer,x,y){ if(layer.type==='bg'||layer.type==='love'){ layers[layer.type].x=x; layers[layer.type].y=y; } else { layer.x=x; layer.y=y; } }
+function setLayerScale(layer,s){ if(layer.type==='bg'||layer.type==='love'){ layers[layer.type].scale=s; } else { layer.scale=s; } }
 
 /* === Додати клятву === */
 function addOverlay(src,isVow=false){
   if(isVow){
     const img=new Image(); img.src=src;
-    img.onload=()=>{
-      const newLayer = { img:img, src:src, x:canvas.width- img.width/2 -10, y:canvas.height - img.height/2 -10, scale:1 };
-      vowLayers.push(newLayer); activeLayer=newLayer; scaleSlider.value=1; pushHistory(); drawAll();
+    img.onload = ()=>{
+      const newLayer = { img: img, src: src, x: canvas.width/2, y: canvas.height/2, scale:1 };
+      vowLayers.push(newLayer);
+      activeLayer = newLayer; scaleSlider.value=1;
+      pushHistory(); drawAll();
     };
   }
 }
 
-/* === Ініціалізація === */
-renderThumbnails(); renderVows(); applySnapshot(history[0]||makeSnapshot());
-template.onload=()=>{ drawAll(); };
+/* === Toggle Buttons === */
+function toggleButtons(){
+  if(previewMode){
+    previewBtn.style.display='none';
+    downloadBtn.style.display='inline-block';
+    if(vowsi) vowsi.style.display='none';
+    if(photoBlock) photoBlock.style.display='none';
+    if(vowse) vowse.style.display='inline-block';
+    setDisabled(true);
+  } else {
+    previewBtn.style.display='inline-block';
+    downloadBtn.style.display='none';
+    if(vowsi) vowsi.style.display='inline-block';
+    if(photoBlock) photoBlock.style.display='inline-block';
+    if(vowse) vowse.style.display='none';
+    setDisabled(false);
+  }
+}
 
+function setDisabled(state){ [thumbs,loveLoader].forEach(el=>{ el.disabled=!!state; el.classList.toggle('disabled',!!state); }); }
+
+/* === Обновлення сторінки === */
+document.getElementById('updateBtn').addEventListener('click',function(){
+  const url = window.location.href.split('?')[0]; 
+  window.location.href = url + '?_=' + new Date().getTime();
+});
+
+/* === Ініціалізація === */
+template.onload=()=>{ drawAll(); };
+renderThumbnails(); renderVows();
+applySnapshot(history[0]||makeSnapshot());
 </script>
+
 
 </body>
 </html>
