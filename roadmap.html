@@ -226,6 +226,10 @@ const HOLE_OFFSET_X=6, HOLE_OFFSET_Y=-115, HOLE_RADIUS=98;
 let mask={cx:canvas.width/2+HOLE_OFFSET_X, cy:canvas.height/2+HOLE_OFFSET_Y, r:HOLE_RADIUS};
 
 let layers={ bg:{img:null,src:null,x:canvas.width/2,y:canvas.height/2,scale:1}, love:{img:null,src:null,x:canvas.width/2,y:canvas.height/2,scale:1} };
+//XXX
+let vowLayers = []; // нові шари для клятв
+
+//xxx
 let activeLayer=null, previewMode=false, bgHoleActive=true;
 const history=[]; const MAX_HISTORY=20;
 function makeSnapshot(){ return { bg:{...layers.bg}, love:{...layers.love}, previewMode, activeLayer, bgHoleActive }; }
@@ -242,7 +246,25 @@ function applySnapshot(s){
 function drawLayerTo(ctxTarget, layer){ if(!layer||!layer.img) return; const w=layer.img.width*layer.scale,h=layer.img.height*layer.scale; ctxTarget.drawImage(layer.img, layer.x-w/2, layer.y-h/2, w, h); }
 function drawLove(ctxTarget, clip=false){ const L=layers.love; if(!L||!L.img) return; const w=L.img.width*L.scale,h=L.img.height*L.scale; ctxTarget.save(); if(clip&&mask.r>0){ ctxTarget.beginPath(); ctxTarget.arc(mask.cx,mask.cy,mask.r,0,Math.PI*2); ctxTarget.clip(); } ctxTarget.drawImage(L.img,L.x-w/2,L.y-h/2,w,h); ctxTarget.restore(); }
 function drawBgWithHole(ctxTarget){ if(!layers.bg.img) return; if(!bgHoleActive||mask.r<=0){ drawLayerTo(ctxTarget,layers.bg); return; } const off=document.createElement('canvas'); off.width=canvas.width; off.height=canvas.height; const octx=off.getContext('2d'); drawLayerTo(octx,layers.bg); octx.globalCompositeOperation='destination-out'; octx.beginPath(); octx.arc(mask.cx,mask.cy,mask.r,0,Math.PI*2); octx.fill(); octx.globalCompositeOperation='source-over'; ctxTarget.drawImage(off,0,0); }
-function drawAll(){ ctx.clearRect(0,0,canvas.width,canvas.height); if(!previewMode){ drawBgWithHole(ctx); drawLove(ctx,false); } else { drawLove(ctx,true); drawBgWithHole(ctx); } if(template.complete) ctx.drawImage(template,0,0,canvas.width,canvas.height); }
+//XXX
+function drawAll(){ 
+  ctx.clearRect(0,0,canvas.width,canvas.height); 
+  if(!previewMode){
+    drawBgWithHole(ctx);
+    drawLove(ctx,false);
+    vowLayers.forEach(layer=>{
+      drawLayerTo(ctx, layer); // малюємо всі клятви
+    });
+  } else {
+    drawLove(ctx,true);
+    drawBgWithHole(ctx);
+    vowLayers.forEach(layer=>{
+      drawLayerTo(ctx, layer);
+    });
+  }
+  if(template.complete) ctx.drawImage(template,0,0,canvas.width,canvas.height); 
+}
+//xxx
 
 function toggleButtons(){
   if(previewMode){
@@ -292,7 +314,28 @@ renderThumbnails(); renderVows();
 applySnapshot(history[0]||makeSnapshot());
 //,scaleSlider
 function setDisabled(state){ [thumbs,loveLoader].forEach(el=>{ el.disabled=!!state; el.classList.toggle('disabled',!!state); }); }
-function addOverlay(src,isVow=false){ const newImg=document.createElement("img"); newImg.src=src; newImg.classList.add("overlay"); if(isVow) newImg.classList.add("vow"); collage.appendChild(newImg); }
+//XXX
+function addOverlay(src,isVow=false){
+  if(isVow){
+    const img=new Image();
+    img.src=src;
+    img.onload = ()=>{
+      const newLayer = {
+        img: img,
+        src: src,
+        x: canvas.width/2,
+        y: canvas.height/2,
+        scale: 1
+      };
+      vowLayers.push(newLayer);
+      activeLayer = newLayer; // щойно доданий шар стане активним
+      scaleSlider.value = 1;
+      pushHistory();
+      drawAll();
+    };
+  }
+}
+//xxx
   
 document.getElementById('updateBtn').addEventListener('click', function () {
     // Додаємо до URL унікальний параметр часу, щоб обійти кеш
