@@ -214,12 +214,45 @@ renderThumbnails();
 
 
 /* === Галерея клятв === */
+/* === Галерея клятв === */
 const vows=["LoveStones","Eternity","Fidelity","Joy","LoveStones","Love","Strength","Tenderness","LoveStones","Trust","Unity","Heart"];
 const fullVows=vows.map(name=>url+name+".png");
 let vowIndex=0;
-function renderVows(){ thumbsVows.innerHTML=""; fullVows.slice(vowIndex,vowIndex+4).forEach(src=>createThumb(src, thumbsVows, true)); }
-function prevVow(){ vowIndex=(vowIndex-4+fullVows.length)%fullVows.length; renderVows(); }
-function nextVow(){ vowIndex=(vowIndex+4)%fullVows.length; renderVows(); }
+
+function renderVows() {
+  thumbsVows.innerHTML="";
+  fullVows.slice(vowIndex,vowIndex+4).forEach(src=>{
+    const wrapper=document.createElement("div");
+    wrapper.className="thumb-wrapper";
+
+    const thumb=document.createElement("img");
+    thumb.className="thumb";
+    thumb.src=src;
+    thumb.onclick=()=>addOverlay(src,true); // додаємо шар клятви
+
+    const big=document.createElement("img");
+    big.className="imagbox";
+    big.src=src;
+
+    wrapper.appendChild(thumb);
+    wrapper.appendChild(big);
+    thumbsVows.appendChild(wrapper);
+  });
+}
+
+function prevVow() {
+  vowIndex=(vowIndex-4+fullVows.length)%fullVows.length;
+  renderVows();
+}
+
+function nextVow() {
+  vowIndex=(vowIndex+4)%fullVows.length;
+  renderVows();
+}
+
+// стартовий рендер
+renderVows();
+
 
 /* === Шари і маска (кругла діра) === */
 const template=new Image(); template.src='images/composit.png';
