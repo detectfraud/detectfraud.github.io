@@ -5,8 +5,8 @@
 <meta charset="UTF-8" />
 <title>Камінь любові — редактор</title>
 <style>
-body { font-family: sans-serif; text-align:center; background:url(https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjghIwEmgtr9VAIzGM4eS8BdLA1nptupwYDch46JvrMH9AILVqnNpUX_vxUtQe2Kr-eNLgXcUu_dfNCc7P45vPblF37xpoN8dbLsm9VHiMKmYf58ixmJeQHTY4R4hvGXj0nC7SqiD_2UWRGvIDgUrvZqoVqq8qT61yJB846igsv4ceY7Q/s1600/fon.png) repeat scroll top left; }  /*background:#f5f5f5;*/
-.venwin {  border-radius:10px;  display:inline-block; background:url(https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjghIwEmgtr9VAIzGM4eS8BdLA1nptupwYDch46JvrMH9AILVqnNpUX_vxUtQe2Kr-eNLgXcUu_dfNCc7P45vPblF37xpoN8dbLsm9VHiMKmYf58ixmJeQHTY4R4hvGXj0nC7SqiD_2UWRGvIDgUrvZqoVqq8qT61yJB846igsv4ceY7Q/s1600/fon.png) repeat scroll top left; }   /*padding:10px;*/
+body { font-family: sans-serif; text-align:center; background:url(https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjghIwEmgtr9VAIzGM4eS8BdLA1nptupwYDch46JvrMH9AILVqnNpUX_vxUtQe2Kr-eNLgXcUu_dfNCc7P45vPblF37xpoN8dbLsm9VHiMKmYf58ixmJeQHTY4R4hvGXj0nC7SqiD_2UWRGvIDgUrvZqoVqq8qT61yJB846igsv4ceY7Q/s1600/fon.png) repeat scroll top left; }
+.venwin { border-radius:10px; display:inline-block; background:url(https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjghIwEmgtr9VAIzGM4eS8BdLA1nptupwYDch46JvrMH9AILVqnNpUX_vxUtQe2Kr-eNLgXcUu_dfNCc7P45vPblF37xpoN8dbLsm9VHiMKmYf58ixmJeQHTY4R4hvGXj0nC7SqiD_2UWRGvIDgUrvZqoVqq8qT61yJB846igsv4ceY7Q/s1600/fon.png) repeat scroll top left; }
 canvas { border:3px solid #bbb; border-radius:6px; box-shadow:0 6px 18px rgba(0,0,0,.1); display:block; margin:10px auto; }
 #scaleSlider { width:420px;}
 button { padding:8px 12px; cursor:pointer; border-radius:8px; }
@@ -15,7 +15,7 @@ button { padding:8px 12px; cursor:pointer; border-radius:8px; }
 .gallery-container { display:flex; align-items:flex-start; justify-content:center; gap:10px; margin-top:20px; }
 .gallery-block { display:flex; flex-direction:column; align-items:center; gap:10px; }
 .gallery-block > div { display:flex; align-items:center; justify-content:center; }
-.arrow, .arow { font-size:20px; cursor:pointer; user-select:none; padding:3px; line-height:1; display:flex; align-items:center; justify-content:center;  }
+.arrow, .arow { font-size:20px; cursor:pointer; user-select:none; padding:3px; line-height:1; display:flex; align-items:center; justify-content:center; }
 .arrow:first-child { margin-right:-110px; } .arrow:last-child { margin-left:-110px; }
 .arow:first-child { margin-right:-60px; }
 .arow:last-child { margin-left:-60px; }
@@ -23,7 +23,15 @@ button { padding:8px 12px; cursor:pointer; border-radius:8px; }
 .thumb-wrapper { position:relative; }
 .thumb { width:108px; height:72px; object-fit:cover; border-radius:8px; cursor:pointer; box-shadow:0 0 6px rgba(0,0,0,0.3); transition:all 0.3s ease; z-index:1; }
 .collage { position:relative; display:inline-block; margin-top:40px; }
-.collage img.overlay { position:absolute; bottom:10px; right:10px; width:500px; border-radius:8px; box-shadow:0 0 8px rgba(0,0,0,0.4); }
+
+/* Зміни в стилях для галереї клятв */
+.vows-container {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    z-index: 2; /* Щоб була над канвасом */
+    padding: 10px;
+}
 
 #fot { display:inline-block; cursor:pointer; border-radius:8px; width:108px; height:72px; background-image:url(https://detectfraud.github.io/gallery/Para.png); background-repeat:no-repeat; background-size:contain; }
 #fot:hover { mix-blend-mode:luminosity; }
@@ -36,7 +44,7 @@ button { padding:8px 12px; cursor:pointer; border-radius:8px; }
 .gallery-container.vows .labels { display:grid; grid-template-columns:repeat(4,1fr); text-align:center; margin-bottom:5px; }
 .gallery-container.vows .labels .label1 { grid-column:1; font-weight:bold; margin-left:70px; }
 .gallery-container.vows .labels .label2 { grid-column:3; font-weight:bold; }
-.arrow, .arow {  position:relative; z-index:3; } /*<br><br>*/
+.arrow, .arow { position:relative; z-index:3; }
 </style>
 </head>
 <body>
@@ -67,7 +75,7 @@ button { padding:8px 12px; cursor:pointer; border-radius:8px; }
 </div>
 
 <!-- Галерея клятв -->
-<div class="gallery-container vows" id="vowse" style="display:none;">
+<div class="gallery-container vows vows-container" id="vowse" style="display:none;">
   <div class="gallery-block">
     <div class="labels">
       <span class="label1">Надпис</span>
@@ -96,64 +104,58 @@ button { padding:8px 12px; cursor:pointer; border-radius:8px; }
 // 1. Отримуємо всі потрібні DOM-елементи з HTML
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
-const thumbs = document.getElementById('thumbs');        // контейнер для галереї фонів
-const thumbsVows = document.getElementById('thumbsVows'); // контейнер для галереї клятв
-const loveLoader = document.getElementById('loveLoader'); // завантажувач фото (клятви/декор)
-const scaleSlider = document.getElementById('scaleSlider'); // повзунок масштабування
-const undoBtn = document.getElementById('undoBtn');       // кнопка "Undo"
-const previewBtn = document.getElementById('previewBtn'); // кнопка "Перегляд"
-const downloadBtn = document.getElementById('downloadBtn'); // кнопка "Завантажити"
-const bgLoader = document.getElementById('bgLoader');     // завантажувач фону
-const collage = document.getElementById('collage');       // контейнер для колажу
-const vowse = document.getElementById('vowse');           // блок для клятв
-const vowsi = document.getElementById('vowsi');           // інший блок для клятв
-const photoBlock = document.querySelector('.photo-block');// блок з фото-кнопками
+const thumbs = document.getElementById('thumbs');
+const thumbsVows = document.getElementById('thumbsVows');
+const loveLoader = document.getElementById('loveLoader');
+const scaleSlider = document.getElementById('scaleSlider');
+const undoBtn = document.getElementById('undoBtn');
+const previewBtn = document.getElementById('previewBtn');
+const downloadBtn = document.getElementById('downloadBtn');
+const bgLoader = document.getElementById('bgLoader');
+const collage = document.getElementById('collage');
+const vowse = document.getElementById('vowse');
+const vowsi = document.getElementById('vowsi');
+const photoBlock = document.querySelector('.photo-block');
+
 
 /* === Галерея фонів === */
-const url = "https://detectfraud.github.io/gallery/"; // базова адреса до зображень
+const url = "https://detectfraud.github.io/gallery/";
 const images = [ "nature(1)","nature(2)","nature(3)","nature(4)","nature(5)",
-  "nature(6)","nature(7)","nature(8)","nature(9)","Fon" ]; // список фонів
-const fullImages = images.map(name => url + name + ".jpeg"); // формуємо повні URL
-let startIndex = 0; // індекс початкового слайду
+  "nature(6)","nature(7)","nature(8)","nature(9)","Fon" ];
+const fullImages = images.map(name => url + name + ".jpeg");
+let startIndex = 0;
 
-// Функція для відмальовки 3-х мініатюр фонів
 function renderThumbnails() {
-    thumbs.innerHTML = "";
-    // Передаємо 'bg' як ключ шару
-    fullImages.slice(startIndex, startIndex + 3).forEach(src => createThumb(src, thumbs, 'bg'));
+    thumbs.innerHTML = "";
+    fullImages.slice(startIndex, startIndex + 3).forEach(src => createThumb(src, thumbs, 'bg'));
 }
 
-// створення однієї мініатюри (фон або клятва)
 function createThumb(src, container, key) {
-    const wrapper = document.createElement("div");
-    wrapper.className = "thumb-wrapper";
+    const wrapper = document.createElement("div");
+    wrapper.className = "thumb-wrapper";
 
-    const imgName = src.split("/").pop().split(".")[0]; // назва картинки
+    const imgName = src.split("/").pop().split(".")[0];
 
-    const thumb = document.createElement("img");
-    thumb.className = "thumb";
-    thumb.src = src;
+    const thumb = document.createElement("img");
+    thumb.className = "thumb";
+    thumb.src = src;
 
-    const big = document.createElement("img");
-    big.className = "imagbox";
-    big.src = src;
+    const big = document.createElement("img");
+    big.className = "imagbox";
+    big.src = src;
 
-    // Обробник кліку для всіх галерей
-    if (imgName === "Fon") {
-        // Спец. пункт → "завантажити свій фон"
-        thumb.title = "Завантажити свій фон";
-        thumb.onclick = () => bgLoader.click();
-    } else {
-        // Встановити готовий фон або клятву з галереї
-        thumb.onclick = () => handleFileFromGallery(src, key);
-    }
+    if (imgName === "Fon") {
+        thumb.title = "Завантажити свій фон";
+        thumb.onclick = () => bgLoader.click();
+    } else {
+        thumb.onclick = () => handleFileFromGallery(src, key);
+    }
 
-    wrapper.appendChild(thumb);
-    wrapper.appendChild(big);
-    container.appendChild(wrapper);
+    wrapper.appendChild(thumb);
+    wrapper.appendChild(big);
+    container.appendChild(wrapper);
 }
 
-// кнопки перемикання слайдів у галереї фонів
 function prevSlide(){
   startIndex=(startIndex-3+fullImages.length)%fullImages.length;
   renderThumbnails();
@@ -166,9 +168,8 @@ function nextSlide(){
 /* === Використати готовий фон із галереї === */
 function handleFileFromGallery(src,key){
   const img=new Image();
-  img.crossOrigin="anonymous"; // вирішує проблему CORS
+  img.crossOrigin="anonymous";
   img.onload=()=>{
-    // розміщуємо зображення в шарі
     layers[key].img=img;
     layers[key].src=src;
     layers[key].x=canvas.width/2;
@@ -176,8 +177,8 @@ function handleFileFromGallery(src,key){
     layers[key].scale=1;
     activeLayer=key;
     scaleSlider.value=1;
-    pushHistory(); // додаємо в історію
-    drawAll();     // перемальовуємо все
+    pushHistory();
+    drawAll();
   };
   img.src=src;
 }
@@ -205,25 +206,21 @@ function handleFileLoad(file,key){
   reader.readAsDataURL(file);
 }
 
-// Прив'язка input-завантажувачів до функцій
 bgLoader.addEventListener('change',e=>handleFileLoad(e.target.files[0],'bg'));
 loveLoader.addEventListener('change',e=>handleFileLoad(e.target.files[0],'love'));
 document.getElementById("fot").onclick=()=>loveLoader.click();
 
-// запускаємо відображення галереї фонів при завантаженні
 renderThumbnails();
 
 
 /* === Галерея клятв === */
 const vows=["LoveStones","Eternity","Fidelity","Joy","LoveStones","Love","Strength","Tenderness","LoveStones","Trust","Unity","Heart"];
-const fullVows=vows.map(name=>url+name+".png"); // формуємо URL клятв
+const fullVows=vows.map(name=>url+name+".png");
 let vowIndex=0;
 
-// Функція для відмальовки 4-х мініатюр клятв
 function renderVows() {
-    thumbsVows.innerHTML = "";
-    // Передаємо 'vow' як ключ шару
-    fullVows.slice(vowIndex, vowIndex + 4).forEach(src => createThumb(src, thumbsVows, 'vow'));
+    thumbsVows.innerHTML = "";
+    fullVows.slice(vowIndex, vowIndex + 4).forEach(src => createThumb(src, thumbsVows, 'vow'));
 }
 function prevVow(){ vowIndex=(vowIndex-4+fullVows.length)%fullVows.length; renderVows(); }
 function nextVow(){ vowIndex=(vowIndex+4)%fullVows.length; renderVows(); }
@@ -234,21 +231,21 @@ const template=new Image(); template.src='images/composit.png';
 const HOLE_OFFSET_X=6, HOLE_OFFSET_Y=-115, HOLE_RADIUS=98;
 let mask={cx:canvas.width/2+HOLE_OFFSET_X, cy:canvas.height/2+HOLE_OFFSET_Y, r:HOLE_RADIUS};
 
-// опис шарів
+// Опис шарів
 let layers={
-    bg:{img:null,src:null,x:canvas.width/2,y:canvas.height/2,scale:1},
-    love:{img:null,src:null,x:canvas.width/2,y:canvas.height/2,scale:1},
-    vow:{img:null,src:null,x:canvas.width/2,y:canvas.height/2,scale:1} // Новий шар для клятв
+    bg:{img:null,src:null,x:canvas.width/2,y:canvas.height/2,scale:1},
+    love:{img:null,src:null,x:canvas.width/2,y:canvas.height/2,scale:1},
+    vow:{img:null,src:null,x:canvas.width/2,y:canvas.height/2,scale:1}
 };
+
 let activeLayer=null, previewMode=false, bgHoleActive=true;
 
-// історія для Undo
+// Історія для Undo
 const history=[]; const MAX_HISTORY=20;
-function makeSnapshot(){ return { bg:{...layers.bg}, love:{...layers.love}, vow:{...layers.vow}, previewMode, activeLayer, bgHoleActive }; } // Змінено: Додано шар 'vow'
+function makeSnapshot(){ return { bg:{...layers.bg}, love:{...layers.love}, vow:{...layers.vow}, previewMode, activeLayer, bgHoleActive }; }
 function pushHistory(){ history.push(makeSnapshot()); if(history.length>MAX_HISTORY) history.shift(); }
 function applySnapshot(s){
   previewMode=!!s.previewMode; activeLayer=s.activeLayer||null; bgHoleActive=!!s.bgHoleActive;
-  // Змінено: Додано шар 'vow' до циклу
   ['bg','love','vow'].forEach(key=>{
     const v=s[key];
     if(v && v.src){
@@ -267,14 +264,12 @@ function applySnapshot(s){
 
 
 /* === Малювання === */
-// малюємо будь-який шар
 function drawLayerTo(ctxTarget, layer){
   if(!layer||!layer.img) return;
   const w=layer.img.width*layer.scale,h=layer.img.height*layer.scale;
   ctxTarget.drawImage(layer.img, layer.x-w/2, layer.y-h/2, w, h);
 }
 
-// малюємо клятви (з опцією обрізки по колу)
 function drawLove(ctxTarget, clip=false){
   const L=layers.love;
   if(!L||!L.img) return;
@@ -285,7 +280,6 @@ function drawLove(ctxTarget, clip=false){
   ctxTarget.restore();
 }
 
-// малюємо фон з "діркою"
 function drawBgWithHole(ctxTarget){
   if(!layers.bg.img) return;
   if(!bgHoleActive||mask.r<=0){ drawLayerTo(ctxTarget,layers.bg); return; }
@@ -300,36 +294,35 @@ function drawBgWithHole(ctxTarget){
   ctxTarget.drawImage(off,0,0);
 }
 
-// перемальовуємо все полотно
 function drawAll(){
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    // Змінено: тепер порядок малювання правильний для всіх режимів
     drawBgWithHole(ctx);
-    drawLove(ctx, previewMode); // Змінено: drawLove тепер приймає previewMode для обрізки
+    drawLove(ctx, previewMode);
     drawLayerTo(ctx, layers.vow);
-
+    
     if(template.complete) {
         ctx.drawImage(template, 0, 0, canvas.width, canvas.height);
     }
 }
 
+
 /* === Кнопки перемикання режимів === */
 function toggleButtons(){
   if(previewMode){
-    // режим перегляду
     previewBtn.style.display = 'none';
     downloadBtn.style.display = 'inline-block';
     if (vowsi) vowsi.style.display = 'none';
     if (photoBlock) photoBlock.style.display = 'none';
-    if (vowse) vowse.style.display = 'inline-block';
+    // Галерея клятв приховується в режимі перегляду, бо там її вже не можна обрати.
+    if (vowse) vowse.style.display = 'none'; 
     setDisabled(true);
   } else {
-    // режим редагування
     previewBtn.style.display = 'inline-block';
     downloadBtn.style.display = 'none';
     if (vowsi) vowsi.style.display = 'inline-block';
     if (photoBlock) photoBlock.style.display = 'inline-block';
-    if (vowse) vowse.style.display = 'none'; //
+    // Галерея клятв стає видимою в режимі редагування
+    if (vowse) vowse.style.display = 'inline-block'; 
     setDisabled(false);
   }
 }
@@ -346,7 +339,6 @@ scaleSlider.addEventListener('input',()=>{
 /* === Drag & Touch (переміщення картинок) === */
 let dragging=false, dragStartX=0, dragStartY=0;
 
-// Початок drag мишею
 canvas.addEventListener('mousedown',e=>{
   if(previewMode||!activeLayer) return;
   dragging=true;
@@ -354,7 +346,6 @@ canvas.addEventListener('mousedown',e=>{
   dragStartY=e.offsetY-layers[activeLayer].y;
 });
 
-// Рух мишею
 canvas.addEventListener('mousemove',e=>{
   if(previewMode||!dragging||!activeLayer) return;
   layers[activeLayer].x=e.offsetX-dragStartX;
@@ -362,7 +353,6 @@ canvas.addEventListener('mousemove',e=>{
   drawAll();
 });
 
-// Завершення drag
 function stopDrag(){
   if(previewMode) return;
   if(dragging){ dragging=false; pushHistory(); }
@@ -370,7 +360,6 @@ function stopDrag(){
 canvas.addEventListener('mouseup',stopDrag);
 canvas.addEventListener('mouseleave',stopDrag);
 
-// Touch-події для мобільних
 canvas.addEventListener('touchstart',e=>{
   if(previewMode||!activeLayer) return;
   const t=e.touches[0],rect=canvas.getBoundingClientRect();
@@ -409,39 +398,27 @@ downloadBtn.addEventListener('click',()=>{
   link.click();
 });
 
-// коли шаблон завантажився → перемальовуємо
 template.onload=()=>{ drawAll(); };
 
-// ініціалізація галерей
 renderThumbnails();
 renderVows();
 applySnapshot(history[0]||makeSnapshot());
 
 
-// блокування елементів у режимі перегляду
 function setDisabled(state){
-  // Змінено: Додано , thumbsVows до списку, щоб блокувати його в режимі перегляду
-  [thumbs, loveLoader].forEach(el=>{
-    if (el) { // Перевірка, щоб уникнути помилок, якщо елемент не знайдено
+  [thumbs, loveLoader, thumbsVows].forEach(el=>{
+    if (el) {
       el.disabled=!!state;
       el.classList.toggle('disabled',!!state);
     }
   });
 }
 
-// додавання накладки (overlay) поверх шаблону
-function addOverlay(src,isVow=false){
-  const newImg=document.createElement("img");
-  newImg.src=src;
-  newImg.classList.add("overlay");
-  if(isVow) newImg.classList.add("vow");
-  collage.appendChild(newImg);
-}
+// Видалена функція addOverlay, оскільки вона не потрібна і виконувала некоректну дію.
 
-// кнопка "оновити сторінку"
 document.getElementById('updateBtn').addEventListener('click', function () {
     const url = window.location.href.split('?')[0];
-    window.location.href = url + '?_=' + new Date().getTime(); // додаємо унікальний параметр, щоб обійти кеш
+    window.location.href = url + '?_=' + new Date().getTime();
 });
 </script>
 
