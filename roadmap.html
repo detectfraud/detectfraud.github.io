@@ -226,7 +226,8 @@ const template=new Image(); template.src='images/composit.png';
 const HOLE_OFFSET_X=6, HOLE_OFFSET_Y=-115, HOLE_RADIUS=98;
 let mask={cx:canvas.width/2+HOLE_OFFSET_X, cy:canvas.height/2+HOLE_OFFSET_Y, r:HOLE_RADIUS};
 
-let layers={ bg:{img:null,src:null,x:canvas.width/2,y:canvas.height/2,scale:1}, love:{img:null,src:null,x:canvas.width/2,y:canvas.height/2,scale:1} };
+let layers={ bg:{img:null,src:null,x:canvas.width/2,y:canvas.height/2,scale:1}, love:{img:null,src:null,x:canvas.width/2,y:canvas.height/2,scale:1}
+              label1:{img:null,src:null,x:canvas.width-250,y:canvas.height-100,scale:1},label2:{img:null,src:null,x:150,y:canvas.height-100,scale:1} };
 let activeLayer=null, previewMode=false, bgHoleActive=true;
 const history=[]; const MAX_HISTORY=20;
 function makeSnapshot(){ return { bg:{...layers.bg}, love:{...layers.love}, previewMode, activeLayer, bgHoleActive }; }
