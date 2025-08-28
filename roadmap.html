@@ -329,7 +329,7 @@ function toggleButtons(){
     downloadBtn.style.display = 'none';
     if (vowsi) vowsi.style.display = 'inline-block';
     if (photoBlock) photoBlock.style.display = 'inline-block';
-    if (vowse) vowse.style.display = 'inline-block'; //none
+    if (vowse) vowse.style.display = 'none'; //
     setDisabled(false);
   }
 }
@@ -420,8 +420,8 @@ applySnapshot(history[0]||makeSnapshot());
 
 // блокування елементів у режимі перегляду
 function setDisabled(state){
-  // Змінено: Додано thumbsVows до списку, щоб блокувати його в режимі перегляду
-  [thumbs, loveLoader, thumbsVows].forEach(el=>{
+  // Змінено: Додано , thumbsVows до списку, щоб блокувати його в режимі перегляду
+  [thumbs, loveLoader].forEach(el=>{
     if (el) { // Перевірка, щоб уникнути помилок, якщо елемент не знайдено
       el.disabled=!!state;
       el.classList.toggle('disabled',!!state);
