@@ -24,14 +24,11 @@ button { padding:8px 12px; cursor:pointer; border-radius:8px; }
 .thumb { width:108px; height:72px; object-fit:cover; border-radius:8px; cursor:pointer; box-shadow:0 0 6px rgba(0,0,0,0.3); transition:all 0.3s ease; z-index:1; }
 .collage { position:relative; display:inline-block; margin-top:40px; }
 
-/* Зміни в стилях для галереї клятв */
-.vows-container {
-    position: absolute;
-    bottom: 0;
-    right: 0;
-    z-index: 2; /* Щоб була над канвасом */
-    padding: 10px;
-}
+/* Зміни в стилях для галереї клятв: тепер вона не позиціонується абсолютно поверх канвасу,
+   а залишається в потоці, як інші галереї, оскільки зображення клятви малюється на Canvas. */
+.gallery-container.vows .labels { display:grid; grid-template-columns:repeat(4,1fr); text-align:center; margin-bottom:5px; }
+.gallery-container.vows .labels .label1 { grid-column:1; font-weight:bold; margin-left:70px; }
+.gallery-container.vows .labels .label2 { grid-column:3; font-weight:bold; }
 
 #fot { display:inline-block; cursor:pointer; border-radius:8px; width:108px; height:72px; background-image:url(https://detectfraud.github.io/gallery/Para.png); background-repeat:no-repeat; background-size:contain; }
 #fot:hover { mix-blend-mode:luminosity; }
@@ -41,9 +38,7 @@ button { padding:8px 12px; cursor:pointer; border-radius:8px; }
 .thumb-wrapper:hover .imagbox { opacity:1; transform:translate(-50%,-50%) scale(0.6); }
 .photo-block { margin-left:100px; }
 #updateBtn { margin-left:300px;font-weight:bold;color:red; }
-.gallery-container.vows .labels { display:grid; grid-template-columns:repeat(4,1fr); text-align:center; margin-bottom:5px; }
-.gallery-container.vows .labels .label1 { grid-column:1; font-weight:bold; margin-left:70px; }
-.gallery-container.vows .labels .label2 { grid-column:3; font-weight:bold; }
+
 .arrow, .arow { position:relative; z-index:3; }
 </style>
 </head>
@@ -51,50 +46,48 @@ button { padding:8px 12px; cursor:pointer; border-radius:8px; }
 
 <fieldset class="venwin" style="height:auto;">
 <div class="collage" id="collage">
-  <canvas id="canvas" width="900" height="600" style="border:1px solid #ccc;"></canvas>
+  <canvas id="canvas" width="900" height="600" style="border:1px solid #ccc;"></canvas>
 </div>
 
 <br><input type="range" id="scaleSlider" min="0.1" max="3" step="0.01" value="1">
 
-<!-- Галерея фонів -->
 <div class="gallery-container">
-  <div class="gallery-block" id="vowsi">
-    <b>Фон</b>
-    <div>
-      <span class="arrow" onclick="prevSlide()">&#10094;</span>
-      <div class="thumbnails" id="thumbs"></div>
-      <span class="arrow" onclick="nextSlide()">&#10095;</span>
-    </div>
-  </div>
-<div class="gallery-block photo-block"> 
-    <b>Фото</b>
-    <div>
-    <label id="fot" title="Фото закоханих"></label>
-  </div>
+  <div class="gallery-block" id="vowsi">
+    <b>Фон</b>
+    <div>
+      <span class="arrow" onclick="prevSlide()">&#10094;</span>
+      <div class="thumbnails" id="thumbs"></div>
+      <span class="arrow" onclick="nextSlide()">&#10095;</span>
+    </div>
+  </div>
+<div class="gallery-block photo-block">
+    <b>Фото</b>
+    <div>
+    <label id="fot" title="Фото закоханих"></label>
+  </div>
 </div>
 </div>
 
-<!-- Галерея клятв -->
-<div class="gallery-container vows vows-container" id="vowse" style="display:none;">
-  <div class="gallery-block">
-    <div class="labels">
-      <span class="label1">Надпис</span>
-      <span class="label2">Клятва закоханих</span>
-    </div>
-    <div class="gallery-row">
-      <span class="arow" onclick="prevVow()">&#10094;</span>
-      <div class="thumbnails" id="thumbsVows"></div>
-      <span class="arow" onclick="nextVow()">&#10095;</span>
-    </div>
-  </div>
+<div class="gallery-container vows" id="vowse">
+  <div class="gallery-block">
+    <div class="labels">
+      <span class="label1">Надпис</span>
+      <span class="label2">Клятва закоханих</span>
+    </div>
+    <div class="gallery-row">
+      <span class="arow" onclick="prevVow()">&#10094;</span>
+      <div class="thumbnails" id="thumbsVows"></div>
+      <span class="arow" onclick="nextVow()">&#10095;</span>
+    </div>
+  </div>
 </div>
 <br><br>
-  <div>
+  <div>
 <button id="undoBtn" type="button">⟲ Undo</button>
 <button id="previewBtn" type="button">👁 Перегляд</button>
 <button id="downloadBtn" type="button" style="display:none;">📥 Завантажити</button>
-     
-  <button id="updateBtn" type="button">UPDATE</button>
+
+  <button id="updateBtn" type="button">UPDATE</button>
 </div> </fieldset>
 <input type="file" id="bgLoader" style="display:none">
 <input type="file" id="loveLoader" style="display:none">
@@ -113,7 +106,7 @@ const previewBtn = document.getElementById('previewBtn');
 const downloadBtn = document.getElementById('downloadBtn');
 const bgLoader = document.getElementById('bgLoader');
 const collage = document.getElementById('collage');
-const vowse = document.getElementById('vowse');
+const vowse = document.getElementById('vowse'); // Змінено: vowse тепер не ховається, а є в потоці
 const vowsi = document.getElementById('vowsi');
 const photoBlock = document.querySelector('.photo-block');
 
@@ -165,18 +158,27 @@ function nextSlide(){
   renderThumbnails();
 }
 
-/* === Використати готовий фон із галереї === */
-function handleFileFromGallery(src,key){
+/* === Завантаження зображення з галереї на Canvas === */
+function handleFileFromGallery(src, key){
   const img=new Image();
   img.crossOrigin="anonymous";
   img.onload=()=>{
     layers[key].img=img;
     layers[key].src=src;
-    layers[key].x=canvas.width/2;
-    layers[key].y=canvas.height/2;
-    layers[key].scale=1;
-    activeLayer=key;
-    scaleSlider.value=1;
+
+    // Встановлення початкової позиції та масштабу для шару 'vow'
+    if (key === 'vow') {
+      layers[key].scale = 0.5; // Розмір 50%
+      // Розміщення в правому нижньому куті
+      layers[key].x = canvas.width - (img.width * layers[key].scale / 2) - 10; // 10px від правого краю
+      layers[key].y = canvas.height - (img.height * layers[key].scale / 2) - 10; // 10px від нижнього краю
+    } else {
+      layers[key].x=canvas.width/2;
+      layers[key].y=canvas.height/2;
+      layers[key].scale=1;
+    }
+    activeLayer=key; // Змінено: activeLayer тепер встановлюється коректно
+    scaleSlider.value=layers[key].scale; // Оновлення повзунка
     pushHistory();
     drawAll();
   };
@@ -193,11 +195,20 @@ function handleFileLoad(file,key){
     img.onload=()=>{
       layers[key].img=img;
       layers[key].src=data;
-      layers[key].x=canvas.width/2;
-      layers[key].y=canvas.height/2;
-      layers[key].scale=1;
-      activeLayer=key;
-      scaleSlider.value=1;
+
+      // Встановлення початкової позиції та масштабу для шару 'vow'
+      if (key === 'vow') {
+        layers[key].scale = 0.5; // Розмір 50%
+        // Розміщення в правому нижньому куті
+        layers[key].x = canvas.width - (img.width * layers[key].scale / 2) - 10; // 10px від правого краю
+        layers[key].y = canvas.height - (img.height * layers[key].scale / 2) - 10; // 10px від нижнього краю
+      } else {
+        layers[key].x=canvas.width/2;
+        layers[key].y=canvas.height/2;
+        layers[key].scale=1;
+      }
+      activeLayer=key; // Змінено: activeLayer тепер встановлюється коректно
+      scaleSlider.value=layers[key].scale; // Оновлення повзунка
       pushHistory();
       drawAll();
     };
@@ -227,7 +238,7 @@ function nextVow(){ vowIndex=(vowIndex+4)%fullVows.length; renderVows(); }
 
 
 /* === Шари і маска (кругла діра для фото) === */
-const template=new Image(); template.src='images/composit.png';
+const template=new Image(); template.src='images/composit.png'; // Переконайтеся, що шлях до шаблону правильний!
 const HOLE_OFFSET_X=6, HOLE_OFFSET_Y=-115, HOLE_RADIUS=98;
 let mask={cx:canvas.width/2+HOLE_OFFSET_X, cy:canvas.height/2+HOLE_OFFSET_Y, r:HOLE_RADIUS};
 
@@ -298,11 +309,11 @@ function drawAll(){
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     drawBgWithHole(ctx);
     drawLove(ctx, previewMode);
-    drawLayerTo(ctx, layers.vow);
-    
+
     if(template.complete) {
         ctx.drawImage(template, 0, 0, canvas.width, canvas.height);
     }
+    drawLayerTo(ctx, layers.vow); // Змінено: малюємо vow після template, щоб вона була зверху
 }
 
 
@@ -313,16 +324,14 @@ function toggleButtons(){
     downloadBtn.style.display = 'inline-block';
     if (vowsi) vowsi.style.display = 'none';
     if (photoBlock) photoBlock.style.display = 'none';
-    // Галерея клятв приховується в режимі перегляду, бо там її вже не можна обрати.
-    if (vowse) vowse.style.display = 'none'; 
+    if (vowse) vowse.style.display = 'none'; // Галерея клятв приховується в режимі перегляду
     setDisabled(true);
   } else {
     previewBtn.style.display = 'inline-block';
     downloadBtn.style.display = 'none';
     if (vowsi) vowsi.style.display = 'inline-block';
     if (photoBlock) photoBlock.style.display = 'inline-block';
-    // Галерея клятв стає видимою в режимі редагування
-    if (vowse) vowse.style.display = 'inline-block'; 
+    if (vowse) vowse.style.display = 'inline-block'; // Галерея клятв видима в режимі редагування
     setDisabled(false);
   }
 }
@@ -414,13 +423,12 @@ function setDisabled(state){
   });
 }
 
-// Видалена функція addOverlay, оскільки вона не потрібна і виконувала некоректну дію.
+// Функція addOverlay була видалена, оскільки вона більше не використовується і виконувала некоректну дію.
 
 document.getElementById('updateBtn').addEventListener('click', function () {
     const url = window.location.href.split('?')[0];
     window.location.href = url + '?_=' + new Date().getTime();
 });
 </script>
-
 </body>
 </html>
