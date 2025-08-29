@@ -103,6 +103,8 @@ button { padding: 8px 12px; cursor: pointer; border-radius: 8px; }
 <input type="file" id="loveLoader" style="display:none">
 <script>
 /* === Collage JS === */
+
+// Отримання посилань на DOM-елементи
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 const thumbs = document.getElementById('thumbs');
@@ -119,17 +121,35 @@ const vowsi = document.getElementById('vowsi');
 const photoBlock = document.querySelector('.photo-block');
 const loveStoneName = "LoveStones"; // Нова змінна для імені надпису
 
+// --- Дані та галереї ---
 const url = "https://detectfraud.github.io/gallery/";
 const images = [ "nature(1)","nature(2)","nature(3)","nature(4)","nature(5)",
   "nature(6)","nature(7)","nature(8)","nature(9)","Fon" ];
 const fullImages = images.map(name => url + name + ".jpeg");
 let startIndex = 0;
 
+const vows = ["Eternity","Fidelity","Joy","Love","Strength","Tenderness","Trust","Unity","Heart"];
+const fullVows = vows.map(name => url + name + ".png");
+let vowIndex = 0;
+
+const lovestoneImages = ["LoveStones"];
+const fullLovestones = lovestoneImages.map(name => url + name + ".png");
+let lovestoneIndex = 0;
+
+// Функція рендерингу прев'ю для фонів
 function renderThumbnails() {
     thumbs.innerHTML = "";
     fullImages.slice(startIndex, startIndex + 3).forEach(src => createThumb(src, thumbs, 'bg'));
 }
 
+// Функція рендерингу прев'ю для клятв
+function renderVows() {
+    thumbsVows.innerHTML = "";
+    fullLovestones.slice(lovestoneIndex, lovestoneIndex + 1).forEach(src => createThumb(src, thumbsVows, 'lovestone'));
+    fullVows.slice(vowIndex, vowIndex + 3).forEach(src => createThumb(src, thumbsVows, 'vow'));
+}
+
+// Функція створення прев'ю-картинки
 function createThumb(src, container, key) {
     const wrapper = document.createElement("div");
     wrapper.className = "thumb-wrapper";
@@ -140,17 +160,20 @@ function createThumb(src, container, key) {
     const big = document.createElement("img");
     big.className = "imagbox";
     big.src = src;
+
     if (imgName === "Fon") {
         thumb.title = "Завантажити свій фон";
         thumb.onclick = () => bgLoader.click();
     } else {
         thumb.onclick = () => handleFileFromGallery(src, key);
     }
+
     wrapper.appendChild(thumb);
     wrapper.appendChild(big);
     container.appendChild(wrapper);
 }
 
+// Функції прокрутки галерей
 function prevSlide(){
   startIndex=(startIndex-3+fullImages.length)%fullImages.length;
   renderThumbnails();
@@ -159,49 +182,47 @@ function nextSlide(){
   startIndex=(startIndex+3)%fullImages.length;
   renderThumbnails();
 }
+function prevVow(){ vowIndex=(vowIndex-3+fullVows.length)%fullVows.length; renderVows(); }
+function nextVow(){ vowIndex=(vowIndex+3)%fullVows.length; renderVows(); }
 
+// Завантаження зображення з галереї на Canvas
 function handleFileFromGallery(src, key){
     const img = new Image();
     img.crossOrigin = "anonymous";
     img.onload = () => {
+        layers[key].img = img;
+        layers[key].src = src;
+        
+        // Встановлення початкової позиції та масштабу для кожного шару
         if (key === 'vow') {
-            // Перевіряємо, чи це "Надпис" чи "Клятва"
-            const imgName = src.split("/").pop().split(".")[0];
-            if (imgName === loveStoneName) {
-                layers.lovestone.img = img;
-                layers.lovestone.src = src;
-                layers.lovestone.x = canvas.width / 2;
-                layers.lovestone.y = canvas.height / 2;
-                layers.lovestone.scale = 0.5;
-                activeLayer = 'lovestone';
-            } else {
-                layers.vow.img = img;
-                layers.vow.src = src;
-                layers.vow.x = canvas.width / 2;
-                layers.vow.y = canvas.height / 2;
-                layers.vow.scale = 0.5;
-                activeLayer = 'vow';
-            }
-        } else {
-            layers[key].img = img;
-            layers[key].src = src;
+            layers[key].scale = 0.5; // Розмір 50%
+            layers[key].x = (img.width * layers[key].scale / 2) + 10; // 10px від лівого краю
+            layers[key].y = canvas.height - (img.height * layers[key].scale / 2) - 10; // 10px від нижнього краю
+            activeLayer = 'vow';
+        } else if (key === 'lovestone') {
+            layers[key].scale = 0.5;
+            layers[key].x = canvas.width / 2;
+            layers[key].y = canvas.height / 2;
+            activeLayer = 'lovestone';
+        } else { // bg та love
             layers[key].x = canvas.width / 2;
             layers[key].y = canvas.height / 2;
             layers[key].scale = 1;
             activeLayer = key;
         }
+
         scaleSlider.value = layers[activeLayer].scale;
         pushHistory();
         drawAll();
-        // Вмикаємо кнопку "Перегляд", якщо обрано клятву
-        if (activeLayer === 'vow' || activeLayer === 'lovestone') {
-            previewBtn.style.display = 'inline-block';
-            downloadBtn.style.display = 'none';
-        }
+
+        // Логіка кнопок "Перегляд" / "Завантажити"
+        previewBtn.style.display = 'inline-block';
+        downloadBtn.style.display = 'none';
     };
     img.src = src;
 }
 
+// Завантаження фото/фонів з файлу
 function handleFileLoad(file,key){
   if(!file) return;
   const reader=new FileReader();
@@ -211,22 +232,11 @@ function handleFileLoad(file,key){
     img.onload=()=>{
       layers[key].img=img;
       layers[key].src=data;
-      if (key === 'vow') {
-          // Розміщення в лівому нижньому куті
-          layers[key].scale = 0.5;
-          layers[key].x = (img.width * layers[key].scale / 2) + 10;
-          layers[key].y = canvas.height - (img.height * layers[key].scale / 2) - 10;
-      } else if (key === 'lovestone') {
-          layers[key].scale = 0.5;
-          layers[key].x = canvas.width / 2;
-          layers[key].y = canvas.height / 2;
-      } else {
-          layers[key].x = canvas.width / 2;
-          layers[key].y = canvas.height / 2;
-          layers[key].scale = 1;
-      }
-      activeLayer=key;
-      scaleSlider.value=layers[activeLayer].scale;
+      layers[key].x = canvas.width / 2;
+      layers[key].y = canvas.height / 2;
+      layers[key].scale = 1;
+      activeLayer = key;
+      scaleSlider.value = layers[activeLayer].scale;
       pushHistory();
       drawAll();
     };
@@ -235,23 +245,12 @@ function handleFileLoad(file,key){
   reader.readAsDataURL(file);
 }
 
+// Обробка подій завантаження файлів
 bgLoader.addEventListener('change',e=>handleFileLoad(e.target.files[0],'bg'));
 loveLoader.addEventListener('change',e=>handleFileLoad(e.target.files[0],'love'));
 document.getElementById("fot").onclick=()=>loveLoader.click();
 
-renderThumbnails();
-
-const vows=["LoveStones","Eternity","Fidelity","Joy","LoveStones","Love","Strength","Tenderness","LoveStones","Trust","Unity","Heart"];
-const fullVows=vows.map(name=>url+name+".png");
-let vowIndex=0;
-
-function renderVows() {
-    thumbsVows.innerHTML = "";
-    fullVows.slice(vowIndex, vowIndex + 4).forEach(src => createThumb(src, thumbsVows, 'vow'));
-}
-function prevVow(){ vowIndex=(vowIndex-4+fullVows.length)%fullVows.length; renderVows(); }
-function nextVow(){ vowIndex=(vowIndex+4)%fullVows.length; renderVows(); }
-
+// --- Шари, маска та історія ---
 const template=new Image(); template.src='images/composit.png';
 const HOLE_OFFSET_X=6, HOLE_OFFSET_Y=-115, HOLE_RADIUS=98;
 let mask={cx:canvas.width/2+HOLE_OFFSET_X, cy:canvas.height/2+HOLE_OFFSET_Y, r:HOLE_RADIUS};
@@ -285,12 +284,12 @@ function applySnapshot(s){
   toggleButtons();
 }
 
+// --- Функції малювання на Canvas ---
 function drawLayerTo(ctxTarget, layer){
   if(!layer||!layer.img) return;
   const w=layer.img.width*layer.scale,h=layer.img.height*layer.scale;
   ctxTarget.drawImage(layer.img, layer.x-w/2, layer.y-h/2, w, h);
 }
-
 function drawLove(ctxTarget, clip=false){
   const L=layers.love;
   if(!L||!L.img) return;
@@ -300,7 +299,6 @@ function drawLove(ctxTarget, clip=false){
   ctxTarget.drawImage(L.img,L.x-w/2,L.y-h/2,w,h);
   ctxTarget.restore();
 }
-
 function drawBgWithHole(ctxTarget){
   if(!layers.bg.img) return;
   if(!bgHoleActive||mask.r<=0){ drawLayerTo(ctxTarget,layers.bg); return; }
@@ -314,7 +312,6 @@ function drawBgWithHole(ctxTarget){
   octx.globalCompositeOperation='source-over';
   ctxTarget.drawImage(off,0,0);
 }
-
 function drawAll(){
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     drawBgWithHole(ctx);
@@ -326,6 +323,7 @@ function drawAll(){
     drawLayerTo(ctx, layers.lovestone);
 }
 
+// --- Кнопки та перемикання режимів ---
 function toggleButtons(){
   if(previewMode){
     previewBtn.style.display = 'none';
@@ -343,29 +341,36 @@ function toggleButtons(){
     setDisabled(false);
   }
 }
+function setDisabled(state){
+  [thumbs, loveLoader, thumbsVows].forEach(el=>{
+    if (el) {
+      el.disabled=!!state;
+      el.classList.toggle('disabled',!!state);
+    }
+  });
+}
 
+// Обробка повзунка масштабування
 scaleSlider.addEventListener('input',()=>{
   if(!activeLayer) return;
   layers[activeLayer].scale=parseFloat(scaleSlider.value);
   drawAll();
 });
 
+// --- Drag & Touch (переміщення картинок) ---
 let dragging=false, dragStartX=0, dragStartY=0;
-
 canvas.addEventListener('mousedown',e=>{
   if(previewMode||!activeLayer) return;
   dragging=true;
   dragStartX=e.offsetX-layers[activeLayer].x;
   dragStartY=e.offsetY-layers[activeLayer].y;
 });
-
 canvas.addEventListener('mousemove',e=>{
   if(previewMode||!dragging||!activeLayer) return;
   layers[activeLayer].x=e.offsetX-dragStartX;
   layers[activeLayer].y=e.offsetY-dragStartY;
   drawAll();
 });
-
 function stopDrag(){
   if(previewMode) return;
   if(dragging){ dragging=false; pushHistory(); }
@@ -390,6 +395,7 @@ canvas.addEventListener('touchmove',e=>{
 });
 canvas.addEventListener('touchend',stopDrag);
 
+// --- Undo / Preview / Download ---
 undoBtn.addEventListener('click',()=>{
   if(history.length<=1) return;
   history.pop();
@@ -407,26 +413,16 @@ downloadBtn.addEventListener('click',()=>{
   link.href=canvas.toDataURL('image/png');
   link.click();
 });
-
-template.onload=()=>{ drawAll(); };
-
-renderThumbnails();
-renderVows();
-applySnapshot(history[0]||makeSnapshot());
-
-function setDisabled(state){
-  [thumbs, loveLoader].forEach(el=>{
-    if (el) {
-      el.disabled=!!state;
-      el.classList.toggle('disabled',!!state);
-    }
-  });
-}
-
 document.getElementById('updateBtn').addEventListener('click', function () {
     const url = window.location.href.split('?')[0];
     window.location.href = url + '?_=' + new Date().getTime();
 });
-</script>
+
+// Ініціалізація
+template.onload = () => { drawAll(); };
+renderThumbnails();
+renderVows();
+applySnapshot(history[0] || makeSnapshot());
+    </script>
 </body>
 </html>
