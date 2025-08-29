@@ -342,7 +342,7 @@ function toggleButtons(){
   }
 }
 function setDisabled(state){
-  [thumbs, loveLoader, thumbsVows].forEach(el=>{
+  [thumbs, loveLoader].forEach(el=>{
     if (el) {
       el.disabled=!!state;
       el.classList.toggle('disabled',!!state);
