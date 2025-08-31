@@ -407,8 +407,8 @@ previewBtn.addEventListener('click',()=>{
 });
 downloadBtn.addEventListener('click',()=>{
     const link=document.createElement('a');
-    link.download='collage.png';
-    link.href=canvas.toDataURL('image/jpg');
+    link.download='collage.jpg';
+    link.href=canvas.toDataURL('image/png');
     link.click();
 });
 document.getElementById('updateBtn').addEventListener('click', function () {
