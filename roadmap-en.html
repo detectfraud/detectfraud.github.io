@@ -363,7 +363,7 @@ function toggleButtons(){
         if (vowsi) vowsi.style.display = 'none';
         if (photoBlock) photoBlock.style.display = 'none';
         if (vowse) vowse.style.display = 'inline-block';
-        activeLayer = null; // Скидаємо активний шар
+        activeLayer = null; // Правильно скидаємо активний шар
         setDisabled(true);
     } else {
         previewBtn.style.display = 'inline-block';
@@ -375,7 +375,7 @@ function toggleButtons(){
     }
 }
 function setDisabled(state){
-    [thumbs, loveLoader, scaleSlider].forEach(el=>{ // Додав scaleSlider
+    [thumbs, loveLoader, scaleSlider].forEach(el=>{
         if (el) {
             el.disabled=!!state;
             el.classList.toggle('disabled',!!state);
@@ -385,7 +385,7 @@ function setDisabled(state){
 
 // Обробка повзунка масштабування
 scaleSlider.addEventListener('input',()=>{
-    if(!activeLayer || previewMode) return; // Додав перевірку previewMode
+    if(!activeLayer) return;
     layers[activeLayer].scale=parseFloat(scaleSlider.value);
     drawAll();
 });
@@ -393,13 +393,13 @@ scaleSlider.addEventListener('input',()=>{
 // --- Drag & Touch (переміщення картинок) ---
 let dragging=false, dragStartX=0, dragStartY=0;
 canvas.addEventListener('mousedown',e=>{
-    if(!activeLayer || previewMode) return; // Додав перевірку previewMode
+    if(!activeLayer) return;
     dragging=true;
     dragStartX=e.offsetX-layers[activeLayer].x;
     dragStartY=e.offsetY-layers[activeLayer].y;
 });
 canvas.addEventListener('mousemove',e=>{
-    if(!dragging||!activeLayer || previewMode) return; // Додав перевірку previewMode
+    if(!dragging||!activeLayer) return;
     layers[activeLayer].x=e.offsetX-dragStartX;
     layers[activeLayer].y=e.offsetY-dragStartY;
     drawAll();
@@ -410,7 +410,7 @@ function stopDrag(){
 canvas.addEventListener('mouseup',stopDrag);
 canvas.addEventListener('mouseleave',stopDrag);
 canvas.addEventListener('touchstart',e=>{
-    if(!activeLayer || previewMode) return; // Додав перевірку previewMode
+    if(!activeLayer) return;
     const t=e.touches[0],rect=canvas.getBoundingClientRect();
     dragging=true;
     dragStartX=t.clientX-rect.left-layers[activeLayer].x;
@@ -418,7 +418,7 @@ canvas.addEventListener('touchstart',e=>{
     e.preventDefault();
 });
 canvas.addEventListener('touchmove',e=>{
-    if(!dragging||!activeLayer || previewMode) return; // Додав перевірку previewMode
+    if(!dragging||!activeLayer) return;
     const t=e.touches[0],rect=canvas.getBoundingClientRect();
     layers[activeLayer].x=t.clientX-rect.left-dragStartX;
     layers[activeLayer].y=t.clientY-rect.top-dragStartY;
