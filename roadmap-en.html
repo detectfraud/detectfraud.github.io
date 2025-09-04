@@ -39,9 +39,9 @@ button { padding: 8px 12px; cursor: pointer; border-radius: 8px; }
     position: absolute;
     top: 30%; /* Піднято вище */
     left: 50%;
+    transform: translate(-50%,-50%) scale(0.1);
     width: 825px;
     height: 510px;
-    transform: translate(-50%,-50%) scale(0.1);
     opacity: 0;
     transition: all 0.5s ease;
     z-index: 9999;
@@ -50,7 +50,7 @@ button { padding: 8px 12px; cursor: pointer; border-radius: 8px; }
     pointer-events: none;
     background: #fff;
 }
-.thumb-wrapper.show-preview .imagbox {
+.imagbox.show {
     opacity: 1;
     transform: translate(-50%,-50%) scale(0.6);
 }
@@ -107,6 +107,7 @@ button { padding: 8px 12px; cursor: pointer; border-radius: 8px; }
 <fieldset class="venwin" style="height:auto;">
 <div class="collage" id="collage">
     <canvas id="canvas" width="630" height="420" style="cursor: pointer;border:1px solid #ccc;"></canvas>
+    <img id="imagePreview" class="imagbox" src="" alt="Image Preview">
 </div>
 <br><b style="text-align: center;">Розмір</b>
 <br><input type="range" id="scaleSlider" min="0.1" max="3" step="0.01" value="1" style="cursor: pointer;">
@@ -171,6 +172,7 @@ const vowsi = document.getElementById('vowsi');
 const photoBlock = document.querySelector('.photo-block');
 const loveStoneName = "LoveStones";
 const DONATE_URL = "https://example.com/donate";
+const imagePreview = document.getElementById('imagePreview'); // Новий елемент прев'ю
 
 // --- Дані та галереї ---
 const url = "https://detectfraud.github.io/gallery/";
@@ -210,20 +212,18 @@ function createThumb(src, container, key) {
     const thumb = document.createElement("img");
     thumb.className = "thumb";
     thumb.src = src;
-    const big = document.createElement("img");
-    big.className = "imagbox";
-    big.src = src;
 
     // Додаємо затримку
     let timer;
     wrapper.addEventListener('mouseenter', () => {
         timer = setTimeout(() => {
-            wrapper.classList.add('show-preview');
+            imagePreview.src = src; // Оновлюємо src єдиного елемента прев'ю
+            imagePreview.classList.add('show');
         }, 1500);
     });
     wrapper.addEventListener('mouseleave', () => {
         clearTimeout(timer);
-        wrapper.classList.remove('show-preview');
+        imagePreview.classList.remove('show');
     });
 
     if (imgName === "Fon") {
@@ -234,7 +234,6 @@ function createThumb(src, container, key) {
     }
 
     wrapper.appendChild(thumb);
-    wrapper.appendChild(big);
     container.appendChild(wrapper);
 }
 
@@ -258,7 +257,6 @@ function handleFileFromGallery(src, key){
         layers[key].img = img;
         layers[key].src = src;
 
-        // Встановлення початкової позиції та масштабу для кожного шару
         if (key === 'vow') {
             layers[key].scale = 0.5;
             layers[key].x = (img.width * layers[key].scale / 2) + 10;
@@ -267,7 +265,7 @@ function handleFileFromGallery(src, key){
             layers[key].scale = 0.5;
             layers[key].x = canvas.width / 2;
             layers[key].y = canvas.height / 2;
-        } else { // bg та love
+        } else {
             layers[key].x = canvas.width / 2;
             layers[key].y = canvas.height / 2;
             layers[key].scale = 1;
@@ -281,7 +279,6 @@ function handleFileFromGallery(src, key){
         pushHistory();
         drawAll();
 
-        // Логіка кнопок "Перегляд" / "Завантажити"
         previewBtn.style.display = 'inline-block';
         downloadBtn.style.display = 'none';
     };
@@ -454,14 +451,14 @@ canvas.addEventListener('touchstart',e=>{
     const t=e.touches[0],rect=canvas.getBoundingClientRect();
     dragging=true;
     dragStartX=t.clientX-rect.left-layers[activeLayer].x;
-    dragStartY=t.clientY-rect.top-layers[activeLayer].y;
+    dragStartY=t.clientY-rect.top-rect.y-layers[activeLayer].y; // Виправлено для тач-скріну
     e.preventDefault();
 });
 canvas.addEventListener('touchmove',e=>{
     if(!dragging||!activeLayer) return;
     const t=e.touches[0],rect=canvas.getBoundingClientRect();
     layers[activeLayer].x=t.clientX-rect.left-dragStartX;
-    layers[activeLayer].y=t.clientY-rect.top-dragStartY;
+    layers[activeLayer].y=t.clientY-rect.top-rect.y-dragStartY; // Виправлено для тач-скріну
     drawAll();
     e.preventDefault();
 });
@@ -491,7 +488,6 @@ downloadBtn.addEventListener('click',()=>{
     downloadCanvas.width = DOWNLOAD_WIDTH;
     downloadCanvas.height = DOWNLOAD_HEIGHT;
 
-    // Малюємо всі шари на новому канвасі, масштабуючи їх
     downloadCtx.clearRect(0, 0, DOWNLOAD_WIDTH, DOWNLOAD_HEIGHT);
     drawBgWithHole(downloadCtx, scaleFactor);
     drawLove(downloadCtx, true, scaleFactor);
@@ -501,7 +497,6 @@ downloadBtn.addEventListener('click',()=>{
     drawLayerTo(downloadCtx, layers.vow, scaleFactor);
     drawLayerTo(downloadCtx, layers.lovestone, scaleFactor);
 
-    // Завантажуємо зображення з нового канваса
     const link=document.createElement('a');
     link.download='collage.jpg';
     link.href=downloadCanvas.toDataURL('image/jpeg');
