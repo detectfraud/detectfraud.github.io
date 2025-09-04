@@ -10,10 +10,6 @@ canvas { border: 3px solid #bbb; border-radius: 6px; box-shadow: 0 6px 18px rgba
 #scaleSlider { width: 420px; }
 button { padding: 8px 12px; cursor: pointer; border-radius: 8px; }
 .disabled { pointer-events: none; opacity: .5; filter: grayscale(100%); }
-/*
-canvas {transition: transform 0.3s ease-in-out;transform-origin: center center;cursor:pointer;border-radius: 3%;position: relative;z-index: 10;}
-canvas:hover {transform: scale(1.4);}
-*/
 .gallery-container { display: flex; align-items: flex-start; justify-content: center; gap: 10px; margin-top: 10px; }/*20px*/
 .gallery-block { display: flex; flex-direction: column; align-items: center; gap: 10px; }
 .gallery-block > div { display: flex; align-items: center; justify-content: center;}
@@ -28,15 +24,33 @@ canvas:hover {transform: scale(1.4);}
 .gallery-container.vows .labels .label1 { grid-column: 1; font-weight: bold; margin-left: 70px; }
 .gallery-container.vows .labels .label2 { grid-column: 3; font-weight: bold; }
 .arrow, .arow { position: relative; z-index: 3; }
-/*#undoBtn {margin-right: 1em;}*/
 .button-row { display: flex; justify-content: center; align-items: center; gap: 10px; }
 
 #fot { display: inline-block; cursor: pointer; border-radius: 8px; width: 108px; height: 72px; background-image: url(https://detectfraud.github.io/gallery/Para.png); background-repeat: no-repeat; background-size: contain; }
 #fot:hover { mix-blend-mode: luminosity; }
 #fot:active { mix-blend-mode: exclusion; }
 
-.imagbox { position: fixed; top: 50%; left: 50%; width: 825px; height: 510px; transform: translate(-50%,-50%) scale(0.1); opacity: 0; transition: all 0.5s ease; z-index: 9999; border-radius: 12px; box-shadow: 0 0 25px rgba(0,0,0,0.7); pointer-events: none; background: #fff; }
-.thumb-wrapper:hover .imagbox { opacity: 1; transform: translate(-50%,-50%) scale(0.6); }
+/* Зміни в стилях */
+.imagbox {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    width: 825px;
+    height: 510px;
+    transform: translate(-50%,-50%) scale(0.1);
+    opacity: 0;
+    transition: all 0.5s ease;
+    z-index: 9999;
+    border-radius: 12px;
+    box-shadow: 0 0 25px rgba(0,0,0,0.7);
+    pointer-events: none;
+    background: #fff;
+}
+.show-preview .imagbox {
+    opacity: 1;
+    transform: translate(-50%,-50%) scale(0.6);
+}
+
 .photo-block { margin-left: 100px; }
 #updateBtn { margin-left: 300px; font-weight: bold; color: red; }
 
@@ -195,6 +209,18 @@ function createThumb(src, container, key) {
     const big = document.createElement("img");
     big.className = "imagbox";
     big.src = src;
+
+    // Додаємо затримку
+    let timer;
+    wrapper.addEventListener('mouseenter', () => {
+        timer = setTimeout(() => {
+            wrapper.classList.add('show-preview');
+        }, 1500); // Затримка 1.5 секунди
+    });
+    wrapper.addEventListener('mouseleave', () => {
+        clearTimeout(timer);
+        wrapper.classList.remove('show-preview');
+    });
 
     if (imgName === "Fon") {
         thumb.title = "Завантажити свій фон";
