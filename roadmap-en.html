@@ -380,7 +380,7 @@ function toggleButtons(){
         if (photoBlock) photoBlock.style.display = 'none';
         if (vowse) vowse.style.display = 'inline-block';
         activeLayer = null; // Правильно скидаємо активний шар
-    } else {
+    } else {  checkAndActivatePreviewButton();
         previewBtn.style.display = 'inline-block';
         downloadBtn.style.display = 'none';
         if (vowsi) vowsi.style.display = 'inline-block';
