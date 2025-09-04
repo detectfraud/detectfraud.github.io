@@ -437,12 +437,12 @@ document.onselectstart = disableContextMenu;
 document.ondragstart = disableContextMenu;
 
 // Додаємо попередження перед виходом зі сторінки, якщо колаж був завантажений
-window.onbeforeunload = function() {
+/*window.onbeforeunload = function() {
     if (sessionStorage.getItem('downloaded') === 'true') {
         // Замість двох кнопок, браузер покаже стандартне вікно з пропозицією залишити сторінку
         return "Дякуємо, що ви з нами! Перш ніж піти, чи не бажаєте підтримати наш проєкт?";
     }
-};
+};*/
 
 // Ініціалізація
 template.onload = () => { drawAll(); };
