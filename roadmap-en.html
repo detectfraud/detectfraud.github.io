@@ -493,4 +493,48 @@ downloadBtn.addEventListener('click',()=>{
     const downloadCtx = downloadCanvas.getContext('2d');
     const DOWNLOAD_WIDTH = 900;
     const DOWNLOAD_HEIGHT = 600;
-    const scaleFactor = DOWNLOAD_WIDTH /
+    const scaleFactor = DOWNLOAD_WIDTH / canvas.width;
+
+    downloadCanvas.width = DOWNLOAD_WIDTH;
+    downloadCanvas.height = DOWNLOAD_HEIGHT;
+
+    // Малюємо всі шари на новому канвасі, масштабуючи їх
+    downloadCtx.clearRect(0, 0, DOWNLOAD_WIDTH, DOWNLOAD_HEIGHT);
+    drawBgWithHole(downloadCtx, scaleFactor);
+    drawLove(downloadCtx, true, scaleFactor);
+    if(template.complete) {
+        downloadCtx.drawImage(template, 0, 0, DOWNLOAD_WIDTH, DOWNLOAD_HEIGHT);
+    }
+    drawLayerTo(downloadCtx, layers.vow, scaleFactor);
+    drawLayerTo(downloadCtx, layers.lovestone, scaleFactor);
+
+    // Завантажуємо зображення з нового канваса
+    const link=document.createElement('a');
+    link.download='collage.jpg';
+    link.href=downloadCanvas.toDataURL('image/jpeg');
+    link.click();
+});
+document.getElementById('updateBtn').addEventListener('click', function () {
+    const confirmUpdate = confirm("Ви впевнені, що хочете оновити сторінку? Усі незавершені зміни буде втрачено.");
+    if (confirmUpdate) {
+        const url = window.location.href.split('?')[0];
+        window.location.href = url + '?_=' + new Date().getTime();
+    }
+});
+
+// Вимкнення контекстного меню та копіювання
+function disableContextMenu() {
+    return false;
+}
+document.oncontextmenu = disableContextMenu;
+document.onselectstart = disableContextMenu;
+document.ondragstart = disableContextMenu;
+
+// Ініціалізація
+template.onload = () => { drawAll(); };
+renderThumbnails();
+renderVows();
+applySnapshot(history[0] || makeSnapshot());
+</script>
+</body>
+</html>
