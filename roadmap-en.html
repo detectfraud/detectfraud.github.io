@@ -9,8 +9,7 @@ body { font-family: sans-serif; text-align: center; background: url(images/uname
 canvas { border: 3px solid #bbb; border-radius: 6px; box-shadow: 0 6px 18px rgba(0,0,0,.1); display: block; margin: 10px auto; }
 #scaleSlider { width: 420px; }
 button { padding: 8px 12px; cursor: pointer; border-radius: 8px; }
-.disabled { pointer-events: none; cursor: not-allowed; opacity: .5; filter: grayscale(100%); }
-:disabled {cursor: not-allowed;} /*курсор із перекресленим колом */    
+.disabled { pointer-events: none; opacity: .5; filter: grayscale(100%); }
 /*
 canvas {transition: transform 0.3s ease-in-out;transform-origin: center center;cursor:pointer;border-radius: 3%;position: relative;z-index: 10;}
 canvas:hover {transform: scale(1.4);}
@@ -305,7 +304,7 @@ let layers={
 let activeLayer=null, previewMode=false, bgHoleActive=true;
 
 const history=[]; const MAX_HISTORY=20;
-function makeSnapshot(){ return { bg:{...layers.bg}, love:{...layers.love}, vow:{...layers.vow}, lovestone:{...layers.lovestone}, previewMode, activeLayer, bgHoleActive }; }
+function makeSnapshot(){ return { bg:{...layers.bg}, love:{...layers.love}, loveScale: scaleSlider.value, vow:{...layers.vow}, lovestone:{...layers.lovestone}, previewMode, activeLayer, bgHoleActive }; }
 function pushHistory(){ history.push(makeSnapshot()); if(history.length>MAX_HISTORY) history.shift(); }
 function applySnapshot(s){
     previewMode=!!s.previewMode; activeLayer=s.activeLayer||null; bgHoleActive=!!s.bgHoleActive;
@@ -326,32 +325,44 @@ function applySnapshot(s){
 }
 
 // --- Функції малювання на Canvas ---
-function drawLayerTo(ctxTarget, layer){
+function drawLayerTo(ctxTarget, layer, scaleFactor = 1){
     if(!layer||!layer.img) return;
-    const w=layer.img.width*layer.scale,h=layer.img.height*layer.scale;
-    ctxTarget.drawImage(layer.img, layer.x-w/2, layer.y-h/2, w, h);
+    const w = layer.img.width * layer.scale * scaleFactor;
+    const h = layer.img.height * layer.scale * scaleFactor;
+    const x = layer.x * scaleFactor;
+    const y = layer.y * scaleFactor;
+    ctxTarget.drawImage(layer.img, x - w/2, y - h/2, w, h);
 }
-function drawLove(ctxTarget, clip=false){
+function drawLove(ctxTarget, clip=false, scaleFactor = 1){
     const L=layers.love;
     if(!L||!L.img) return;
-    const w=L.img.width*L.scale,h=L.img.height*L.scale;
+    const w = L.img.width * L.scale * scaleFactor;
+    const h = L.img.height * L.scale * scaleFactor;
+    const x = L.x * scaleFactor;
+    const y = L.y * scaleFactor;
     ctxTarget.save();
-    if(clip&&mask.r>0){ ctxTarget.beginPath(); ctxTarget.arc(mask.cx,mask.cy,mask.r,0,Math.PI*2); ctxTarget.clip(); }
-    ctxTarget.drawImage(L.img,L.x-w/2,L.y-h/2,w,h);
+    if(clip && mask.r>0){
+        ctxTarget.beginPath();
+        ctxTarget.arc(mask.cx * scaleFactor, mask.cy * scaleFactor, mask.r * scaleFactor, 0, Math.PI * 2);
+        ctxTarget.clip();
+    }
+    ctxTarget.drawImage(L.img, x - w/2, y - h/2, w, h);
     ctxTarget.restore();
 }
-function drawBgWithHole(ctxTarget){
+function drawBgWithHole(ctxTarget, scaleFactor = 1){
     if(!layers.bg.img) return;
-    if(!bgHoleActive||mask.r<=0){ drawLayerTo(ctxTarget,layers.bg); return; }
-    const off=document.createElement('canvas');
-    off.width=canvas.width; off.height=canvas.height;
-    const octx=off.getContext('2d');
-    drawLayerTo(octx,layers.bg);
-    octx.globalCompositeOperation='destination-out';
-    octx.beginPath(); octx.arc(mask.cx,mask.cy,mask.r,0,Math.PI*2);
+    if(!bgHoleActive||mask.r<=0){ drawLayerTo(ctxTarget,layers.bg, scaleFactor); return; }
+    const off = document.createElement('canvas');
+    off.width = canvas.width * scaleFactor;
+    off.height = canvas.height * scaleFactor;
+    const octx = off.getContext('2d');
+    drawLayerTo(octx, layers.bg, scaleFactor);
+    octx.globalCompositeOperation = 'destination-out';
+    octx.beginPath();
+    octx.arc(mask.cx * scaleFactor, mask.cy * scaleFactor, mask.r * scaleFactor, 0, Math.PI * 2);
     octx.fill();
-    octx.globalCompositeOperation='source-over';
-    ctxTarget.drawImage(off,0,0);
+    octx.globalCompositeOperation = 'source-over';
+    ctxTarget.drawImage(off, 0, 0);
 }
 function drawAll(){
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -373,7 +384,7 @@ function toggleButtons(){
         if (photoBlock) photoBlock.style.display = 'none';
         if (vowse) vowse.style.display = 'inline-block';
         activeLayer = null; // Правильно скидаємо активний шар
-    } else { 
+    } else {
         previewBtn.style.display = 'inline-block';
         downloadBtn.style.display = 'none';
         if (vowsi) vowsi.style.display = 'inline-block';
@@ -441,9 +452,29 @@ previewBtn.addEventListener('click',()=>{
     drawAll();
 });
 downloadBtn.addEventListener('click',()=>{
+    const downloadCanvas = document.createElement('canvas');
+    const downloadCtx = downloadCanvas.getContext('2d');
+    const DOWNLOAD_WIDTH = 900;
+    const DOWNLOAD_HEIGHT = 600;
+    const scaleFactor = DOWNLOAD_WIDTH / canvas.width;
+
+    downloadCanvas.width = DOWNLOAD_WIDTH;
+    downloadCanvas.height = DOWNLOAD_HEIGHT;
+
+    // Малюємо всі шари на новому канвасі, масштабуючи їх
+    downloadCtx.clearRect(0, 0, DOWNLOAD_WIDTH, DOWNLOAD_HEIGHT);
+    drawBgWithHole(downloadCtx, scaleFactor);
+    drawLove(downloadCtx, true, scaleFactor);
+    if(template.complete) {
+        downloadCtx.drawImage(template, 0, 0, DOWNLOAD_WIDTH, DOWNLOAD_HEIGHT);
+    }
+    drawLayerTo(downloadCtx, layers.vow, scaleFactor);
+    drawLayerTo(downloadCtx, layers.lovestone, scaleFactor);
+
+    // Завантажуємо зображення з нового канваса
     const link=document.createElement('a');
     link.download='collage.jpg';
-    link.href=canvas.toDataURL('image/jpeg');
+    link.href=downloadCanvas.toDataURL('image/jpeg');
     link.click();
 });
 document.getElementById('updateBtn').addEventListener('click', function () {
