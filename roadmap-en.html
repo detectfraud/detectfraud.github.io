@@ -35,14 +35,17 @@ button { padding: 8px 12px; cursor: pointer; border-radius: 8px; }
 .photo-block { margin-left: 100px; }
 #updateBtn { margin-left: 300px; font-weight: bold; color: red; }
 .canvas-preview-mode {
-    transition: all 0.3s ease-in-out;
-    transform-origin: center center;
+    transition: transform 0.3s ease-in-out, z-index 0s 0.3s;
+    position: relative;
 }
+
 .canvas-preview-mode:hover {
-    transform: translate(-50%,-50%) scale(1.428) !important;
+    transform: scale(1.428); /* 900 / 630 */
     position: fixed;
     top: 50%;
     left: 50%;
+    margin-left: -315px; /* (width / 2) */
+    margin-top: -210px;  /* (height / 2) */
     z-index: 9999;
 }
 
