@@ -6,7 +6,22 @@
 <style>
 body { font-family: sans-serif; text-align: center; background: url(images/unamed.jpg) repeat scroll top left; }
 .venwin { border-radius: 10px; display: inline-block; background-color: rgba(255, 255, 255, 0.5); padding: 0 20px; box-sizing: border-box; }
-canvas { border: 3px solid #bbb; border-radius: 6px; box-shadow: 0 6px 18px rgba(0,0,0,.1); display: block; margin: 10px auto; }
+/* Зміни в стилях canvas */
+canvas {
+    border: 3px solid #bbb;
+    border-radius: 6px;
+    box-shadow: 0 6px 18px rgba(0,0,0,.1);
+    display: block;
+    margin: 10px auto;
+    width: 630px; /* Початкова ширина */
+    height: 420px; /* Початкова висота */
+    transition: width 0.5s ease, height 0.5s ease; /* Плавний перехід */
+}
+/* Новий клас для режиму масштабування */
+canvas.canvas-preview-zoom {
+    width: 900px;
+    height: 600px;
+}
 #scaleSlider { width: 420px; }
 button { padding: 8px 12px; cursor: pointer; border-radius: 8px; }
 .disabled { pointer-events: none; opacity: .5; filter: grayscale(100%); }
@@ -445,6 +460,10 @@ function drawBgWithHole(ctxTarget, scaleFactor = 1){
     ctxTarget.drawImage(off, 0, 0);
 }
 function drawAll(){
+    // Оновлюємо внутрішні розміри канвасу, щоб відповідати стилям
+    canvas.width = canvas.offsetWidth;
+    canvas.height = canvas.offsetHeight;
+    
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     drawBgWithHole(ctx);
     drawLove(ctx, previewMode);
@@ -520,9 +539,16 @@ canvas.addEventListener('touchend',stopDrag);
 // --- Undo / Preview / Download ---
 undoBtn.addEventListener('click',()=>{
     if(history.length<=1) return;
+    // При відкаті, якщо ми були в режимі перегляду, відключаємо зум
+    if (previewMode) {
+        canvas.removeEventListener('mouseenter', handleCanvasHover);
+        canvas.removeEventListener('mouseleave', handleCanvasHover);
+        canvas.classList.remove('canvas-preview-zoom');
+    }
     history.pop();
     applySnapshot(history[history.length-1]);
 });
+
 previewBtn.addEventListener('click',()=>{
     previewMode=true;
     scaleSlider.disabled = true;
@@ -530,6 +556,9 @@ previewBtn.addEventListener('click',()=>{
     pushHistory();
     toggleButtons();
     drawAll();
+    // Додаємо обробники подій для зуму тільки в режимі перегляду
+    canvas.addEventListener('mouseenter', handleCanvasHover);
+    canvas.addEventListener('mouseleave', handleCanvasHover);
 });
 downloadBtn.addEventListener('click',()=>{
     const downloadCanvas = document.createElement('canvas');
@@ -562,6 +591,14 @@ document.getElementById('updateBtn').addEventListener('click', function () {
         window.location.href = url + '?_=' + new Date().getTime();
     }
 });
+
+// Функція для обробки наведення курсора
+function handleCanvasHover(e) {
+    if (previewMode) {
+        canvas.classList.toggle('canvas-preview-zoom');
+        drawAll();
+    }
+}
 
 // Вимкнення контекстного меню та копіювання
 function disableContextMenu() {
