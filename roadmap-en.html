@@ -19,7 +19,11 @@ button { padding: 8px 12px; cursor: pointer; border-radius: 8px; }
 .thumbnails { display: flex; gap: 10px; overflow: hidden; width: 600px; justify-content: center; }
 .thumb-wrapper { position: relative; }
 .thumb { width: 108px; height: 72px; object-fit: cover; cursor: pointer; box-shadow: 0 0 6px rgba(0,0,0,0.3); transition: all 0.3s ease; z-index: 1; border-radius: 10px; }
-.collage { position: relative; display: inline-block; margin-top: 0; }
+.collage {
+    position: relative; /* Важливо для позиціонування imagbox */
+    display: inline-block;
+    margin-top: 0;
+}
 .gallery-container.vows .labels { display: grid; grid-template-columns: repeat(4, 1fr); text-align: center; margin-bottom: 5px; }
 .gallery-container.vows .labels .label1 { grid-column: 1; font-weight: bold; margin-left: 70px; }
 .gallery-container.vows .labels .label2 { grid-column: 3; font-weight: bold; }
@@ -30,30 +34,25 @@ button { padding: 8px 12px; cursor: pointer; border-radius: 8px; }
 #fot:hover { mix-blend-mode: luminosity; }
 #fot:active { mix-blend-mode: exclusion; }
 
-#previewBox {
-    position: fixed;
+/* Зміни в стилях imagbox для позиціонування відносно collage */
+.imagbox {
+    position: absolute; /* Позиціонування відносно .collage */
     top: 50%;
     left: 50%;
-    transform: translate(-50%,-50%) scale(0.6);
-    width: 825px;
-    height: 510px;
+    transform: translate(-50%,-50%) scale(0.1);
+    width: 825px; /* Розмір як раніше */
+    height: 510px; /* Розмір як раніше */
     opacity: 0;
-    transition: opacity 0.5s ease;
-    z-index: 9999;
+    transition: all 0.5s ease;
+    z-index: 9999; /* Поверх всіх елементів */
     border-radius: 12px;
     box-shadow: 0 0 25px rgba(0,0,0,0.7);
     pointer-events: none;
     background: #fff;
 }
-#previewBox.visible {
+.thumb-wrapper.show-preview .imagbox { /* Застосовуємо тільки при show-preview */
     opacity: 1;
-}
-
-#previewImage {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 12px;
+    transform: translate(-50%,-50%) scale(0.6); /* Збільшення і центр */
 }
 
 .photo-block { margin-left: 100px; }
@@ -149,7 +148,6 @@ button { padding: 8px 12px; cursor: pointer; border-radius: 8px; }
     <button id="updateBtn" type="button">UPDATE</button>
 </p><br>
 </fieldset>
-<div id="previewBox"><img id="previewImage"></div>
 <a href="https://example.com/donate" class="donate-btn" target="_blank" title="Підтримати проєкт">❤️</a>
 <input type="file" id="bgLoader" style="display:none">
 <input type="file" id="loveLoader" style="display:none">
@@ -167,14 +165,12 @@ const undoBtn = document.getElementById('undoBtn');
 const previewBtn = document.getElementById('previewBtn');
 const downloadBtn = document.getElementById('downloadBtn');
 const bgLoader = document.getElementById('bgLoader');
-const collage = document.getElementById('collage');
+const collage = document.getElementById('collage'); // Отримуємо collage
 const vowse = document.getElementById('vowse');
 const vowsi = document.getElementById('vowsi');
 const photoBlock = document.querySelector('.photo-block');
 const loveStoneName = "LoveStones"; // Змінна для імені надпису
 const DONATE_URL = "https://example.com/donate"; // Замініть на реальне посилання для донатів
-const previewBox = document.getElementById('previewBox');
-const previewImage = document.getElementById('previewImage');
 
 // --- Дані та галереї ---
 const url = "https://detectfraud.github.io/gallery/";
@@ -214,34 +210,31 @@ function createThumb(src, container, key) {
     const thumb = document.createElement("img");
     thumb.className = "thumb";
     thumb.src = src;
+    const big = document.createElement("img");
+    big.className = "imagbox"; // Клас для великого прев'ю
+    big.src = src;
 
-    // Додаємо затримку для появи прев'ю
+    // Додаємо затримку
     let timer;
-    thumb.addEventListener('mouseenter', () => {
+    wrapper.addEventListener('mouseenter', () => {
         timer = setTimeout(() => {
-            previewImage.src = src;
-            previewBox.classList.add('visible');
+            wrapper.classList.add('show-preview');
         }, 1500); // Затримка 1.5 секунди
     });
-    thumb.addEventListener('mouseleave', () => {
+    wrapper.addEventListener('mouseleave', () => {
         clearTimeout(timer);
-        previewBox.classList.remove('visible');
+        wrapper.classList.remove('show-preview');
     });
 
     if (imgName === "Fon") {
         thumb.title = "Завантажити свій фон";
-        thumb.onclick = () => {
-            bgLoader.click();
-            previewBox.classList.remove('visible');
-        };
+        thumb.onclick = () => bgLoader.click();
     } else {
-        thumb.onclick = () => {
-            handleFileFromGallery(src, key);
-            previewBox.classList.remove('visible');
-        };
+        thumb.onclick = () => handleFileFromGallery(src, key);
     }
 
     wrapper.appendChild(thumb);
+    wrapper.appendChild(big); // Додаємо велике прев'ю всередину wrapper
     container.appendChild(wrapper);
 }
 
