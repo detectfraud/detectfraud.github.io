@@ -363,7 +363,14 @@ function drawAll(){
     drawLayerTo(ctx, layers.vow);
     drawLayerTo(ctx, layers.lovestone);
 }
-
+    // XXX
+function checkAndActivatePreviewButton() {
+    if (layers.bg.img && layers.love.img) {
+        previewBtn.classList.remove('disabled');
+    } else {
+        previewBtn.classList.add('disabled');
+    }
+}  // xxx
 // --- Кнопки та перемикання режимів ---
 function toggleButtons(){
     if(previewMode){
