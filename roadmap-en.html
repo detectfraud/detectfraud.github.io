@@ -246,7 +246,8 @@ function handleFileFromGallery(src, key){
         if (activeLayer) {
             scaleSlider.value = layers[activeLayer].scale;
         }
-        scaleSlider.disabled = false; // Активуємо повзунок
+        scaleSlider.disabled = false; // Явно активуємо повзунок
+        scaleSlider.classList.remove('disabled');
         pushHistory();
         drawAll();
 
@@ -274,7 +275,8 @@ function handleFileLoad(file,key){
             if (activeLayer) {
                 scaleSlider.value = layers[activeLayer].scale;
             }
-            scaleSlider.disabled = false; // Активуємо повзунок
+            scaleSlider.disabled = false; // Явно активуємо повзунок
+            scaleSlider.classList.remove('disabled');
             pushHistory();
             drawAll();
         };
@@ -370,23 +372,13 @@ function toggleButtons(){
         if (photoBlock) photoBlock.style.display = 'none';
         if (vowse) vowse.style.display = 'inline-block';
         activeLayer = null; // Правильно скидаємо активний шар
-        setDisabled(true);
     } else {
         previewBtn.style.display = 'inline-block';
         downloadBtn.style.display = 'none';
         if (vowsi) vowsi.style.display = 'inline-block';
         if (photoBlock) photoBlock.style.display = 'inline-block';
         if (vowse) vowse.style.display = 'none';
-        setDisabled(false);
     }
-}
-function setDisabled(state){
-    [thumbs, loveLoader, scaleSlider].forEach(el=>{
-        if (el) {
-            el.disabled=!!state;
-            el.classList.toggle('disabled',!!state);
-        }
-    });
 }
 
 // Обробка повзунка масштабування
@@ -441,6 +433,8 @@ undoBtn.addEventListener('click',()=>{
 });
 previewBtn.addEventListener('click',()=>{
     previewMode=true;
+    scaleSlider.disabled = true; // Явно вимикаємо повзунок
+    scaleSlider.classList.add('disabled');
     pushHistory();
     toggleButtons();
     drawAll();
