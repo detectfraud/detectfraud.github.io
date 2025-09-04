@@ -24,7 +24,7 @@ button { padding: 8px 12px; cursor: pointer; border-radius: 8px; }
 .gallery-container.vows .labels .label1 { grid-column: 1; font-weight: bold; margin-left: 70px; }
 .gallery-container.vows .labels .label2 { grid-column: 3; font-weight: bold; }
 .arrow, .arow { position: relative; z-index: 3; }
-.button-row { display: flex; justify-content: center; align-items: center; gap: 10px; } /* Додано для відступів між кнопками */
+.button-row { display: flex; justify-content: center; align-items: center; gap: 10px; }
 
 #fot { display: inline-block; cursor: pointer; border-radius: 8px; width: 108px; height: 72px; background-image: url(https://detectfraud.github.io/gallery/Para.png); background-repeat: no-repeat; background-size: contain; }
 #fot:hover { mix-blend-mode: luminosity; }
@@ -35,20 +35,15 @@ button { padding: 8px 12px; cursor: pointer; border-radius: 8px; }
 .photo-block { margin-left: 100px; }
 #updateBtn { margin-left: 300px; font-weight: bold; color: red; }
 .canvas-preview-mode {
-    transition: transform 0.3s ease-in-out;
+    transition: all 0.3s ease-in-out;
     transform-origin: center center;
-    position: relative;
-    z-index: 10;
 }
 .canvas-preview-mode:hover {
-    transform: scale(1.428) !important; /* 900 / 630 */
+    transform: translate(-50%,-50%) scale(1.428) !important;
     position: fixed;
     top: 50%;
     left: 50%;
-    margin: 0;
-    transform: translate(-50%,-50%) scale(1.428) !important;
     z-index: 9999;
-    background-color: #fff;
 }
 
 
@@ -118,8 +113,6 @@ button { padding: 8px 12px; cursor: pointer; border-radius: 8px; }
 <input type="file" id="loveLoader" style="display:none">
 <script>
 /* === Collage JS === */
-
-// Отримання посилань на DOM-елементи
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 const thumbs = document.getElementById('thumbs');
@@ -134,9 +127,9 @@ const collage = document.getElementById('collage');
 const vowse = document.getElementById('vowse');
 const vowsi = document.getElementById('vowsi');
 const photoBlock = document.querySelector('.photo-block');
-const loveStoneName = "LoveStones"; // Змінна для імені надпису
+const loveStoneName = "LoveStones";
+const DONATE_URL = "https://example.com/donate"; // Замініть на реальне посилання для донатів
 
-// --- Дані та галереї ---
 const url = "https://detectfraud.github.io/gallery/";
 const images = [ "nature(1)","nature(2)","nature(3)","nature(4)","nature(5)",
 "nature(6)","nature(7)","nature(8)","nature(9)","Fon" ];
@@ -151,22 +144,17 @@ const lovestoneImages = ["LoveStones"];
 const fullLovestones = lovestoneImages.map(name => url + name + ".png");
 let lovestoneIndex = 0;
 
-// Функція рендерингу прев'ю для фонів
 function renderThumbnails() {
     thumbs.innerHTML = "";
     fullImages.slice(startIndex, startIndex + 3).forEach(src => createThumb(src, thumbs, 'bg'));
 }
 
-// Функція рендерингу прев'ю для клятв та надписів
 function renderVows() {
     thumbsVows.innerHTML = "";
-    // Рендеримо надпис окремо
     fullLovestones.slice(lovestoneIndex, lovestoneIndex + 1).forEach(src => createThumb(src, thumbsVows, 'lovestone'));
-    // Рендеримо клятви
     fullVows.slice(vowIndex, vowIndex + 3).forEach(src => createThumb(src, thumbsVows, 'vow'));
 }
 
-// Функція створення прев'ю-картинки
 function createThumb(src, container, key) {
     const wrapper = document.createElement("div");
     wrapper.className = "thumb-wrapper";
@@ -190,7 +178,6 @@ function createThumb(src, container, key) {
     container.appendChild(wrapper);
 }
 
-// Функції прокрутки галерей
 function prevSlide(){
     startIndex=(startIndex-3+fullImages.length)%fullImages.length;
     renderThumbnails();
@@ -202,15 +189,12 @@ function nextSlide(){
 function prevVow(){ vowIndex=(vowIndex-3+fullVows.length)%fullVows.length; renderVows(); }
 function nextVow(){ vowIndex=(vowIndex+3)%fullVows.length; renderVows(); }
 
-// Завантаження зображення з галереї на Canvas
 function handleFileFromGallery(src, key){
     const img = new Image();
     img.crossOrigin = "anonymous";
     img.onload = () => {
         layers[key].img = img;
         layers[key].src = src;
-        
-        // Встановлення початкової позиції та масштабу для кожного шару
         if (key === 'vow') {
             layers[key].scale = 0.5;
             layers[key].x = (img.width * layers[key].scale / 2) + 10;
@@ -219,25 +203,20 @@ function handleFileFromGallery(src, key){
             layers[key].scale = 0.5;
             layers[key].x = canvas.width / 2;
             layers[key].y = canvas.height / 2;
-        } else { // bg та love
+        } else {
             layers[key].x = canvas.width / 2;
             layers[key].y = canvas.height / 2;
             layers[key].scale = 1;
         }
-        activeLayer = key; // Активація обраного шару
+        activeLayer = key;
         scaleSlider.value = layers[activeLayer].scale;
         pushHistory();
         drawAll();
-
-        // Логіка кнопок "Перегляд" / "Завантажити"
-        previewBtn.style.display = 'inline-block';
-        previewBtn.classList.remove('disabled');
-        downloadBtn.style.display = 'none';
+        checkAndActivatePreviewButton();
     };
     img.src = src;
 }
 
-// Завантаження фото/фонів з файлу
 function handleFileLoad(file,key){
     if(!file) return;
     const reader=new FileReader();
@@ -254,20 +233,19 @@ function handleFileLoad(file,key){
             scaleSlider.value = layers[activeLayer].scale;
             pushHistory();
             drawAll();
+            checkAndActivatePreviewButton();
         };
         img.src=data;
     };
     reader.readAsDataURL(file);
 }
 
-// Обробка подій завантаження файлів
 bgLoader.addEventListener('change',e=>handleFileLoad(e.target.files[0],'bg'));
 loveLoader.addEventListener('change',e=>handleFileLoad(e.target.files[0],'love'));
 document.getElementById("fot").onclick=()=>loveLoader.click();
 
-// --- Шари, маска та історія ---
 const template=new Image(); template.src='images/composit.png';
-const HOLE_OFFSET_X=4.2, HOLE_OFFSET_Y=-80.5, HOLE_RADIUS=68.6; // Оновлені координати та радіус
+const HOLE_OFFSET_X=4.2, HOLE_OFFSET_Y=-80.5, HOLE_RADIUS=68.6;
 let mask={cx:canvas.width/2+HOLE_OFFSET_X, cy:canvas.height/2+HOLE_OFFSET_Y, r:HOLE_RADIUS};
 
 let layers={
@@ -297,9 +275,9 @@ function applySnapshot(s){
         }
     });
     toggleButtons();
+    checkAndActivatePreviewButton();
 }
 
-// --- Функції малювання на Canvas ---
 function drawLayerTo(ctxTarget, layer){
     if(!layer||!layer.img) return;
     const w=layer.img.width*layer.scale,h=layer.img.height*layer.scale;
@@ -338,7 +316,16 @@ function drawAll(){
     drawLayerTo(ctx, layers.lovestone);
 }
 
-// --- Кнопки та перемикання режимів ---
+function checkAndActivatePreviewButton() {
+    if (layers.bg.img && layers.love.img) {
+        previewBtn.style.display = 'inline-block';
+        previewBtn.classList.remove('disabled');
+    } else {
+        previewBtn.style.display = 'none';
+        previewBtn.classList.add('disabled');
+    }
+}
+
 function toggleButtons(){
     if(previewMode){
         previewBtn.style.display = 'none';
@@ -349,7 +336,7 @@ function toggleButtons(){
         setDisabled(true);
         canvas.classList.add('canvas-preview-mode');
     } else {
-        previewBtn.style.display = 'inline-block';
+        checkAndActivatePreviewButton();
         downloadBtn.style.display = 'none';
         if (vowsi) vowsi.style.display = 'inline-block';
         if (photoBlock) photoBlock.style.display = 'inline-block';
@@ -367,14 +354,12 @@ function setDisabled(state){
     });
 }
 
-// Обробка повзунка масштабування
 scaleSlider.addEventListener('input',()=>{
     if(!activeLayer) return;
     layers[activeLayer].scale=parseFloat(scaleSlider.value);
     drawAll();
 });
 
-// --- Drag & Touch (переміщення картинок) ---
 let dragging=false, dragStartX=0, dragStartY=0;
 canvas.addEventListener('mousedown',e=>{
     if(!activeLayer || previewMode) return;
@@ -411,7 +396,6 @@ canvas.addEventListener('touchmove',e=>{
 });
 canvas.addEventListener('touchend',stopDrag);
 
-// --- Undo / Preview / Download ---
 undoBtn.addEventListener('click',()=>{
     if(history.length<=1) return;
     history.pop();
@@ -424,17 +408,27 @@ previewBtn.addEventListener('click',()=>{
     drawAll();
 });
 downloadBtn.addEventListener('click',()=>{
+    if (!sessionStorage.getItem('donated')) {
+        const confirmDonation = confirm("Дякуємо за використання нашого сервісу! Чи не бажаєте підтримати розробників невеликою пожертвою?");
+        if (confirmDonation) {
+            window.open(DONATE_URL, '_blank');
+        }
+        sessionStorage.setItem('donated', 'true');
+    }
+
     const link=document.createElement('a');
     link.download='collage.jpg';
     link.href=canvas.toDataURL('image/jpeg');
     link.click();
 });
 document.getElementById('updateBtn').addEventListener('click', function () {
-    const url = window.location.href.split('?')[0];
-    window.location.href = url + '?_=' + new Date().getTime();
+    const confirmUpdate = confirm("Ви впевнені, що хочете оновити сторінку? Усі незавершені зміни буде втрачено.");
+    if (confirmUpdate) {
+        const url = window.location.href.split('?')[0];
+        window.location.href = url + '?_=' + new Date().getTime();
+    }
 });
 
-// Вимкнення контекстного меню та копіювання
 function disableContextMenu() {
     return false;
 }
@@ -442,8 +436,12 @@ document.oncontextmenu = disableContextMenu;
 document.onselectstart = disableContextMenu;
 document.ondragstart = disableContextMenu;
 
+window.onbeforeunload = function() {
+    if (!sessionStorage.getItem('donated')) {
+        return "Дякуємо, що ви з нами! Перш ніж піти, чи не бажаєте підтримати наш проєкт?";
+    }
+};
 
-// Ініціалізація
 template.onload = () => { drawAll(); };
 renderThumbnails();
 renderVows();
