@@ -10,6 +10,10 @@ canvas { border: 3px solid #bbb; border-radius: 6px; box-shadow: 0 6px 18px rgba
 #scaleSlider { width: 420px; }
 button { padding: 8px 12px; cursor: pointer; border-radius: 8px; }
 .disabled { pointer-events: none; opacity: .5; filter: grayscale(100%); }
+/*
+canvas {transition: transform 0.3s ease-in-out;transform-origin: center center;cursor:pointer;border-radius: 3%;position: relative;z-index: 10;}
+canvas:hover {transform: scale(1.4);}
+*/
 .gallery-container { display: flex; align-items: flex-start; justify-content: center; gap: 10px; margin-top: 10px; }/*20px*/
 .gallery-block { display: flex; flex-direction: column; align-items: center; gap: 10px; }
 .gallery-block > div { display: flex; align-items: center; justify-content: center;}
@@ -24,6 +28,7 @@ button { padding: 8px 12px; cursor: pointer; border-radius: 8px; }
 .gallery-container.vows .labels .label1 { grid-column: 1; font-weight: bold; margin-left: 70px; }
 .gallery-container.vows .labels .label2 { grid-column: 3; font-weight: bold; }
 .arrow, .arow { position: relative; z-index: 3; }
+/*#undoBtn {margin-right: 1em;}*/
 .button-row { display: flex; justify-content: center; align-items: center; gap: 10px; }
 
 #fot { display: inline-block; cursor: pointer; border-radius: 8px; width: 108px; height: 72px; background-image: url(https://detectfraud.github.io/gallery/Para.png); background-repeat: no-repeat; background-size: contain; }
@@ -62,19 +67,6 @@ button { padding: 8px 12px; cursor: pointer; border-radius: 8px; }
     100% { transform: scale(1); }
 }
 
-/* СТИЛІ ДЛЯ ЗБІЛЬШЕННЯ ПРИ НАВЕДЕННІ */
-.canvas-preview {
-    transition: transform 0.3s ease-in-out;
-    transform-origin: center center;
-    transform: translate(-50%, -50%) scale(1.4) !important;
-    position: fixed !important;
-    top: 50% !important;
-    left: 50% !important;
-    width: 900px !important;
-    height: 600px !important;
-    z-index: 1000 !important;
-}
-
 /* Адаптація для мобільних пристроїв */
 @media (max-width: 768px) {
     .venwin { padding: 10px; }
@@ -89,7 +81,6 @@ button { padding: 8px 12px; cursor: pointer; border-radius: 8px; }
     .gallery-container.vows .labels { grid-template-columns: 1fr 1fr; }
     .gallery-container.vows .labels .label1, .gallery-container.vows .labels .label2 { margin: 0; }
     .donate-btn { bottom: 10px; right: 10px; width: 50px; height: 50px; font-size: 24px; }
-    .canvas-preview { transform: translate(-50%, -50%) scale(1.1) !important; }
 }
 </style>
 </head>
@@ -491,19 +482,6 @@ document.getElementById('updateBtn').addEventListener('click', function () {
     if (confirmUpdate) {
         const url = window.location.href.split('?')[0];
         window.location.href = url + '?_=' + new Date().getTime();
-    }
-});
-
-// Додаємо обробники подій для ефекту збільшення
-canvas.addEventListener('mouseenter', () => {
-    if (previewMode) {
-        canvas.classList.add('canvas-preview');
-    }
-});
-
-canvas.addEventListener('mouseleave', () => {
-    if (previewMode) {
-        canvas.classList.remove('canvas-preview');
     }
 });
 
