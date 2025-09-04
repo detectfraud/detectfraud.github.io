@@ -251,7 +251,7 @@ function handleFileFromGallery(src, key){
         scaleSlider.classList.remove('disabled');
         pushHistory();
         drawAll();
-
+ checkAndActivatePreviewButton();
         // Логіка кнопок "Перегляд" / "Завантажити"
         previewBtn.style.display = 'inline-block';
         downloadBtn.style.display = 'none';
