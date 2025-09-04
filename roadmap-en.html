@@ -123,6 +123,7 @@ const vowse = document.getElementById('vowse');
 const vowsi = document.getElementById('vowsi');
 const photoBlock = document.querySelector('.photo-block');
 const loveStoneName = "LoveStones"; // Змінна для імені надпису
+const DONATE_URL = "https://example.com/donate"; // Замініть на реальне посилання для донатів
 
 // --- Дані та галереї ---
 const url = "https://detectfraud.github.io/gallery/";
@@ -409,14 +410,20 @@ previewBtn.addEventListener('click',()=>{
     drawAll();
 });
 downloadBtn.addEventListener('click',()=>{
+    // Встановлюємо прапорець, що колаж був завантажений
+    sessionStorage.setItem('downloaded', 'true');
+
     const link=document.createElement('a');
     link.download='collage.jpg';
     link.href=canvas.toDataURL('image/jpeg');
     link.click();
 });
 document.getElementById('updateBtn').addEventListener('click', function () {
-    const url = window.location.href.split('?')[0];
-    window.location.href = url + '?_=' + new Date().getTime();
+    const confirmUpdate = confirm("Ви впевнені, що хочете оновити сторінку? Усі незавершені зміни буде втрачено.");
+    if (confirmUpdate) {
+        const url = window.location.href.split('?')[0];
+        window.location.href = url + '?_=' + new Date().getTime();
+    }
 });
 
 // Вимкнення контекстного меню та копіювання
@@ -426,6 +433,14 @@ function disableContextMenu() {
 document.oncontextmenu = disableContextMenu;
 document.onselectstart = disableContextMenu;
 document.ondragstart = disableContextMenu;
+
+// Додаємо попередження перед виходом зі сторінки, якщо колаж був завантажений
+window.onbeforeunload = function() {
+    if (sessionStorage.getItem('downloaded') === 'true') {
+        // Замість двох кнопок, браузер покаже стандартне вікно з пропозицією залишити сторінку
+        return "Дякуємо, що ви з нами! Перш ніж піти, чи не бажаєте підтримати наш проєкт?";
+    }
+};
 
 // Ініціалізація
 template.onload = () => { drawAll(); };
