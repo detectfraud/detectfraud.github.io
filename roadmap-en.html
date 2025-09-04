@@ -363,16 +363,11 @@ scaleSlider.addEventListener('input',()=>{
 let dragging=false, dragStartX=0, dragStartY=0;
 canvas.addEventListener('mousedown',e=>{
     if(!activeLayer) return;
-    let isDraggable = false;
-    if (activeLayer === 'bg' || activeLayer === 'love') {
-        isDraggable = !previewMode;
-    } else if (activeLayer === 'vow' || activeLayer === 'lovestone') {
-        isDraggable = previewMode;
-    }
-    if (!isDraggable) {
-        return;
-    }
-
+    
+    // Allow dragging for bg/love in edit mode and for vow/lovestone in preview mode
+    if ((activeLayer === 'bg' || activeLayer === 'love') && previewMode) return;
+    if ((activeLayer === 'vow' || activeLayer === 'lovestone') && !previewMode) return;
+    
     dragging=true;
     dragStartX=e.offsetX-layers[activeLayer].x;
     dragStartY=e.offsetY-layers[activeLayer].y;
@@ -390,16 +385,11 @@ canvas.addEventListener('mouseup',stopDrag);
 canvas.addEventListener('mouseleave',stopDrag);
 canvas.addEventListener('touchstart',e=>{
     if(!activeLayer) return;
-    let isDraggable = false;
-    if (activeLayer === 'bg' || activeLayer === 'love') {
-        isDraggable = !previewMode;
-    } else if (activeLayer === 'vow' || activeLayer === 'lovestone') {
-        isDraggable = previewMode;
-    }
-    if (!isDraggable) {
-        return;
-    }
     
+    // Allow dragging for bg/love in edit mode and for vow/lovestone in preview mode
+    if ((activeLayer === 'bg' || activeLayer === 'love') && previewMode) return;
+    if ((activeLayer === 'vow' || activeLayer === 'lovestone') && !previewMode) return;
+
     const t=e.touches[0],rect=canvas.getBoundingClientRect();
     dragging=true;
     dragStartX=t.clientX-rect.left-layers[activeLayer].x;
