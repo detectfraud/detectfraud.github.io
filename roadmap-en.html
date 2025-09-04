@@ -126,7 +126,7 @@ canvas:hover {transform: scale(1.4);}
 
 <p class="button-row">
     <button id="undoBtn" type="button">⟲ Undo</button>
-    <button id="previewBtn" class="disabled" type="button">👁 Перегляд</button>
+    <button id="previewBtn" type="button">👁 Перегляд</button>
     <button id="downloadBtn" type="button" style="display:none;">📥 Завантажити</button>
     <button id="updateBtn" type="button">UPDATE</button>
 </p><br>
@@ -251,7 +251,7 @@ function handleFileFromGallery(src, key){
         scaleSlider.classList.remove('disabled');
         pushHistory();
         drawAll();
- checkAndActivatePreviewButton();
+
         // Логіка кнопок "Перегляд" / "Завантажити"
         previewBtn.style.display = 'inline-block';
         downloadBtn.style.display = 'none';
@@ -363,14 +363,7 @@ function drawAll(){
     drawLayerTo(ctx, layers.vow);
     drawLayerTo(ctx, layers.lovestone);
 }
-    // XXX
-function checkAndActivatePreviewButton() {
-    if (layers.bg.img && layers.love.img) {
-        previewBtn.classList.remove('disabled');
-    } else {
-        previewBtn.classList.add('disabled');
-    }
-}  // xxx
+
 // --- Кнопки та перемикання режимів ---
 function toggleButtons(){
     if(previewMode){
@@ -380,7 +373,7 @@ function toggleButtons(){
         if (photoBlock) photoBlock.style.display = 'none';
         if (vowse) vowse.style.display = 'inline-block';
         activeLayer = null; // Правильно скидаємо активний шар
-    } else {  checkAndActivatePreviewButton();
+    } else { 
         previewBtn.style.display = 'inline-block';
         downloadBtn.style.display = 'none';
         if (vowsi) vowsi.style.display = 'inline-block';
