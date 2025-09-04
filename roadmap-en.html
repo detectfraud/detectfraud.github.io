@@ -40,6 +40,33 @@ canvas:hover {transform: scale(1.4);}
 .photo-block { margin-left: 100px; }
 #updateBtn { margin-left: 300px; font-weight: bold; color: red; }
 
+/* Кнопка донату */
+.donate-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #e74c3c; /* Червоний колір */
+    color: white;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    text-decoration: none;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    z-index: 1000;
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
 /* Адаптація для мобільних пристроїв */
 @media (max-width: 768px) {
     .venwin { padding: 10px; }
@@ -53,6 +80,7 @@ canvas:hover {transform: scale(1.4);}
     #updateBtn { margin-left: 0; margin-top: 10px; }
     .gallery-container.vows .labels { grid-template-columns: 1fr 1fr; }
     .gallery-container.vows .labels .label1, .gallery-container.vows .labels .label2 { margin: 0; }
+    .donate-btn { bottom: 10px; right: 10px; width: 50px; height: 50px; font-size: 24px; }
 }
 </style>
 </head>
@@ -101,9 +129,8 @@ canvas:hover {transform: scale(1.4);}
     <button id="downloadBtn" type="button" style="display:none;">📥 Завантажити</button>
     <button id="updateBtn" type="button">UPDATE</button>
 </p><br>
-    <a href="https://intuit-portal.blogspot.com/p/stonelove.html" target="_blank">клік</a>
-    <a href="https://intuit-portal.blogspot.com/2025/07/intuitive-intelligence.html">клік2</a>
 </fieldset>
+<a href="https://example.com/donate" class="donate-btn" target="_blank" title="Підтримати проєкт">❤️</a>
 <input type="file" id="bgLoader" style="display:none">
 <input type="file" id="loveLoader" style="display:none">
 <script>
@@ -412,9 +439,6 @@ previewBtn.addEventListener('click',()=>{
     drawAll();
 });
 downloadBtn.addEventListener('click',()=>{
-    // Встановлюємо прапорець, що колаж був завантажений
-    sessionStorage.setItem('downloaded', 'true');
-
     const link=document.createElement('a');
     link.download='collage.jpg';
     link.href=canvas.toDataURL('image/jpeg');
@@ -435,14 +459,6 @@ function disableContextMenu() {
 document.oncontextmenu = disableContextMenu;
 document.onselectstart = disableContextMenu;
 document.ondragstart = disableContextMenu;
-
-// Додаємо попередження перед виходом зі сторінки, якщо колаж був завантажений
-/*window.onbeforeunload = function() {
-    if (sessionStorage.getItem('downloaded') === 'true') {
-        // Замість двох кнопок, браузер покаже стандартне вікно з пропозицією залишити сторінку
-        return "Дякуємо, що ви з нами! Перш ніж піти, чи не бажаєте підтримати наш проєкт?";
-    }
-};*/
 
 // Ініціалізація
 template.onload = () => { drawAll(); };
