@@ -19,6 +19,8 @@ button { padding: 8px 12px; cursor: pointer; border-radius: 8px; }
 .thumbnails { display: flex; gap: 10px; overflow: hidden; width: 600px; justify-content: center; }
 .thumb-wrapper { position: relative; }
 .thumb { width: 108px; height: 72px; object-fit: cover; cursor: pointer; box-shadow: 0 0 6px rgba(0,0,0,0.3); transition: all 0.3s ease; z-index: 1; border-radius: 10px; }
+/* Додано новий стиль для активної/обраної мініатюри */
+.thumb.active { border: 3px solid red; box-shadow: 0 0 10px red; }
 .collage {
     position: relative;
     display: inline-block;
@@ -189,15 +191,29 @@ const lovestoneImages = ["LoveStones"];
 const fullLovestones = lovestoneImages.map(name => url + name + ".png");
 let lovestoneIndex = 0;
 
+// Зберігає посилання на поточну активну мініатюру
+let activeThumb = null;
+
+// Функція для встановлення активної мініатюри
+function setActiveThumb(thumbElement) {
+    if (activeThumb) {
+        activeThumb.classList.remove('active');
+    }
+    thumbElement.classList.add('active');
+    activeThumb = thumbElement;
+}
+
 // Функція рендерингу прев'ю для фонів
 function renderThumbnails() {
     thumbs.innerHTML = "";
+    activeThumb = null; // Очищуємо активний елемент при зміні слайду
     fullImages.slice(startIndex, startIndex + 3).forEach(src => createThumb(src, thumbs, 'bg'));
 }
 
 // Функція рендерингу прев'ю для клятв та надписів
 function renderVows() {
     thumbsVows.innerHTML = "";
+    activeThumb = null; // Очищуємо активний елемент при зміні слайду
     // Рендеримо надпис окремо
     fullLovestones.slice(lovestoneIndex, lovestoneIndex + 1).forEach(src => createThumb(src, thumbsVows, 'lovestone'));
     // Рендеримо клятви
@@ -228,9 +244,15 @@ function createThumb(src, container, key) {
 
     if (imgName === "Fon") {
         thumb.title = "Завантажити свій фон";
-        thumb.onclick = () => bgLoader.click();
+        thumb.onclick = () => {
+            bgLoader.click();
+            imagePreview.classList.remove('show'); // Приховуємо прев'ю
+        };
     } else {
-        thumb.onclick = () => handleFileFromGallery(src, key);
+        thumb.onclick = () => {
+            handleFileFromGallery(src, key);
+            setActiveThumb(thumb); // Встановлюємо цю мініатюру як активну
+        };
     }
 
     wrapper.appendChild(thumb);
@@ -251,6 +273,7 @@ function nextVow(){ vowIndex=(vowIndex+3)%fullVows.length; renderVows(); }
 
 // Завантаження зображення з галереї на Canvas
 function handleFileFromGallery(src, key){
+    imagePreview.classList.remove('show'); // Видаляємо клас для приховування прев'ю
     const img = new Image();
     img.crossOrigin = "anonymous";
     img.onload = () => {
