@@ -1,4 +1,3 @@
-<!-- Collage (23:26 04.09.25) робочий -->
 <!DOCTYPE html>
 <html lang="uk">
 <head>
@@ -126,7 +125,7 @@ button { padding: 8px 12px; cursor: pointer; border-radius: 8px; }
     <div class="gallery-block photo-block">
         <b>Ваше фото</b><br /><br />
         <div>
-            <label id="fot" title="Фото закоханих"></label>
+            <label id="fot" class="disabled" title="Фото закоханих"></label>
         </div>
     </div>
 </div>
@@ -147,7 +146,7 @@ button { padding: 8px 12px; cursor: pointer; border-radius: 8px; }
 
 <p class="button-row">
     <button id="undoBtn" type="button">⟲ Undo</button>
-    <button id="previewBtn" type="button">👁 Перегляд</button>
+    <button id="previewBtn" type="button" class="disabled">👁 Перегляд</button>
     <button id="downloadBtn" type="button" style="display:none;">📥 Завантажити</button>
     <button id="updateBtn" type="button">UPDATE</button>
 </p><br>
@@ -252,7 +251,9 @@ function createThumb(src, container, key) {
     } else {
         thumb.onclick = () => {
             handleFileFromGallery(src, key);
-            setActiveThumb(thumb); // Встановлюємо цю мініатюру як активну
+            if (key === 'bg') {
+                setActiveThumb(thumb);
+            }
         };
     }
 
@@ -303,6 +304,14 @@ function handleFileFromGallery(src, key){
         pushHistory();
         drawAll();
 
+        // Управління станом кнопок
+        if (key === 'bg') {
+            document.getElementById('fot').classList.remove('disabled');
+        }
+        if (key === 'love' || key === 'lovestone') {
+            document.getElementById('previewBtn').classList.remove('disabled');
+        }
+
         previewBtn.style.display = 'inline-block';
         downloadBtn.style.display = 'none';
     };
@@ -330,6 +339,13 @@ function handleFileLoad(file,key){
             scaleSlider.classList.remove('disabled');
             pushHistory();
             drawAll();
+            // Управління станом кнопок
+            if (key === 'bg') {
+                document.getElementById('fot').classList.remove('disabled');
+            }
+            if (key === 'love') {
+                document.getElementById('previewBtn').classList.remove('disabled');
+            }
         };
         img.src=data;
     };
@@ -359,6 +375,19 @@ function makeSnapshot(){ return { bg:{...layers.bg}, love:{...layers.love}, love
 function pushHistory(){ history.push(makeSnapshot()); if(history.length>MAX_HISTORY) history.shift(); }
 function applySnapshot(s){
     previewMode=!!s.previewMode; activeLayer=s.activeLayer||null; bgHoleActive=!!s.bgHoleActive;
+    
+    // Оновлюємо стан кнопок
+    if (s.bg.img) {
+        document.getElementById('fot').classList.remove('disabled');
+    } else {
+        document.getElementById('fot').classList.add('disabled');
+    }
+    if (s.love.img) {
+        document.getElementById('previewBtn').classList.remove('disabled');
+    } else {
+        document.getElementById('previewBtn').classList.add('disabled');
+    }
+
     ['bg','love','vow','lovestone'].forEach(key=>{
         const v=s[key];
         if(v && v.src){
