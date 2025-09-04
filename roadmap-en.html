@@ -35,17 +35,15 @@ button { padding: 8px 12px; cursor: pointer; border-radius: 8px; }
 .photo-block { margin-left: 100px; }
 #updateBtn { margin-left: 300px; font-weight: bold; color: red; }
 .canvas-preview-mode {
-    transition: transform 0.3s ease-in-out, z-index 0s 0.3s;
-    position: relative;
+    transition: transform 0.3s ease-in-out;
+    transform-origin: center center;
 }
-
 .canvas-preview-mode:hover {
-    transform: scale(1.428); /* 900 / 630 */
+    transform: scale(1.428); /* 900/630 */
     position: fixed;
     top: 50%;
     left: 50%;
-    margin-left: -315px; /* (width / 2) */
-    margin-top: -210px;  /* (height / 2) */
+    transform: translate(-50%, -50%) scale(1.428);
     z-index: 9999;
 }
 
@@ -107,7 +105,7 @@ button { padding: 8px 12px; cursor: pointer; border-radius: 8px; }
 
 <p class="button-row">
     <button id="undoBtn" type="button">⟲ Undo</button>
-    <button id="previewBtn" type="button" class="disabled" style="display:none;">👁 Перегляд</button>
+    <button id="previewBtn" type="button" class="disabled">👁 Перегляд</button>
     <button id="downloadBtn" type="button" style="display:none;">📥 Завантажити</button>
     <button id="updateBtn" type="button">UPDATE</button>
 </p><br>
@@ -289,7 +287,7 @@ function drawLayerTo(ctxTarget, layer){
 function drawLove(ctxTarget, clip=false){
     const L=layers.love;
     if(!L||!L.img) return;
-    const w=L.img.width*L.scale,h=L.img.height*L.scale;
+    const w=L.img.width*L.img.scale,h=L.img.height*L.img.scale;
     ctxTarget.save();
     if(clip&&mask.r>0){ ctxTarget.beginPath(); ctxTarget.arc(mask.cx,mask.cy,mask.r,0,Math.PI*2); ctxTarget.clip(); }
     ctxTarget.drawImage(L.img,L.x-w/2,L.y-h/2,w,h);
@@ -321,10 +319,8 @@ function drawAll(){
 
 function checkAndActivatePreviewButton() {
     if (layers.bg.img && layers.love.img) {
-        previewBtn.style.display = 'inline-block';
         previewBtn.classList.remove('disabled');
     } else {
-        previewBtn.style.display = 'none';
         previewBtn.classList.add('disabled');
     }
 }
@@ -339,6 +335,7 @@ function toggleButtons(){
         setDisabled(true);
         canvas.classList.add('canvas-preview-mode');
     } else {
+        previewBtn.style.display = 'inline-block';
         checkAndActivatePreviewButton();
         downloadBtn.style.display = 'none';
         if (vowsi) vowsi.style.display = 'inline-block';
