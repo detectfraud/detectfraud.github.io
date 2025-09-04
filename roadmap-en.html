@@ -10,7 +10,7 @@ canvas { border: 3px solid #bbb; border-radius: 6px; box-shadow: 0 6px 18px rgba
 #scaleSlider { width: 420px; }
 button { padding: 8px 12px; cursor: pointer; border-radius: 8px; }
 .disabled { pointer-events: none; cursor: not-allowed; opacity: .5; filter: grayscale(100%); }
-/*:disabled {cursor: not-allowed;} курсор із перекресленим колом */    
+:disabled {cursor: not-allowed;} /*курсор із перекресленим колом */    
 /*
 canvas {transition: transform 0.3s ease-in-out;transform-origin: center center;cursor:pointer;border-radius: 3%;position: relative;z-index: 10;}
 canvas:hover {transform: scale(1.4);}
@@ -126,7 +126,7 @@ canvas:hover {transform: scale(1.4);}
 
 <p class="button-row">
     <button id="undoBtn" type="button">⟲ Undo</button>
-    <button id="previewBtn" type="button">👁 Перегляд</button>
+    <button id="previewBtn" class="disabled" type="button">👁 Перегляд</button>
     <button id="downloadBtn" type="button" style="display:none;">📥 Завантажити</button>
     <button id="updateBtn" type="button">UPDATE</button>
 </p><br>
