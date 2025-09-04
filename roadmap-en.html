@@ -105,7 +105,7 @@ button { padding: 8px 12px; cursor: pointer; border-radius: 8px; }
 
 <p class="button-row">
     <button id="undoBtn" type="button">⟲ Undo</button>
-    <button id="previewBtn" type="button" class="disabled">👁 Перегляд</button>
+    <button id="previewBtn" type="button" class="disabled" style="display:none;">👁 Перегляд</button>
     <button id="downloadBtn" type="button" style="display:none;">📥 Завантажити</button>
     <button id="updateBtn" type="button">UPDATE</button>
 </p><br>
@@ -319,8 +319,10 @@ function drawAll(){
 
 function checkAndActivatePreviewButton() {
     if (layers.bg.img && layers.love.img) {
+        previewBtn.style.display = 'inline-block';
         previewBtn.classList.remove('disabled');
     } else {
+        previewBtn.style.display = 'none';
         previewBtn.classList.add('disabled');
     }
 }
@@ -335,7 +337,6 @@ function toggleButtons(){
         setDisabled(true);
         canvas.classList.add('canvas-preview-mode');
     } else {
-        previewBtn.style.display = 'inline-block';
         checkAndActivatePreviewButton();
         downloadBtn.style.display = 'none';
         if (vowsi) vowsi.style.display = 'inline-block';
