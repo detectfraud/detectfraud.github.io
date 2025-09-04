@@ -101,6 +101,8 @@ canvas:hover {transform: scale(1.4);}
     <button id="downloadBtn" type="button" style="display:none;">📥 Завантажити</button>
     <button id="updateBtn" type="button">UPDATE</button>
 </p><br>
+    <a href="https://intuit-portal.blogspot.com/p/stonelove.html" target="_blank">клік</a>
+    <a href="https://intuit-portal.blogspot.com/2025/07/intuitive-intelligence.html">клік2</a>
 </fieldset>
 <input type="file" id="bgLoader" style="display:none">
 <input type="file" id="loveLoader" style="display:none">
@@ -296,7 +298,7 @@ function drawLayerTo(ctxTarget, layer){
 function drawLove(ctxTarget, clip=false){
     const L=layers.love;
     if(!L||!L.img) return;
-    const w=L.img.width*L.img.scale,h=L.img.height*L.img.scale;
+    const w=L.img.width*L.scale,h=L.img.height*L.scale;
     ctxTarget.save();
     if(clip&&mask.r>0){ ctxTarget.beginPath(); ctxTarget.arc(mask.cx,mask.cy,mask.r,0,Math.PI*2); ctxTarget.clip(); }
     ctxTarget.drawImage(L.img,L.x-w/2,L.y-h/2,w,h);
@@ -410,6 +412,9 @@ previewBtn.addEventListener('click',()=>{
     drawAll();
 });
 downloadBtn.addEventListener('click',()=>{
+    // Встановлюємо прапорець, що колаж був завантажений
+    sessionStorage.setItem('downloaded', 'true');
+
     const link=document.createElement('a');
     link.download='collage.jpg';
     link.href=canvas.toDataURL('image/jpeg');
@@ -430,6 +435,14 @@ function disableContextMenu() {
 document.oncontextmenu = disableContextMenu;
 document.onselectstart = disableContextMenu;
 document.ondragstart = disableContextMenu;
+
+// Додаємо попередження перед виходом зі сторінки, якщо колаж був завантажений
+window.onbeforeunload = function() {
+    if (sessionStorage.getItem('downloaded') === 'true') {
+        // Замість двох кнопок, браузер покаже стандартне вікно з пропозицією залишити сторінку
+        return "Дякуємо, що ви з нами! Перш ніж піти, чи не бажаєте підтримати наш проєкт?";
+    }
+};
 
 // Ініціалізація
 template.onload = () => { drawAll(); };
