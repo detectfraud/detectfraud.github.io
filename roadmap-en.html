@@ -362,11 +362,17 @@ scaleSlider.addEventListener('input',()=>{
 
 let dragging=false, dragStartX=0, dragStartY=0;
 canvas.addEventListener('mousedown',e=>{
-    // Виправлення: дозволяємо перетягування для клятв лише в режимі "Перегляд"
     if(!activeLayer) return;
-    if(!previewMode && (activeLayer === 'vow' || activeLayer === 'lovestone')) return;
-    if(previewMode && (activeLayer === 'bg' || activeLayer === 'love')) return;
-    
+    let isDraggable = false;
+    if (activeLayer === 'bg' || activeLayer === 'love') {
+        isDraggable = !previewMode;
+    } else if (activeLayer === 'vow' || activeLayer === 'lovestone') {
+        isDraggable = previewMode;
+    }
+    if (!isDraggable) {
+        return;
+    }
+
     dragging=true;
     dragStartX=e.offsetX-layers[activeLayer].x;
     dragStartY=e.offsetY-layers[activeLayer].y;
@@ -383,11 +389,17 @@ function stopDrag(){
 canvas.addEventListener('mouseup',stopDrag);
 canvas.addEventListener('mouseleave',stopDrag);
 canvas.addEventListener('touchstart',e=>{
-    // Виправлення: дозволяємо перетягування для клятв лише в режимі "Перегляд"
     if(!activeLayer) return;
-    if(!previewMode && (activeLayer === 'vow' || activeLayer === 'lovestone')) return;
-    if(previewMode && (activeLayer === 'bg' || activeLayer === 'love')) return;
-
+    let isDraggable = false;
+    if (activeLayer === 'bg' || activeLayer === 'love') {
+        isDraggable = !previewMode;
+    } else if (activeLayer === 'vow' || activeLayer === 'lovestone') {
+        isDraggable = previewMode;
+    }
+    if (!isDraggable) {
+        return;
+    }
+    
     const t=e.touches[0],rect=canvas.getBoundingClientRect();
     dragging=true;
     dragStartX=t.clientX-rect.left-layers[activeLayer].x;
