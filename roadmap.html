@@ -21,8 +21,8 @@ canvas {
   position: relative; /* Додаємо це! */
   z-index: 10;
 }
-canvas:hover {
-  transform: scale(1.43);
+.preview-zoom-in:hover {
+    transform: scale(1.43);
 }
     
 #scaleSlider { width: 420px; } /* Адаптовано до ширини канвасу */
@@ -486,6 +486,7 @@ function toggleButtons(){
         if (vowsi) vowsi.style.display = 'none';
         if (photoBlock) photoBlock.style.display = 'none';
         if (vowse) vowse.style.display = 'inline-block';
+        canvas.classList.add('preview-zoom-in'); // Додаємо клас
         activeLayer = null;
     } else {
         previewBtn.style.display = 'inline-block';
@@ -493,6 +494,7 @@ function toggleButtons(){
         if (vowsi) vowsi.style.display = 'inline-block';
         if (photoBlock) photoBlock.style.display = 'inline-block';
         if (vowse) vowse.style.display = 'none';
+        canvas.classList.remove('preview-zoom-in'); // Видаляємо клас
     }
 }
 
@@ -506,13 +508,13 @@ scaleSlider.addEventListener('input',()=>{
 // --- Drag & Touch (переміщення картинок) ---
 let dragging=false, dragStartX=0, dragStartY=0;
 canvas.addEventListener('mousedown',e=>{
-    if(!activeLayer) return;
+    if(previewMode || !activeLayer) return; // Відключаємо перетягування у режимі перегляду
     dragging=true;
     dragStartX=e.offsetX-layers[activeLayer].x;
     dragStartY=e.offsetY-layers[activeLayer].y;
 });
 canvas.addEventListener('mousemove',e=>{
-    if(!dragging||!activeLayer) return;
+    if(!dragging || previewMode || !activeLayer) return; // Відключаємо перетягування у режимі перегляду
     layers[activeLayer].x=e.offsetX-dragStartX;
     layers[activeLayer].y=e.offsetY-dragStartY;
     drawAll();
@@ -523,7 +525,7 @@ function stopDrag(){
 canvas.addEventListener('mouseup',stopDrag);
 canvas.addEventListener('mouseleave',stopDrag);
 canvas.addEventListener('touchstart',e=>{
-    if(!activeLayer) return;
+    if(previewMode || !activeLayer) return; // Відключаємо перетягування у режимі перегляду
     const t=e.touches[0],rect=canvas.getBoundingClientRect();
     dragging=true;
     dragStartX=(t.clientX-rect.left) * (canvas.width/rect.width) - layers[activeLayer].x;
@@ -531,7 +533,7 @@ canvas.addEventListener('touchstart',e=>{
     e.preventDefault();
 });
 canvas.addEventListener('touchmove',e=>{
-    if(!dragging||!activeLayer) return;
+    if(!dragging || previewMode || !activeLayer) return; // Відключаємо перетягування у режимі перегляду
     const t=e.touches[0],rect=canvas.getBoundingClientRect();
     layers[activeLayer].x=(t.clientX-rect.left) * (canvas.width/rect.width) - dragStartX;
     layers[activeLayer].y=(t.clientY-rect.top) * (canvas.height/rect.height) - dragStartY;
