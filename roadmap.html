@@ -246,7 +246,7 @@ function createThumb(src, container, key) {
         timer = setTimeout(() => {
             imagePreview.src = src; // Оновлюємо src єдиного елемента прев'ю
             imagePreview.classList.add('show');
-        }, 1500);
+        }, 1000);
     });
     wrapper.addEventListener('mouseleave', () => {
         clearTimeout(timer);
