@@ -295,6 +295,16 @@ function nextVow(){ vowIndex=(vowIndex+3)%fullVows.length; renderVows(); }
 
 // Завантаження зображення з галереї на Canvas
 function handleFileFromGallery(src, key){
+
+ // --- НОВІ РЯДКИ КОДУ ---
+    // Вимикаємо режим перегляду, якщо він був увімкнений
+    if (previewMode) {
+        previewMode = false;
+        toggleButtons();
+    }
+    // --- КІНЕЦЬ НОВИХ РЯДКІВ ---
+
+
     imagePreview.classList.remove('show'); // Видаляємо клас для приховування прев'ю
     const img = new Image();
     img.crossOrigin = "anonymous";
