@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <title>Камінь любові — редактор</title>
-<style>
+<style>    
 body { font-family: sans-serif; text-align: center; background: url(images/unamed.jpg) repeat scroll top left; }
 .venwin { border-radius: 10px; display: inline-block; background-color: rgba(255, 255, 255, 0.5); padding: 0 20px; box-sizing: border-box;width: 670px; }
 /* Змінено CSS для відображення канвасу меншим, ніж його реальний розмір */
@@ -16,16 +16,18 @@ canvas {
     width: 630px; /* Відображуваний розмір */
     height: 420px; /* Відображуваний розмір */
 }
-#scaleSlider { width: 630px; } /* Масштабовано відповідно до нового розміру */
+#scaleSlider { width: 630px; } /* Адаптовано до ширини канвасу */
 button { padding: 8px 12px; cursor: pointer; border-radius: 8px; }
 .disabled { pointer-events: none; opacity: .5; filter: grayscale(100%); }
 .gallery-container { display: flex; align-items: flex-start; justify-content: center; gap: 10px; margin-top: 10px; }
 .gallery-block { display: flex; flex-direction: column; align-items: center; gap: 10px; }
 .gallery-block > div { display: flex; align-items: center; justify-content: center;}
 .arrow, .arow { font-size: 20px; cursor: pointer; user-select: none; padding: 3px; line-height: 1; display: flex; align-items: center; justify-content: center; }
-.arrow:first-child { margin-right: -157px; } .arrow:last-child { margin-left: -157px; } /* Масштабовано */
-.arow:first-child { margin-right: -86px; } .arow:last-child { margin-left: -86px; } /* Масштабовано */
-.thumbnails { display: flex; gap: 10px; overflow: hidden; width: 857px; justify-content: center; } /* Масштабовано */
+.arrow:first-child { margin-right: -100px; }
+.arrow:last-child { margin-left: -100px; }
+.arow:first-child { margin-right: -40px; }
+.arow:last-child { margin-left: -40px; }
+.thumbnails { display: flex; gap: 10px; overflow: hidden; width: 630px; justify-content: center; }
 .thumb-wrapper { position: relative; }
 .thumb { width: 108px; height: 72px; object-fit: cover; cursor: pointer; box-shadow: 0 0 6px rgba(0,0,0,0.3); transition: all 0.3s ease; z-index: 1; border-radius: 10px; }
 /* Додано новий стиль для активної/обраної мініатюри */
