@@ -134,7 +134,7 @@
             <div class="gallery-block photo-block">
                 <b>Ваше фото</b><br /><br />
                 <div>
-                    <label id="fot" title="Фото закоханих"></label>
+                    <label id="fot" class="disabled" title="Фото закоханих"></label>
                 </div>
             </div>
         </div>
@@ -193,22 +193,7 @@
         const fullLovestones = lovestoneImages.map(name => url + name + ".png");
         let lovestoneIndex = 0;
         let activeThumb = null;
-        let disabledThumb = null;
-        
-        function updateDisabledThumbs(src) {
-            if (disabledThumb) {
-                disabledThumb.classList.remove('disabled');
-            }
-            const allThumbs = document.querySelectorAll('.thumb');
-            for (const thumb of allThumbs) {
-                if (thumb.src === src) {
-                    thumb.classList.add('disabled');
-                    disabledThumb = thumb;
-                    break;
-                }
-            }
-        }
-
+        let currentDisabledThumb = null;
         function setActiveThumb(thumbElement) {
             if (activeThumb) {
                 activeThumb.classList.remove('active');
@@ -220,12 +205,20 @@
             thumbs.innerHTML = "";
             activeThumb = null;
             fullImages.slice(startIndex, startIndex + 3).forEach(src => createThumb(src, thumbs, 'bg'));
+            if (currentDisabledThumb) {
+                currentDisabledThumb.classList.remove('disabled');
+                currentDisabledThumb = null;
+            }
         }
         function renderVows() {
             thumbsVows.innerHTML = "";
             activeThumb = null;
             fullLovestones.slice(lovestoneIndex, lovestoneIndex + 1).forEach(src => createThumb(src, thumbsVows, 'lovestone'));
             fullVows.slice(vowIndex, vowIndex + 3).forEach(src => createThumb(src, thumbsVows, 'vow'));
+            if (currentDisabledThumb) {
+                currentDisabledThumb.classList.remove('disabled');
+                currentDisabledThumb = null;
+            }
         }
         function createThumb(src, container, key) {
             const wrapper = document.createElement("div");
@@ -253,10 +246,7 @@
                 };
             } else {
                 thumb.onclick = () => {
-                    handleFileFromGallery(src, key);
-                    if (key === 'bg') {
-                        setActiveThumb(thumb);
-                    }
+                    handleFileFromGallery(src, key, thumb);
                 };
             }
             wrapper.appendChild(thumb);
@@ -266,7 +256,7 @@
         function nextSlide(){ startIndex=(startIndex+3)%fullImages.length; renderThumbnails(); }
         function prevVow(){ vowIndex=(vowIndex-3+fullVows.length)%fullVows.length; renderVows(); }
         function nextVow(){ vowIndex=(vowIndex+3)%fullVows.length; renderVows(); }
-        function handleFileFromGallery(src, key) {
+        function handleFileFromGallery(src, key, thumb) {
             if (previewMode) {
                 previewMode = false;
                 canvas.classList.remove('preview-zoom-in');
@@ -314,7 +304,19 @@
                 previewBtn.style.display = 'inline-block';
                 downloadBtn.style.display = 'none';
 
-                updateDisabledThumbs(src); // <-- Added this line
+                // Added logic for disabling/enabling thumbnails
+                if (currentDisabledThumb) {
+                    currentDisabledThumb.classList.remove('disabled');
+                }
+                if (thumb) {
+                    thumb.classList.add('disabled');
+                    currentDisabledThumb = thumb;
+                }
+                
+                // Keep the active class for the red border on bg thumbs
+                if (key === 'bg') {
+                    setActiveThumb(thumb);
+                }
             };
             img.src = src;
         }
