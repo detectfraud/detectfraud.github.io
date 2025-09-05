@@ -564,96 +564,63 @@ function nextVow(){ vowIndex=(vowIndex+3)%fullVows.length; renderVows(); }
 
 
 // Завантаження зображення з галереї на Canvas
+function handleFileFromGallery(src, key) {
+    // Вимикаємо режим перегляду, якщо він був увімкнений
+    if (previewMode) {
+        previewMode = false;
+        canvas.classList.remove('preview-zoom-in');
+    }
 
-function handleFileFromGallery(src, key){
+    // Управління відображенням галерей
+    if (key === 'vow' || key === 'lovestone') {
+        vowse.style.display = 'inline-block';
+        vowsi.style.display = 'none';
+    } else if (key === 'bg') {
+        vowse.style.display = 'none';
+        vowsi.style.display = 'inline-block';
+    }
+   
+    imagePreview.classList.remove('show');
 
-        // --- НОВІ РЯДКИ КОДУ ---
-    // Вимикаємо режим перегляду, якщо він був увімкнений
-    if (previewMode) {
-        previewMode = false;
-        toggleButtons();
-    }
-    // --- КІНЕЦЬ НОВИХ РЯДКІВ ---
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => {
+        layers[key].img = img;
+        layers[key].src = src;
 
-    imagePreview.classList.remove('show'); // Видаляємо клас для приховування прев'ю
+        if (key === 'vow') {
+            layers[key].scale = 0.5;
+            layers[key].x = (img.width * layers[key].scale / 2) + 14.28;
+            layers[key].y = canvas.height - (img.height * layers[key].scale / 2) - 14.28;
+        } else if (key === 'lovestone') {
+            layers[key].scale = 0.5;
+            layers[key].x = canvas.width / 2;
+            layers[key].y = canvas.height / 2;
+        } else {
+            layers[key].x = canvas.width / 2;
+            layers[key].y = canvas.height / 2;
+            layers[key].scale = 1;
+        }
+        activeLayer = key;
+        if (activeLayer) {
+            scaleSlider.value = layers[activeLayer].scale;
+        }
+        scaleSlider.disabled = false;
+        scaleSlider.classList.remove('disabled');
+        pushHistory();
+        drawAll();
 
-    const img = new Image();
+        if (key === 'bg') {
+            document.getElementById('fot').classList.remove('disabled');
+        }
+        if (key === 'love' || key === 'lovestone') {
+            document.getElementById('previewBtn').classList.remove('disabled');
+        }
 
-    img.crossOrigin = "anonymous";
-
-    img.onload = () => {
-
-        layers[key].img = img;
-
-        layers[key].src = src;
-
-
-        if (key === 'vow') {
-
-            layers[key].scale = 0.5;
-
-            layers[key].x = (img.width * layers[key].scale / 2) + 14.28; // Масштабовано
-
-            layers[key].y = canvas.height - (img.height * layers[key].scale / 2) - 14.28; // Масштабовано
-
-        } else if (key === 'lovestone') {
-
-            layers[key].scale = 0.5;
-
-            layers[key].x = canvas.width / 2;
-
-            layers[key].y = canvas.height / 2;
-
-        } else {
-
-            layers[key].x = canvas.width / 2;
-
-            layers[key].y = canvas.height / 2;
-
-            layers[key].scale = 1;
-
-        }
-
-        activeLayer = key;
-
-        if (activeLayer) {
-
-            scaleSlider.value = layers[activeLayer].scale;
-
-        }
-
-        scaleSlider.disabled = false;
-
-        scaleSlider.classList.remove('disabled');
-
-        pushHistory();
-
-        drawAll();
-
-
-        // Управління станом кнопок
-
-        if (key === 'bg') {
-
-            document.getElementById('fot').classList.remove('disabled');
-
-        }
-
-        if (key === 'love' || key === 'lovestone') {
-
-            document.getElementById('previewBtn').classList.remove('disabled');
-
-        }
-
-
-        previewBtn.style.display = 'inline-block';
-
-        downloadBtn.style.display = 'none';
-
-    };
-
-    img.src = src;
-
+        previewBtn.style.display = 'inline-block';
+        downloadBtn.style.display = 'none';
+    };
+    img.src = src;
 }
 
 
