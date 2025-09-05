@@ -15,7 +15,16 @@ canvas {
     margin: 10px auto; 
     width: 630px; /* Відображуваний розмір */
     height: 420px; /* Відображуваний розмір */
+  transition: transform 0.3s ease-in-out;
+  transform-origin: center center;
+  cursor:pointer;
+  position: relative; /* Додаємо це! */
+  z-index: 10;
 }
+canvas:hover {
+  transform: scale(1.43);
+}
+    
 #scaleSlider { width: 420px; } /* Адаптовано до ширини канвасу */
 button { padding: 8px 12px; cursor: pointer; border-radius: 8px; }
 .disabled { pointer-events: none; opacity: .5; filter: grayscale(100%); }
