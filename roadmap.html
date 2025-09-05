@@ -38,6 +38,7 @@
         .thumb-wrapper { position: relative; }
         .thumb { width: 108px; height: 72px; object-fit: cover; cursor: pointer; box-shadow: 0 0 6px rgba(0,0,0,0.3); transition: all 0.3s ease; z-index: 1; border-radius: 10px; }
         .thumb.active { border: 3px solid red; box-shadow: 0 0 10px red; }
+        .thumb.active.disabled { pointer-events: none; opacity: .5; filter: grayscale(100%); }
         .collage {
             position: relative;
             display: inline-block;
@@ -148,6 +149,7 @@
                     <span class="arow" onclick="prevVow()">&#10094;</span>
                     <div class="thumbnails" id="thumbsVows"></div>
                     <span class="arow" onclick="nextVow()">&#10095;</span>
+                </div>
             </div>
         </div>
         <p class="button-row">
@@ -193,29 +195,22 @@
         let lovestoneIndex = 0;
         let activeThumb = null;
         function setActiveThumb(thumbElement) {
-            if (activeThumb) {
-                activeThumb.classList.remove('active');
-                activeThumb.classList.remove('disabled');
-            }
-            thumbElement.classList.add('active');
-            thumbElement.classList.add('disabled');
+            // Очищення класів з усіх мініатюр
+            document.querySelectorAll('.thumb').forEach(thumb => {
+                thumb.classList.remove('active', 'disabled');
+            });
+            // Додавання класів до обраної мініатюри
+            thumbElement.classList.add('active', 'disabled');
             activeThumb = thumbElement;
         }
         function renderThumbnails() {
             thumbs.innerHTML = "";
-            const displayedImages = fullImages.slice(startIndex, startIndex + 3);
-            displayedImages.forEach(src => createThumb(src, thumbs, 'bg'));
-            if (thumbs.firstChild) {
-                setActiveThumb(thumbs.firstChild.firstChild);
-            }
+            fullImages.slice(startIndex, startIndex + 3).forEach((src, index) => createThumb(src, thumbs, 'bg', startIndex + index));
         }
         function renderVows() {
             thumbsVows.innerHTML = "";
-            fullLovestones.slice(lovestoneIndex, lovestoneIndex + 1).forEach(src => createThumb(src, thumbsVows, 'lovestone'));
-            fullVows.slice(vowIndex, vowIndex + 3).forEach(src => createThumb(src, thumbsVows, 'vow'));
-            if (thumbsVows.firstChild) {
-                setActiveThumb(thumbsVows.firstChild.firstChild);
-            }
+            fullLovestones.slice(lovestoneIndex, lovestoneIndex + 1).forEach((src, index) => createThumb(src, thumbsVows, 'lovestone', lovestoneIndex + index));
+            fullVows.slice(vowIndex, vowIndex + 3).forEach((src, index) => createThumb(src, thumbsVows, 'vow', vowIndex + index));
         }
         function createThumb(src, container, key) {
             const wrapper = document.createElement("div");
@@ -240,13 +235,12 @@
                 thumb.onclick = () => {
                     bgLoader.click();
                     imagePreview.classList.remove('show');
+                    setActiveThumb(thumb);
                 };
             } else {
                 thumb.onclick = () => {
                     handleFileFromGallery(src, key);
-                    if (key === 'bg' || key === 'vow' || key === 'lovestone') {
-                        setActiveThumb(thumb);
-                    }
+                    setActiveThumb(thumb);
                 };
             }
             wrapper.appendChild(thumb);
