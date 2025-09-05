@@ -512,9 +512,9 @@
         function disableContextMenu() {
             return false;
         }
-        document.oncontextmenu = disableContextMenu;
-        document.onselectstart = disableContextMenu;
-        document.ondragstart = disableContextMenu;
+       // document.oncontextmenu = disableContextMenu;
+       // document.onselectstart = disableContextMenu;
+        //document.ondragstart = disableContextMenu;
         template.onload = () => { drawAll(); };
         renderThumbnails();
         renderVows();
