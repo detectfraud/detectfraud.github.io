@@ -134,7 +134,7 @@
             <div class="gallery-block photo-block">
                 <b>Ваше фото</b><br /><br />
                 <div>
-                    <label id="fot" class="disabled" title="Фото закоханих"></label>
+                    <label id="fot" title="Фото закоханих"></label>
                 </div>
             </div>
         </div>
@@ -193,35 +193,40 @@
         const fullLovestones = lovestoneImages.map(name => url + name + ".png");
         let lovestoneIndex = 0;
         let activeThumb = null;
-
-        // Оновлена функція для встановлення активної мініатюри
-        function setActiveThumb(thumbElement) {
+        let disabledThumb = null;
+        
+        function updateDisabledThumbs(src) {
+            if (disabledThumb) {
+                disabledThumb.classList.remove('disabled');
+            }
             const allThumbs = document.querySelectorAll('.thumb');
-            allThumbs.forEach(thumb => {
-                thumb.classList.remove('active');
-                thumb.classList.remove('disabled');
-            });
+            for (const thumb of allThumbs) {
+                if (thumb.src === src) {
+                    thumb.classList.add('disabled');
+                    disabledThumb = thumb;
+                    break;
+                }
+            }
+        }
+
+        function setActiveThumb(thumbElement) {
+            if (activeThumb) {
+                activeThumb.classList.remove('active');
+            }
             thumbElement.classList.add('active');
-            thumbElement.classList.add('disabled');
             activeThumb = thumbElement;
         }
-
         function renderThumbnails() {
             thumbs.innerHTML = "";
-            fullImages.slice(startIndex, startIndex + 3).forEach((src, index) => {
-                const thumb = createThumb(src, thumbs, 'bg');
-                if (index === 0) {
-                    setActiveThumb(thumb);
-                }
-            });
+            activeThumb = null;
+            fullImages.slice(startIndex, startIndex + 3).forEach(src => createThumb(src, thumbs, 'bg'));
         }
-
         function renderVows() {
             thumbsVows.innerHTML = "";
+            activeThumb = null;
             fullLovestones.slice(lovestoneIndex, lovestoneIndex + 1).forEach(src => createThumb(src, thumbsVows, 'lovestone'));
             fullVows.slice(vowIndex, vowIndex + 3).forEach(src => createThumb(src, thumbsVows, 'vow'));
         }
-
         function createThumb(src, container, key) {
             const wrapper = document.createElement("div");
             wrapper.className = "thumb-wrapper";
@@ -249,12 +254,13 @@
             } else {
                 thumb.onclick = () => {
                     handleFileFromGallery(src, key);
-                    setActiveThumb(thumb);
+                    if (key === 'bg') {
+                        setActiveThumb(thumb);
+                    }
                 };
             }
             wrapper.appendChild(thumb);
             container.appendChild(wrapper);
-            return thumb;
         }
         function prevSlide(){ startIndex=(startIndex-3+fullImages.length)%fullImages.length; renderThumbnails(); }
         function nextSlide(){ startIndex=(startIndex+3)%fullImages.length; renderThumbnails(); }
@@ -307,6 +313,8 @@
                 }
                 previewBtn.style.display = 'inline-block';
                 downloadBtn.style.display = 'none';
+
+                updateDisabledThumbs(src); // <-- Added this line
             };
             img.src = src;
         }
