@@ -212,9 +212,9 @@ let activeThumb = null;
 // Функція для встановлення активної мініатюри
 function setActiveThumb(thumbElement) {
     if (activeThumb) {
-        activeThumb.classList.remove('active');
+        activeThumb.classList.remove('disabled');
     }
-    thumbElement.classList.add('active');
+    thumbElement.classList.add('disabled');
     activeThumb = thumbElement;
 }
 
