@@ -193,13 +193,14 @@
         const fullLovestones = lovestoneImages.map(name => url + name + ".png");
         let lovestoneIndex = 0;
         let activeThumb = null;
-        function setActiveThumb(thumbElement) {
-            if (activeThumb) {
-                activeThumb.classList.remove('active');
-            }
-            thumbElement.classList.add('active');
-            activeThumb = thumbElement;
-        }
+// Функція для встановлення активної мініатюри
+function setDisabledThumb(thumbElement) {
+    if (activeThumb) {
+        activeThumb.classList.remove('disabled');
+    }
+    thumbElement.classList.add('disabled');
+    activeThumb = thumbElement;
+}
         function renderThumbnails() {
             thumbs.innerHTML = "";
             activeThumb = null;
