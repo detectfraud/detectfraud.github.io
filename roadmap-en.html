@@ -117,6 +117,10 @@ button { padding: 8px 12px; cursor: pointer; border-radius: 8px; }
     .gallery-container.vows .labels .label1, .gallery-container.vows .labels .label2 { margin: 0; }
     .donate-btn { bottom: 10px; right: 10px; width: 50px; height: 50px; font-size: 24px; }
 }
+/* Приховання радіокнопок */
+.radio-buttons {
+    display: none;
+}
 </style>
 </head>
 <body>
@@ -136,6 +140,7 @@ button { padding: 8px 12px; cursor: pointer; border-radius: 8px; }
             <div class="thumbnails" id="thumbs"></div>
             <span class="arrow" onclick="nextSlide()">&#10095;</span>
         </div>
+        <div class="radio-buttons" id="radioThumbs"></div>
     </div>
     <div class="gallery-block photo-block">
         <b>Ваше фото</b><br /><br />
@@ -156,6 +161,7 @@ button { padding: 8px 12px; cursor: pointer; border-radius: 8px; }
             <div class="thumbnails" id="thumbsVows"></div>
             <span class="arow" onclick="nextVow()">&#10095;</span>
         </div>
+        <div class="radio-buttons" id="radioThumbsVows"></div>
     </div>
 </div>
 
@@ -177,6 +183,8 @@ const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 const thumbs = document.getElementById('thumbs');
 const thumbsVows = document.getElementById('thumbsVows');
+const radioThumbs = document.getElementById('radioThumbs');
+const radioThumbsVows = document.getElementById('radioThumbsVows');
 const loveLoader = document.getElementById('loveLoader');
 const scaleSlider = document.getElementById('scaleSlider');
 const undoBtn = document.getElementById('undoBtn');
@@ -209,40 +217,90 @@ let lovestoneIndex = 0;
 // Зберігає посилання на поточну активну мініатюру
 let activeThumb = null;
 
-// Функція для встановлення активної мініатюри
-function setActiveThumb(thumbElement) {
+// УНІВЕРСАЛЬНА ФУНКЦІЯ: для встановлення активної мініатюри та радіокнопки
+function updateActiveState(element, key) {
     if (activeThumb) {
-        activeThumb.classList.remove('disabled');
+        activeThumb.classList.remove('active');
+        // Повертаємо можливість кліку
+        if (key === 'bg' && activeThumb.src.includes('Fon.jpeg')) {
+             activeThumb.onclick = () => { bgLoader.click(); imagePreview.classList.remove('show'); };
+        } else {
+             activeThumb.onclick = () => { handleFileFromGallery(activeThumb.src, key); };
+        }
     }
-    thumbElement.classList.add('disabled');
-    activeThumb = thumbElement;
+
+    const newId = element.dataset.id;
+    const newActiveThumb = document.querySelector(`.thumb[data-id="${newId}"]`);
+    const newActiveRadio = document.querySelector(`.radio-buttons input[type="radio"][data-id="${newId}"][name="${key}-select"]`);
+    
+    if (newActiveThumb) {
+        newActiveThumb.classList.add('active');
+        activeThumb = newActiveThumb;
+        // Замість handleFileFromGallery викликаємо її тут
+        if (newActiveThumb.src.includes('Fon.jpeg')) {
+            newActiveThumb.onclick = () => { bgLoader.click(); imagePreview.classList.remove('show'); };
+        } else {
+            handleFileFromGallery(newActiveThumb.src, key);
+        }
+    }
+
+    if (newActiveRadio) {
+        newActiveRadio.checked = true;
+    }
 }
 
 // Функція рендерингу прев'ю для фонів
 function renderThumbnails() {
     thumbs.innerHTML = "";
-    activeThumb = null; // Очищуємо активний елемент при зміні слайду
-    fullImages.slice(startIndex, startIndex + 3).forEach(src => createThumb(src, thumbs, 'bg'));
+    radioThumbs.innerHTML = "";
+    
+    fullImages.slice(startIndex, startIndex + 3).forEach((src, index) => {
+        const id = startIndex + index;
+        createThumb(src, thumbs, 'bg', id);
+        createRadio(src, radioThumbs, 'bg', id, 'gallery-select');
+    });
+
+    // Встановлюємо активний стан для першого елемента при рендерингу
+    const firstThumb = thumbs.querySelector('.thumb');
+    if (firstThumb) {
+      updateActiveState(firstThumb, 'bg');
+    }
 }
 
 // Функція рендерингу прев'ю для клятв та надписів
 function renderVows() {
     thumbsVows.innerHTML = "";
-    activeThumb = null; // Очищуємо активний елемент при зміні слайду
+    radioThumbsVows.innerHTML = "";
+    
     // Рендеримо надпис окремо
-    fullLovestones.slice(lovestoneIndex, lovestoneIndex + 1).forEach(src => createThumb(src, thumbsVows, 'lovestone'));
+    fullLovestones.slice(lovestoneIndex, lovestoneIndex + 1).forEach((src, index) => {
+        const id = `lovestone-${lovestoneIndex + index}`;
+        createThumb(src, thumbsVows, 'lovestone', id);
+        createRadio(src, radioThumbsVows, 'lovestone', id, 'vow-select');
+    });
     // Рендеримо клятви
-    fullVows.slice(vowIndex, vowIndex + 3).forEach(src => createThumb(src, thumbsVows, 'vow'));
+    fullVows.slice(vowIndex, vowIndex + 3).forEach((src, index) => {
+        const id = `vow-${vowIndex + index}`;
+        createThumb(src, thumbsVows, 'vow', id);
+        createRadio(src, radioThumbsVows, 'vow', id, 'vow-select');
+    });
+
+    // Встановлюємо активний стан для першого елемента при рендерингу
+    const firstVowThumb = thumbsVows.querySelector('.thumb');
+    if (firstVowThumb) {
+      updateActiveState(firstVowThumb, 'vow');
+    }
 }
 
 // Функція створення прев'ю-картинки
-function createThumb(src, container, key) {
+function createThumb(src, container, key, id) {
     const wrapper = document.createElement("div");
     wrapper.className = "thumb-wrapper";
     const imgName = src.split("/").pop().split(".")[0];
     const thumb = document.createElement("img");
     thumb.className = "thumb";
     thumb.src = src;
+    thumb.dataset.id = id;
 
     // Додаємо затримку
     let timer;
@@ -265,15 +323,33 @@ function createThumb(src, container, key) {
         };
     } else {
         thumb.onclick = () => {
-            handleFileFromGallery(src, key);
-            if (key === 'bg') {
-                setActiveThumb(thumb);
-            }
+            updateActiveState(thumb, key);
         };
     }
 
     wrapper.appendChild(thumb);
     container.appendChild(wrapper);
+}
+
+// Функція створення радіокнопки
+function createRadio(src, container, key, id, name) {
+    const radio = document.createElement('input');
+    radio.type = 'radio';
+    radio.name = name;
+    radio.dataset.id = id;
+    const radioId = `radio-${id}`;
+    radio.id = radioId;
+    
+    radio.addEventListener('change', () => {
+      updateActiveState(radio, key);
+    });
+    
+    const label = document.createElement('label');
+    label.htmlFor = radioId;
+    label.textContent = src.split("/").pop().split(".")[0];
+
+    container.appendChild(radio);
+    container.appendChild(label);
 }
 
 // Функції прокрутки галерей
