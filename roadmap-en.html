@@ -254,8 +254,7 @@ function updateActiveState(element, key) {
 // Функція рендерингу прев'ю для фонів
 function renderThumbnails() {
     thumbs.innerHTML = "";
-    radioThumbs.querySelectorAll('input').forEach(radio => radio.remove());
-    radioThumbs.querySelectorAll('label').forEach(label => label.remove());
+    radioThumbs.innerHTML = "";
     
     // Створюємо порожню радіокнопку
     createRadio(null, radioThumbs, 'bg', 'none', 'gallery-select');
