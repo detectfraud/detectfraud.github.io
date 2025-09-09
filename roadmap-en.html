@@ -29,7 +29,6 @@
         .gallery-container { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; margin-top: 10px; }
         .gallery-block { display: flex; flex-direction: column; align-items: center; gap: 10px; }
         
-        /* Нові стилі галереї */
         .gallery-wrapper {
             display: flex;
             align-items: center;
@@ -39,16 +38,16 @@
             display: flex;
             gap: 10px;
             overflow: hidden;
-            width: 400px; /* Визначена ширина галереї */
+            width: 400px;
         }
         .gallery-content {
             display: flex;
             gap: 10px;
-            transition: transform 0.3s ease-in-out; /* Анімація прокрутки */
+            transition: transform 0.3s ease-in-out;
         }
         .gallery input[type="radio"] { display: none; }
         .gallery label {
-            flex-shrink: 0; /* Запобігає стисненню елементів */
+            flex-shrink: 0;
             display: block;
             cursor: pointer;
             border: 2px solid transparent;
@@ -207,7 +206,6 @@
     <input type="file" id="bgLoader" style="display:none">
     <input type="file" id="loveLoader" style="display:none">
     <script>
-        /* === Collage JS === */
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
         const bgGalleryContent = document.getElementById('bgGalleryContent');
@@ -218,7 +216,6 @@
         const previewBtn = document.getElementById('previewBtn');
         const downloadBtn = document.getElementById('downloadBtn');
         const bgLoader = document.getElementById('bgLoader');
-        const collage = document.getElementById('collage');
         const vowse = document.getElementById('vowse');
         const vowsi = document.getElementById('vowsi');
         const photoBlock = document.querySelector('.photo-block');
@@ -235,14 +232,15 @@
         const fullVowsImages = vowsImages.map(name => url + name + ".png");
         const lovestoneImages = ["LoveStones"];
         const fullLovestones = lovestoneImages.map(name => url + name + ".png");
+        const combinedVows = [...fullLovestones, ...fullVowsImages];
 
         let bgStartIndex = 0;
         let vowsStartIndex = 0;
         const visibleCount = 3;
-        const thumbnailWidth = 120 + 10; // width + gap
+        const thumbnailWidth = 130; // 120px width + 10px gap
 
-        // Функція для створення мініатюр галереї
         function createGallery(galleryElement, images, key) {
+            galleryElement.innerHTML = '';
             images.forEach((src, index) => {
                 const imgName = src.split("/").pop().split(".")[0];
                 const input = document.createElement("input");
@@ -254,13 +252,10 @@
                 label.setAttribute("for", input.id);
                 label.classList.add("thumb-label");
                 
-                const img = document.createElement("img");
+                const img = new Image();
                 img.src = src;
                 img.alt = imgName;
-
                 label.appendChild(img);
-                galleryElement.appendChild(input);
-                galleryElement.appendChild(label);
                 
                 if (imgName === "Fon") {
                     label.title = "Завантажити свій фон";
@@ -288,11 +283,12 @@
                     clearTimeout(hoverTimeout);
                     imagePreview.classList.remove('show');
                 });
+                galleryElement.appendChild(input);
+                galleryElement.appendChild(label);
             });
         }
         
-        // Функція для оновлення видимості мініатюр
-        function updateGallery(galleryElement, startIndex, totalImages, navElement, prevBtn, nextBtn) {
+        function updateGallery(galleryElement, startIndex, totalImages, prevBtn, nextBtn) {
             const offset = -startIndex * thumbnailWidth;
             galleryElement.style.transform = `translateX(${offset}px)`;
             
@@ -300,29 +296,28 @@
             nextBtn.disabled = (startIndex >= totalImages - visibleCount);
         }
 
-        // Обробники кліків для навігації
         prevBgBtn.addEventListener("click", () => {
             if (bgStartIndex > 0) {
                 bgStartIndex--;
-                updateGallery(bgGalleryContent, bgStartIndex, fullBgImages.length, bgGalleryContent, prevBgBtn, nextBgBtn);
+                updateGallery(bgGalleryContent, bgStartIndex, fullBgImages.length, prevBgBtn, nextBgBtn);
             }
         });
         nextBgBtn.addEventListener("click", () => {
             if (bgStartIndex < fullBgImages.length - visibleCount) {
                 bgStartIndex++;
-                updateGallery(bgGalleryContent, bgStartIndex, fullBgImages.length, bgGalleryContent, prevBgBtn, nextBgBtn);
+                updateGallery(bgGalleryContent, bgStartIndex, fullBgImages.length, prevBgBtn, nextBgBtn);
             }
         });
         prevVowBtn.addEventListener("click", () => {
             if (vowsStartIndex > 0) {
                 vowsStartIndex--;
-                updateGallery(vowsGalleryContent, vowsStartIndex, [...fullLovestones, ...fullVowsImages].length, vowsGalleryContent, prevVowBtn, nextVowBtn);
+                updateGallery(vowsGalleryContent, vowsStartIndex, combinedVows.length, prevVowBtn, nextVowBtn);
             }
         });
         nextVowBtn.addEventListener("click", () => {
-            if (vowsStartIndex < [...fullLovestones, ...fullVowsImages].length - visibleCount) {
+            if (vowsStartIndex < combinedVows.length - visibleCount) {
                 vowsStartIndex++;
-                updateGallery(vowsGalleryContent, vowsStartIndex, [...fullLovestones, ...fullVowsImages].length, vowsGalleryContent, prevVowBtn, nextVowBtn);
+                updateGallery(vowsGalleryContent, vowsStartIndex, combinedVows.length, prevVowBtn, nextVowBtn);
             }
         });
 
@@ -592,9 +587,9 @@
         document.ondragstart = disableContextMenu;
         template.onload = () => { drawAll(); };
         createGallery(bgGalleryContent, fullBgImages, 'bg');
-        createGallery(vowsGalleryContent, [...fullLovestones, ...fullVowsImages], 'vow');
-        updateGallery(bgGalleryContent, 0, fullBgImages.length, bgGalleryContent, prevBgBtn, nextBgBtn);
-        updateGallery(vowsGalleryContent, 0, [...fullLovestones, ...fullVowsImages].length, vowsGalleryContent, prevVowBtn, nextVowBtn);
+        createGallery(vowsGalleryContent, combinedVows, 'vow');
+        updateGallery(bgGalleryContent, 0, fullBgImages.length, prevBgBtn, nextBgBtn);
+        updateGallery(vowsGalleryContent, 0, combinedVows.length, prevVowBtn, nextVowBtn);
         applySnapshot(history[0] || makeSnapshot());
     </script>
 </body>
