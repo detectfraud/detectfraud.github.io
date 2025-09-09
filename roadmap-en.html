@@ -25,19 +25,55 @@
         }
         #scaleSlider { width: 420px; }
         button { padding: 8px 12px; cursor: pointer; border-radius: 8px; }
-        .disabled {cursor: not-allowed;pointer-events: none; opacity: .5; filter: grayscale(100%); }
-        .gallery-container { display: flex; align-items: flex-start; justify-content: center; gap: 10px; margin-top: 10px; }
+        .disabled {/*cursor: not-allowed; */ pointer-events: none;opacity: .5; filter: grayscale(100%); }
+        .gallery-container { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; margin-top: 10px; }
         .gallery-block { display: flex; flex-direction: column; align-items: center; gap: 10px; }
-        .gallery-block > div { display: flex; align-items: center; justify-content: center;}
-        .arrow, .arow { font-size: 20px; cursor: pointer; user-select: none; padding: 3px; line-height: 1; display: flex; align-items: center; justify-content: center; }
-        .arrow:first-child { margin-right: -130px; }
-        .arrow:last-child { margin-left: -130px; }
-        .arow:first-child { margin-right: -60px; }
-        .arow:last-child { margin-left: -60px; }
-        .thumbnails { display: flex; gap: 10px; overflow: hidden; width: 630px; justify-content: center; }
-        .thumb-wrapper { position: relative; }
-        .thumb { width: 108px; height: 72px; object-fit: cover; cursor: pointer; box-shadow: 0 0 6px rgba(0,0,0,0.3); transition: all 0.3s ease; z-index: 1; border-radius: 10px; }
-        .thumb.active { border: 3px solid red; box-shadow: 0 0 10px red; }
+        .gallery-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .gallery {
+            display: flex;
+            gap: 10px;
+            overflow: hidden;
+            width: 400px;
+        }
+        .gallery input[type="radio"] { display: none; }
+        .gallery label {
+            display: block;
+            cursor: pointer;
+            border: 2px solid transparent;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: border 0.3s;
+        }
+        .gallery label img {
+            width: 120px;
+            height: 80px;
+            object-fit: cover;
+            display: block;
+        }
+        .gallery input[type="radio"]:checked + label {
+            border: 2px solid #007bff;
+        }
+        .gallery label.disabled {
+            cursor: not-allowed;
+            opacity: .5;
+            filter: grayscale(100%);
+        }
+        .nav {
+            background: #fff;
+            border: 1px solid #ccc;
+            padding: 5px 10px;
+            font-size: 20px;
+            cursor: pointer;
+            border-radius: 6px;
+        }
+        .nav:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
         .collage {
             position: relative;
             display: inline-block;
@@ -46,12 +82,11 @@
         .gallery-container.vows .labels { display: grid; grid-template-columns: repeat(4, 1fr); text-align: center; margin-bottom: 5px; }
         .gallery-container.vows .labels .label1 { grid-column: 1; font-weight: bold; margin-left: 70px; }
         .gallery-container.vows .labels .label2 { grid-column: 3; font-weight: bold; }
-        .arrow, .arow { position: relative; z-index: 3; }
         .button-row { display: flex; justify-content: center; align-items: center; gap: 10px; }
         #fot { display: inline-block; cursor: pointer; border-radius: 8px; width: 108px; height: 72px; background-image: url(https://detectfraud.github.io/gallery/Para.png); background-repeat: no-repeat; background-size: contain; }
         #fot:hover { mix-blend-mode: luminosity; }
         #fot:active { mix-blend-mode: exclusion; }
-        .imagbox {
+        #imagePreview {
             position: absolute;
             top: 50%;
             left: 50%;
@@ -65,13 +100,12 @@
             box-shadow: 0 0 25px rgba(0,0,0,0.7);
             pointer-events: none;
             background: #fff;
+            object-fit: cover;
         }
-        .imagbox.show {
+        #imagePreview.show {
             opacity: 1;
             transform: translate(-50%,-50%) scale(0.6);
         }
-        .photo-block { margin-left: 100px; }
-        #updateBtn { margin-left: 300px; font-weight: bold; color: red; }
         .donate-btn {
             position: fixed;
             bottom: 20px;
@@ -101,42 +135,28 @@
             canvas { width: 95%; height: auto; }
             #scaleSlider { width: 95%; }
             .gallery-container { flex-direction: column; align-items: center; }
-            .thumbnails { width: 100%; justify-content: center; }
-            .arrow:first-child, .arrow:last-child { margin: 0 10px; }
-            .arow:first-child, .arow:last-child { margin: 0 10px; }
-            .photo-block { margin-left: 0; }
-            #updateBtn { margin-left: 0; margin-top: 10px; }
-            .gallery-container.vows .labels { grid-template-columns: 1fr 1fr; }
-            .gallery-container.vows .labels .label1, .gallery-container.vows .labels .label2 { margin: 0; }
+            .gallery { width: 100%; justify-content: center; }
             .donate-btn { bottom: 10px; right: 10px; width: 50px; height: 50px; font-size: 24px; }
         }
-        .radio-buttons { display: none; }
-        #vowse .thumbnails .thumb { width: 108px; height: 72px; }
     </style>
 </head>
 <body>
     <fieldset class="venwin" style="height:auto;">
         <div class="collage" id="collage">
             <canvas id="canvas" width="900" height="600" style="cursor: pointer;border:1px solid #ccc;"></canvas>
-            <img id="imagePreview" class="imagbox" src="" alt="Image Preview">
+            <img id="imagePreview" src="" alt="Image Preview">
         </div>
         <br>
         <b style="text-align: center;">Розмір</b>
         <br>
         <input type="range" id="scaleSlider" min="0.1" max="3" step="0.01" value="1" style="cursor: pointer;">
-        <div class="radio-buttons" style="display: none;">
-            <label>
-                <input type="radio" name="gallery-radio" value="none" checked>
-                <span></span>
-            </label>
-        </div>
         <div class="gallery-container">
             <div class="gallery-block" id="vowsi">
                 <b>Фон</b><br /><br />
-                <div>
-                    <span class="arrow" onclick="prevSlide()">&#10094;</span>
-                    <div class="thumbnails" id="thumbs"></div>
-                    <span class="arrow" onclick="nextSlide()">&#10095;</span>
+                <div class="gallery-wrapper">
+                    <button class="nav prev" id="prevBg">⟨</button>
+                    <div class="gallery" id="bgGallery"></div>
+                    <button class="nav next" id="nextBg">⟩</button>
                 </div>
             </div>
             <div class="gallery-block photo-block">
@@ -152,10 +172,10 @@
                     <span class="label1">Надпис</span>
                     <span class="label2">Клятва закоханих</span>
                 </div>
-                <div class="gallery-row">
-                    <span class="arow" onclick="prevVow()">&#10094;</span>
-                    <div class="thumbnails" id="thumbsVows"></div>
-                    <span class="arow" onclick="nextVow()">&#10095;</span>
+                <div class="gallery-wrapper">
+                    <button class="nav prev" id="prevVow">⟨</button>
+                    <div class="gallery" id="vowsGallery"></div>
+                    <button class="nav next" id="nextVow">⟩</button>
                 </div>
             </div>
         </div>
@@ -174,8 +194,8 @@
         /* === Collage JS === */
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
-        const thumbs = document.getElementById('thumbs');
-        const thumbsVows = document.getElementById('thumbsVows');
+        const bgGallery = document.getElementById('bgGallery');
+        const vowsGallery = document.getElementById('vowsGallery');
         const loveLoader = document.getElementById('loveLoader');
         const scaleSlider = document.getElementById('scaleSlider');
         const undoBtn = document.getElementById('undoBtn');
@@ -186,154 +206,117 @@
         const vowse = document.getElementById('vowse');
         const vowsi = document.getElementById('vowsi');
         const photoBlock = document.querySelector('.photo-block');
-        const loveStoneName = "LoveStones";
-        const DONATE_URL = "https://example.com/donate";
         const imagePreview = document.getElementById('imagePreview');
-        const radioButtonsContainer = document.querySelector('.radio-buttons');
+        const prevBgBtn = document.getElementById('prevBg');
+        const nextBgBtn = document.getElementById('nextBg');
+        const prevVowBtn = document.getElementById('prevVow');
+        const nextVowBtn = document.getElementById('nextVow');
 
         const url = "https://detectfraud.github.io/gallery/";
-        const images = [ "nature(1)","nature(2)","nature(3)","nature(4)","nature(5)", "nature(6)","nature(7)","nature(8)","nature(9)","Fon" ];
-        const fullImages = images.map(name => url + name + ".jpeg");
-        let startIndex = 0;
-        const vows = ["Eternity","Fidelity","Joy","Love","Strength","Tenderness","Trust","Unity","Heart","Hearts"];
-        const fullVows = vows.map(name => url + name + ".png");
-        let vowIndex = 0;
+        const bgImages = ["nature(1)", "nature(2)", "nature(3)", "nature(4)", "nature(5)", "nature(6)", "nature(7)", "nature(8)", "nature(9)", "Fon"];
+        const fullBgImages = bgImages.map(name => url + name + ".jpeg");
+        const vowsImages = ["Eternity", "Fidelity", "Joy", "Love", "Strength", "Tenderness", "Trust", "Unity", "Heart", "Hearts"];
+        const fullVowsImages = vowsImages.map(name => url + name + ".png");
         const lovestoneImages = ["LoveStones"];
         const fullLovestones = lovestoneImages.map(name => url + name + ".png");
-        let lovestoneIndex = 0;
-        let activeThumb = null;
 
-        function setActiveThumb(thumbElement) {
-            const allThumbs = document.querySelectorAll('.thumb');
-            allThumbs.forEach(thumb => {
-                thumb.classList.remove('active');
-                thumb.classList.remove('disabled');
-            });
-            const allRadioButtons = document.querySelectorAll('input[name="gallery-radio"]');
-            allRadioButtons.forEach(radio => radio.checked = false);
+        let bgStartIndex = 0;
+        let vowsStartIndex = 0;
+        let activeThumb = { bg: null, vow: null };
+        let hoverTimeout;
 
-            if (thumbElement) {
-                thumbElement.classList.add('active');
-                thumbElement.classList.add('disabled');
-                const radioId = thumbElement.dataset.radioId;
-                const radioInput = document.getElementById(radioId);
-                if (radioInput) {
-                    radioInput.checked = true;
+        function renderGallery(galleryElement, images, key) {
+            galleryElement.innerHTML = '';
+            const startIndex = key === 'bg' ? bgStartIndex : vowsStartIndex;
+            images.slice(startIndex, startIndex + 3).forEach((src, index) => {
+                const imgName = src.split("/").pop().split(".")[0];
+                const input = document.createElement("input");
+                input.type = "radio";
+                input.name = `${key}Thumb`;
+                input.id = `${key}Thumb${startIndex + index}`;
+                
+                const label = document.createElement("label");
+                label.setAttribute("for", input.id);
+                label.classList.add("thumb-label");
+                
+                const img = document.createElement("img");
+                img.src = src;
+                img.alt = imgName;
+
+                label.appendChild(img);
+                galleryElement.appendChild(input);
+                galleryElement.appendChild(label);
+                
+                if (imgName === "Fon") {
+                    label.title = "Завантажити свій фон";
                 }
-            } else {
-                document.querySelector('input[value="none"]').checked = true;
-            }
-            activeThumb = thumbElement;
-        }
 
-        function renderThumbnails() {
-            thumbs.innerHTML = "";
-            fullImages.slice(startIndex, startIndex + 3).forEach((src, index) => {
-                const radioId = `bg-radio-${startIndex + index}`;
-                createRadioButton(src, radioId, 'bg');
-                createThumb(src, thumbs, 'bg', radioId);
-            });
-            // Позначаємо активним порожній радіоелемент, якщо нічого не вибрано
-            if (!activeThumb) {
-                document.querySelector('input[value="none"]').checked = true;
-            }
-        }
-
-        function renderVows() {
-            thumbsVows.innerHTML = "";
-            let counter = 0;
-            fullLovestones.slice(lovestoneIndex, lovestoneIndex + 1).forEach((src) => {
-                const radioId = `lovestone-radio-${counter++}`;
-                createRadioButton(src, radioId, 'lovestone');
-                createThumb(src, thumbsVows, 'lovestone', radioId);
-            });
-            fullVows.slice(vowIndex, vowIndex + 3).forEach((src) => {
-                const radioId = `vow-radio-${counter++}`;
-                createRadioButton(src, radioId, 'vow');
-                createThumb(src, thumbsVows, 'vow', radioId);
-            });
-            // Позначаємо активним порожній радіоелемент, якщо нічого не вибрано
-            if (!activeThumb) {
-                document.querySelector('input[value="none"]').checked = true;
-            }
-        }
-
-        function createRadioButton(src, id, key) {
-            const label = document.createElement("label");
-            const input = document.createElement("input");
-            input.type = "radio";
-            input.name = "gallery-radio";
-            input.value = src;
-            input.id = id;
-            input.dataset.key = key;
-
-            input.addEventListener('change', () => {
-                if (input.checked) {
-                    if (input.value === 'none') {
-                        layers.bg.img = null;
-                        layers.love.img = null;
-                        layers.vow.img = null;
-                        layers.lovestone.img = null;
-                        activeLayer = null;
-                        setActiveThumb(null);
-                        toggleButtons();
-                        drawAll();
-                    } else {
-                        handleFileFromGallery(src, key, id);
-                    }
-                }
-            });
-
-            label.appendChild(input);
-            radioButtonsContainer.appendChild(label);
-        }
-
-        function createThumb(src, container, key, radioId) {
-            const wrapper = document.createElement("div");
-            wrapper.className = "thumb-wrapper";
-            const imgName = src.split("/").pop().split(".")[0];
-            const thumb = document.createElement("img");
-            thumb.className = "thumb";
-            thumb.src = src;
-            thumb.dataset.radioId = radioId;
-
-            let timer;
-            wrapper.addEventListener('mouseenter', () => {
-                timer = setTimeout(() => {
-                    imagePreview.src = src;
-                    imagePreview.classList.add('show');
-                }, 700);
-            });
-            wrapper.addEventListener('mouseleave', () => {
-                clearTimeout(timer);
-                imagePreview.classList.remove('show');
-            });
-
-            if (imgName === "Fon") {
-                thumb.title = "Завантажити свій фон";
-                thumb.onclick = () => {
-                    bgLoader.click();
-                    imagePreview.classList.remove('show');
-                    document.getElementById(radioId).checked = true;
-                    setActiveThumb(thumb);
-                };
-            } else {
-                thumb.onclick = () => {
-                    document.getElementById(radioId).checked = true;
-                    setActiveThumb(thumb);
+                input.addEventListener("change", () => {
                     handleFileFromGallery(src, key);
-                };
-            }
-            wrapper.appendChild(thumb);
-            container.appendChild(wrapper);
+                    if (activeThumb[key]) {
+                        activeThumb[key].classList.remove("disabled");
+                    }
+                    label.classList.add("disabled");
+                    activeThumb[key] = label;
+                });
+
+                label.addEventListener('mouseenter', () => {
+                    clearTimeout(hoverTimeout);
+                    hoverTimeout = setTimeout(() => {
+                        imagePreview.src = src;
+                        imagePreview.classList.add('show');
+                    }, 700);
+                });
+
+                label.addEventListener('mouseleave', () => {
+                    clearTimeout(hoverTimeout);
+                    imagePreview.classList.remove('show');
+                });
+            });
+            updateNavButtons(key);
         }
 
-        function handleFileFromGallery(src, key, radioId) {
+        function updateNavButtons(key) {
+            const startIndex = key === 'bg' ? bgStartIndex : vowsStartIndex;
+            const totalImages = key === 'bg' ? fullBgImages.length : fullVowsImages.length;
+            const prevBtn = key === 'bg' ? prevBgBtn : prevVowBtn;
+            const nextBtn = key === 'bg' ? nextBgBtn : nextVowBtn;
+            
+            prevBtn.disabled = (startIndex === 0);
+            nextBtn.disabled = (startIndex >= totalImages - 3);
+        }
+
+        prevBgBtn.addEventListener("click", () => {
+            if (bgStartIndex > 0) {
+                bgStartIndex--;
+                renderGallery(bgGallery, fullBgImages, 'bg');
+            }
+        });
+        nextBgBtn.addEventListener("click", () => {
+            if (bgStartIndex < fullBgImages.length - 3) {
+                bgStartIndex++;
+                renderGallery(bgGallery, fullBgImages, 'bg');
+            }
+        });
+        prevVowBtn.addEventListener("click", () => {
+            if (vowsStartIndex > 0) {
+                vowsStartIndex--;
+                renderGallery(vowsGallery, fullVowsImages, 'vow');
+            }
+        });
+        nextVowBtn.addEventListener("click", () => {
+            if (vowsStartIndex < fullVowsImages.length - 3) {
+                vowsStartIndex++;
+                renderGallery(vowsGallery, fullVowsImages, 'vow');
+            }
+        });
+
+        function handleFileFromGallery(src, key) {
             if (previewMode) {
                 previewMode = false;
                 canvas.classList.remove('preview-zoom-in');
             }
-            if (key === 'vow' || key === 'lovestone') {
+            if (key === 'vow') {
                 vowse.style.display = 'inline-block';
                 vowsi.style.display = 'none';
             } else if (key === 'bg') {
@@ -370,7 +353,7 @@
                 if (key === 'bg') {
                     document.getElementById('fot').classList.remove('disabled');
                 }
-                if (key === 'love' || key === 'lovestone') {
+                if (layers.love.img || layers.lovestone.img) {
                     document.getElementById('previewBtn').classList.remove('disabled');
                 }
                 previewBtn.style.display = 'inline-block';
@@ -379,15 +362,15 @@
             img.src = src;
         }
 
-        function handleFileLoad(file, key) {
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = e => {
-                const data = e.target.result;
-                const img = new Image();
-                img.onload = () => {
-                    layers[key].img = img;
-                    layers[key].src = data;
+        function handleFileLoad(file,key){
+            if(!file) return;
+            const reader=new FileReader();
+            reader.onload=e=>{
+                const data=e.target.result;
+                const img=new Image();
+                img.onload=()=>{
+                    layers[key].img=img;
+                    layers[key].src=data;
                     layers[key].x = canvas.width / 2;
                     layers[key].y = canvas.height / 2;
                     layers[key].scale = 1;
@@ -406,32 +389,28 @@
                         document.getElementById('previewBtn').classList.remove('disabled');
                     }
                 };
-                img.src = data;
+                img.src=data;
             };
             reader.readAsDataURL(file);
         }
-
-        bgLoader.addEventListener('change', e => handleFileLoad(e.target.files[0], 'bg'));
-        loveLoader.addEventListener('change', e => handleFileLoad(e.target.files[0], 'love'));
-        document.getElementById("fot").onclick = () => loveLoader.click();
-        const template = new Image(); template.src = 'images/composit.png';
-        const HOLE_OFFSET_X = 6, HOLE_OFFSET_Y = -115, HOLE_RADIUS = 98;
-        let mask = { cx: canvas.width / 2 + HOLE_OFFSET_X, cy: canvas.height / 2 + HOLE_OFFSET_Y, r: HOLE_RADIUS };
-        let layers = {
-            bg: { img: null, src: null, x: canvas.width / 2, y: canvas.height / 2, scale: 1 },
-            love: { img: null, src: null, x: canvas.width / 2, y: canvas.height / 2, scale: 1 },
-            vow: { img: null, src: null, x: canvas.width / 2, y: canvas.height / 2, scale: 1 },
-            lovestone: { img: null, src: null, x: canvas.width / 2, y: canvas.height / 2, scale: 1 }
+        bgLoader.addEventListener('change',e=>handleFileLoad(e.target.files[0],'bg'));
+        loveLoader.addEventListener('change',e=>handleFileLoad(e.target.files[0],'love'));
+        document.getElementById("fot").onclick=()=>loveLoader.click();
+        const template=new Image(); template.src='images/composit.png';
+        const HOLE_OFFSET_X=6, HOLE_OFFSET_Y=-115, HOLE_RADIUS=98;
+        let mask={cx:canvas.width/2+HOLE_OFFSET_X, cy:canvas.height/2+HOLE_OFFSET_Y, r:HOLE_RADIUS};
+        let layers={
+            bg:{img:null,src:null,x:canvas.width/2,y:canvas.height/2,scale:1},
+            love:{img:null,src:null,x:canvas.width/2,y:canvas.height/2,scale:1},
+            vow:{img:null,src:null,x:canvas.width/2,y:canvas.height/2,scale:1},
+            lovestone:{img:null,src:null,x:canvas.width/2,y:canvas.height/2,scale:1}
         };
-        let activeLayer = null, previewMode = false, bgHoleActive = true;
-        const history = []; const MAX_HISTORY = 20;
-
-        function makeSnapshot() { return { bg: { ...layers.bg }, love: { ...layers.love }, loveScale: scaleSlider.value, vow: { ...layers.vow }, lovestone: { ...layers.lovestone }, previewMode, activeLayer, bgHoleActive }; }
-
-        function pushHistory() { history.push(makeSnapshot()); if (history.length > MAX_HISTORY) history.shift(); }
-
-        function applySnapshot(s) {
-            previewMode = !!s.previewMode; activeLayer = s.activeLayer || null; bgHoleActive = !!s.bgHoleActive;
+        let activeLayer=null, previewMode=false, bgHoleActive=true;
+        const history=[]; const MAX_HISTORY=20;
+        function makeSnapshot(){ return { bg:{...layers.bg}, love:{...layers.love}, loveScale: scaleSlider.value, vow:{...layers.vow}, lovestone:{...layers.lovestone}, previewMode, activeLayer, bgHoleActive }; }
+        function pushHistory(){ history.push(makeSnapshot()); if(history.length>MAX_HISTORY) history.shift(); }
+        function applySnapshot(s){
+            previewMode=!!s.previewMode; activeLayer=s.activeLayer||null; bgHoleActive=!!s.bgHoleActive;
             if (s.bg.img) {
                 document.getElementById('fot').classList.remove('disabled');
             } else {
@@ -442,51 +421,48 @@
             } else {
                 document.getElementById('previewBtn').classList.add('disabled');
             }
-            ['bg', 'love', 'vow', 'lovestone'].forEach(key => {
-                const v = s[key];
-                if (v && v.src) {
-                    const img = new Image();
-                    img.onload = () => { layers[key].img = img; layers[key].src = v.src; layers[key].x = v.x; layers[key].y = v.y; layers[key].scale = v.scale; drawAll(); };
-                    img.src = v.src;
+            ['bg','love','vow','lovestone'].forEach(key=>{
+                const v=s[key];
+                if(v && v.src){
+                    const img=new Image();
+                    img.onload=()=>{ layers[key].img=img; layers[key].src=v.src; layers[key].x=v.x; layers[key].y=v.y; layers[key].scale=v.scale; drawAll(); };
+                    img.src=v.src;
                 } else {
-                    layers[key].img = null; layers[key].src = null;
-                    layers[key].x = v ? v.x : canvas.width / 2;
-                    layers[key].y = v ? v.y : canvas.height / 2;
-                    layers[key].scale = v ? v.scale : 1;
+                    layers[key].img=null; layers[key].src=null;
+                    layers[key].x=v? v.x: canvas.width/2;
+                    layers[key].y=v? v.y: canvas.height/2;
+                    layers[key].scale=v? v.scale:1;
                 }
             });
             toggleButtons();
         }
-
-        function drawLayerTo(ctxTarget, layer) {
-            if (!layer || !layer.img) return;
+        function drawLayerTo(ctxTarget, layer){
+            if(!layer||!layer.img) return;
             const w = layer.img.width * layer.scale;
             const h = layer.img.height * layer.scale;
             const x = layer.x;
             const y = layer.y;
-            ctxTarget.drawImage(layer.img, x - w / 2, y - h / 2, w, h);
+            ctxTarget.drawImage(layer.img, x - w/2, y - h/2, w, h);
         }
-
-        function drawLove(ctxTarget, clip = false) {
-            const L = layers.love;
-            if (!L || !L.img) return;
+        function drawLove(ctxTarget, clip=false){
+            const L=layers.love;
+            if(!L||!L.img) return;
             const w = L.img.width * L.scale;
             const h = L.img.height * L.scale;
             const x = L.x;
             const y = L.y;
             ctxTarget.save();
-            if (clip && mask.r > 0) {
+            if(clip && mask.r>0){
                 ctxTarget.beginPath();
                 ctxTarget.arc(mask.cx, mask.cy, mask.r, 0, Math.PI * 2);
                 ctxTarget.clip();
             }
-            ctxTarget.drawImage(L.img, x - w / 2, y - h / 2, w, h);
+            ctxTarget.drawImage(L.img, x - w/2, y - h/2, w, h);
             ctxTarget.restore();
         }
-
-        function drawBgWithHole(ctxTarget) {
-            if (!layers.bg.img) return;
-            if (!bgHoleActive || mask.r <= 0) { drawLayerTo(ctxTarget, layers.bg); return; }
+        function drawBgWithHole(ctxTarget){
+            if(!layers.bg.img) return;
+            if(!bgHoleActive||mask.r<=0){ drawLayerTo(ctxTarget,layers.bg); return; }
             const off = document.createElement('canvas');
             off.width = canvas.width;
             off.height = canvas.height;
@@ -499,20 +475,18 @@
             octx.globalCompositeOperation = 'source-over';
             ctxTarget.drawImage(off, 0, 0);
         }
-
-        function drawAll() {
+        function drawAll(){
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             drawBgWithHole(ctx);
             drawLove(ctx, previewMode);
-            if (template.complete) {
+            if(template.complete) {
                 ctx.drawImage(template, 0, 0, canvas.width, canvas.height);
             }
             drawLayerTo(ctx, layers.vow);
             drawLayerTo(ctx, layers.lovestone);
         }
-
-        function toggleButtons() {
-            if (previewMode) {
+        function toggleButtons(){
+            if(previewMode){
                 previewBtn.style.display = 'none';
                 downloadBtn.style.display = 'inline-block';
                 vowsi.style.display = 'none';
@@ -529,68 +503,63 @@
                 canvas.classList.remove('preview-zoom-in');
             }
         }
-
-        scaleSlider.addEventListener('input', () => {
-            if (!activeLayer) return;
-            layers[activeLayer].scale = parseFloat(scaleSlider.value);
+        scaleSlider.addEventListener('input',()=>{
+            if(!activeLayer) return;
+            layers[activeLayer].scale=parseFloat(scaleSlider.value);
             drawAll();
         });
-        let dragging = false, dragStartX = 0, dragStartY = 0;
-        canvas.addEventListener('mousedown', e => {
-            if (previewMode || !activeLayer) return;
-            dragging = true;
-            dragStartX = e.offsetX - layers[activeLayer].x;
-            dragStartY = e.offsetY - layers[activeLayer].y;
+        let dragging=false, dragStartX=0, dragStartY=0;
+        canvas.addEventListener('mousedown',e=>{
+            if(previewMode || !activeLayer) return;
+            dragging=true;
+            dragStartX=e.offsetX-layers[activeLayer].x;
+            dragStartY=e.offsetY-layers[activeLayer].y;
         });
-        canvas.addEventListener('mousemove', e => {
-            if (!dragging || previewMode || !activeLayer) return;
-            layers[activeLayer].x = e.offsetX - dragStartX;
-            layers[activeLayer].y = e.offsetY - dragStartY;
+        canvas.addEventListener('mousemove',e=>{
+            if(!dragging || previewMode || !activeLayer) return;
+            layers[activeLayer].x=e.offsetX-dragStartX;
+            layers[activeLayer].y=e.offsetY-dragStartY;
             drawAll();
         });
-
-        function stopDrag() {
-            if (dragging) {
-                dragging = false;
-                pushHistory();
-            }
+        function stopDrag(){
+            if(dragging){ dragging=false; pushHistory(); }
         }
-        canvas.addEventListener('mouseup', stopDrag);
-        canvas.addEventListener('mouseleave', stopDrag);
-        canvas.addEventListener('touchstart', e => {
-            if (previewMode || !activeLayer) return;
-            const t = e.touches[0], rect = canvas.getBoundingClientRect();
-            dragging = true;
-            dragStartX = (t.clientX - rect.left) * (canvas.width / rect.width) - layers[activeLayer].x;
-            dragStartY = (t.clientY - rect.top) * (canvas.height / rect.height) - layers[activeLayer].y;
+        canvas.addEventListener('mouseup',stopDrag);
+        canvas.addEventListener('mouseleave',stopDrag);
+        canvas.addEventListener('touchstart',e=>{
+            if(previewMode || !activeLayer) return;
+            const t=e.touches[0],rect=canvas.getBoundingClientRect();
+            dragging=true;
+            dragStartX=(t.clientX-rect.left) * (canvas.width/rect.width) - layers[activeLayer].x;
+            dragStartY=(t.clientY-rect.top) * (canvas.height/rect.height) - layers[activeLayer].y;
             e.preventDefault();
         });
-        canvas.addEventListener('touchmove', e => {
-            if (!dragging || previewMode || !activeLayer) return;
-            const t = e.touches[0], rect = canvas.getBoundingClientRect();
-            layers[activeLayer].x = (t.clientX - rect.left) * (canvas.width / rect.width) - dragStartX;
-            layers[activeLayer].y = (t.clientY - rect.top) * (canvas.height / rect.height) - dragStartY;
+        canvas.addEventListener('touchmove',e=>{
+            if(!dragging || previewMode || !activeLayer) return;
+            const t=e.touches[0],rect=canvas.getBoundingClientRect();
+            layers[activeLayer].x=(t.clientX-rect.left) * (canvas.width/rect.width) - dragStartX;
+            layers[activeLayer].y=(t.clientY-rect.top) * (canvas.height/rect.height) - dragStartY;
             drawAll();
             e.preventDefault();
         });
-        canvas.addEventListener('touchend', stopDrag);
-        undoBtn.addEventListener('click', () => {
-            if (history.length <= 1) return;
+        canvas.addEventListener('touchend',stopDrag);
+        undoBtn.addEventListener('click',()=>{
+            if(history.length<=1) return;
             history.pop();
-            applySnapshot(history[history.length - 1]);
+            applySnapshot(history[history.length-1]);
         });
-        previewBtn.addEventListener('click', () => {
-            previewMode = true;
+        previewBtn.addEventListener('click',()=>{
+            previewMode=true;
             scaleSlider.disabled = true;
             scaleSlider.classList.add('disabled');
             pushHistory();
             toggleButtons();
             drawAll();
         });
-        downloadBtn.addEventListener('click', () => {
-            const link = document.createElement('a');
-            link.download = 'collage.jpg';
-            link.href = canvas.toDataURL('image/jpeg');
+        downloadBtn.addEventListener('click',()=>{
+            const link=document.createElement('a');
+            link.download='collage.jpg';
+            link.href=canvas.toDataURL('image/jpeg');
             link.click();
         });
         document.getElementById('updateBtn').addEventListener('click', function () {
@@ -600,30 +569,15 @@
                 window.location.href = url + '?_=' + new Date().getTime();
             }
         });
-
-        document.querySelector('input[value="none"]').addEventListener('change', () => {
-            if (document.querySelector('input[value="none"]').checked) {
-                layers.bg.img = null;
-                layers.love.img = null;
-                layers.vow.img = null;
-                layers.lovestone.img = null;
-                activeLayer = null;
-                setActiveThumb(null);
-                toggleButtons();
-                drawAll();
-            }
-        });
-        
         function disableContextMenu() {
             return false;
         }
         document.oncontextmenu = disableContextMenu;
         document.onselectstart = disableContextMenu;
         document.ondragstart = disableContextMenu;
-
         template.onload = () => { drawAll(); };
-        renderThumbnails();
-        renderVows();
+        renderGallery(bgGallery, fullBgImages, 'bg');
+        renderGallery(vowsGallery, [...fullLovestones, ...fullVowsImages], 'vow');
         applySnapshot(history[0] || makeSnapshot());
     </script>
 </body>
