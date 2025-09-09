@@ -25,9 +25,11 @@
         }
         #scaleSlider { width: 420px; }
         button { padding: 8px 12px; cursor: pointer; border-radius: 8px; }
-        .disabled {cursor: not-allowed;/* pointer-events: none;*/ opacity: .5; filter: grayscale(100%); }
+        .disabled { pointer-events: none; opacity: .5; filter: grayscale(100%); }
         .gallery-container { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; margin-top: 10px; }
         .gallery-block { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+        
+        /* Стилі з коду "Gallery" */
         .gallery-wrapper {
             display: flex;
             align-items: center;
@@ -74,6 +76,8 @@
             opacity: 0.3;
             cursor: not-allowed;
         }
+        /* Кінець стилів з "Gallery" */
+
         .collage {
             position: relative;
             display: inline-block;
@@ -86,7 +90,7 @@
         #fot { display: inline-block; cursor: pointer; border-radius: 8px; width: 108px; height: 72px; background-image: url(https://detectfraud.github.io/gallery/Para.png); background-repeat: no-repeat; background-size: contain; }
         #fot:hover { mix-blend-mode: luminosity; }
         #fot:active { mix-blend-mode: exclusion; }
-        #imagePreview {
+        .imagbox {
             position: absolute;
             top: 50%;
             left: 50%;
@@ -102,10 +106,12 @@
             background: #fff;
             object-fit: cover;
         }
-        #imagePreview.show {
+        .imagbox.show {
             opacity: 1;
             transform: translate(-50%,-50%) scale(0.6);
         }
+        .photo-block { margin-left: 100px; }
+        #updateBtn { margin-left: 300px; font-weight: bold; color: red; }
         .donate-btn {
             position: fixed;
             bottom: 20px;
@@ -135,7 +141,13 @@
             canvas { width: 95%; height: auto; }
             #scaleSlider { width: 95%; }
             .gallery-container { flex-direction: column; align-items: center; }
-            .gallery { width: 100%; justify-content: center; }
+            .thumbnails { width: 100%; justify-content: center; }
+            .arrow:first-child, .arrow:last-child { margin: 0 10px; }
+            .arow:first-child, .arow:last-child { margin: 0 10px; }
+            .photo-block { margin-left: 0; }
+            #updateBtn { margin-left: 0; margin-top: 10px; }
+            .gallery-container.vows .labels { grid-template-columns: 1fr 1fr; }
+            .gallery-container.vows .labels .label1, .gallery-container.vows .labels .label2 { margin: 0; }
             .donate-btn { bottom: 10px; right: 10px; width: 50px; height: 50px; font-size: 24px; }
         }
     </style>
@@ -144,7 +156,7 @@
     <fieldset class="venwin" style="height:auto;">
         <div class="collage" id="collage">
             <canvas id="canvas" width="900" height="600" style="cursor: pointer;border:1px solid #ccc;"></canvas>
-            <img id="imagePreview" src="" alt="Image Preview">
+            <img id="imagePreview" class="imagbox" src="" alt="Image Preview">
         </div>
         <br>
         <b style="text-align: center;">Розмір</b>
@@ -154,9 +166,9 @@
             <div class="gallery-block" id="vowsi">
                 <b>Фон</b><br /><br />
                 <div class="gallery-wrapper">
-                    <button class="nav prev" id="prevBg">⟨</button>
+                    <button class="nav prev" id="prevBgBtn">⟨</button>
                     <div class="gallery" id="bgGallery"></div>
-                    <button class="nav next" id="nextBg">⟩</button>
+                    <button class="nav next" id="nextBgBtn">⟩</button>
                 </div>
             </div>
             <div class="gallery-block photo-block">
@@ -173,9 +185,9 @@
                     <span class="label2">Клятва закоханих</span>
                 </div>
                 <div class="gallery-wrapper">
-                    <button class="nav prev" id="prevVow">⟨</button>
+                    <button class="nav prev" id="prevVowBtn">⟨</button>
                     <div class="gallery" id="vowsGallery"></div>
-                    <button class="nav next" id="nextVow">⟩</button>
+                    <button class="nav next" id="nextVowBtn">⟩</button>
                 </div>
             </div>
         </div>
@@ -207,10 +219,10 @@
         const vowsi = document.getElementById('vowsi');
         const photoBlock = document.querySelector('.photo-block');
         const imagePreview = document.getElementById('imagePreview');
-        const prevBgBtn = document.getElementById('prevBg');
-        const nextBgBtn = document.getElementById('nextBg');
-        const prevVowBtn = document.getElementById('prevVow');
-        const nextVowBtn = document.getElementById('nextVow');
+        const prevBgBtn = document.getElementById('prevBgBtn');
+        const nextBgBtn = document.getElementById('nextBgBtn');
+        const prevVowBtn = document.getElementById('prevVowBtn');
+        const nextVowBtn = document.getElementById('nextVowBtn');
 
         const url = "https://detectfraud.github.io/gallery/";
         const bgImages = ["nature(1)", "nature(2)", "nature(3)", "nature(4)", "nature(5)", "nature(6)", "nature(7)", "nature(8)", "nature(9)", "Fon"];
@@ -224,11 +236,13 @@
         let vowsStartIndex = 0;
         let activeThumb = { bg: null, vow: null };
         let hoverTimeout;
+        const visibleCount = 3;
 
+        // Функція для рендерингу галереї
         function renderGallery(galleryElement, images, key) {
             galleryElement.innerHTML = '';
             const startIndex = key === 'bg' ? bgStartIndex : vowsStartIndex;
-            images.slice(startIndex, startIndex + 3).forEach((src, index) => {
+            images.slice(startIndex, startIndex + visibleCount).forEach((src, index) => {
                 const imgName = src.split("/").pop().split(".")[0];
                 const input = document.createElement("input");
                 input.type = "radio";
@@ -249,9 +263,12 @@
                 
                 if (imgName === "Fon") {
                     label.title = "Завантажити свій фон";
+                    label.addEventListener("click", () => bgLoader.click());
                 }
 
+                // Вибір мініатюри
                 input.addEventListener("change", () => {
+                    if (imgName === "Fon") return;
                     handleFileFromGallery(src, key);
                     if (activeThumb[key]) {
                         activeThumb[key].classList.remove("disabled");
@@ -260,7 +277,9 @@
                     activeThumb[key] = label;
                 });
 
+                // Прев'ю при наведенні
                 label.addEventListener('mouseenter', () => {
+                    if (label.classList.contains("disabled")) return;
                     clearTimeout(hoverTimeout);
                     hoverTimeout = setTimeout(() => {
                         imagePreview.src = src;
@@ -276,16 +295,18 @@
             updateNavButtons(key);
         }
 
+        // Оновлення кнопок навігації
         function updateNavButtons(key) {
             const startIndex = key === 'bg' ? bgStartIndex : vowsStartIndex;
-            const totalImages = key === 'bg' ? fullBgImages.length : fullVowsImages.length;
+            const images = key === 'bg' ? fullBgImages : [...fullLovestones, ...fullVowsImages];
             const prevBtn = key === 'bg' ? prevBgBtn : prevVowBtn;
             const nextBtn = key === 'bg' ? nextBgBtn : nextVowBtn;
             
             prevBtn.disabled = (startIndex === 0);
-            nextBtn.disabled = (startIndex >= totalImages - 3);
+            nextBtn.disabled = (startIndex >= images.length - visibleCount);
         }
 
+        // Обробники кліків для навігації
         prevBgBtn.addEventListener("click", () => {
             if (bgStartIndex > 0) {
                 bgStartIndex--;
@@ -293,7 +314,7 @@
             }
         });
         nextBgBtn.addEventListener("click", () => {
-            if (bgStartIndex < fullBgImages.length - 3) {
+            if (bgStartIndex < fullBgImages.length - visibleCount) {
                 bgStartIndex++;
                 renderGallery(bgGallery, fullBgImages, 'bg');
             }
@@ -301,13 +322,13 @@
         prevVowBtn.addEventListener("click", () => {
             if (vowsStartIndex > 0) {
                 vowsStartIndex--;
-                renderGallery(vowsGallery, fullVowsImages, 'vow');
+                renderGallery(vowsGallery, [...fullLovestones, ...fullVowsImages], 'vow');
             }
         });
         nextVowBtn.addEventListener("click", () => {
-            if (vowsStartIndex < fullVowsImages.length - 3) {
+            if (vowsStartIndex < fullVowsImages.length - visibleCount) {
                 vowsStartIndex++;
-                renderGallery(vowsGallery, fullVowsImages, 'vow');
+                renderGallery(vowsGallery, [...fullLovestones, ...fullVowsImages], 'vow');
             }
         });
 
@@ -316,7 +337,7 @@
                 previewMode = false;
                 canvas.classList.remove('preview-zoom-in');
             }
-            if (key === 'vow') {
+            if (key === 'vow' || key === 'lovestone') {
                 vowse.style.display = 'inline-block';
                 vowsi.style.display = 'none';
             } else if (key === 'bg') {
