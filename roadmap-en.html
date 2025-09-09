@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <title>Камінь любові — редактор</title>
     <style>
-        body { font-family: sans-serif; text-align: center; background: url(images/unamed.jpg) repeat scroll top left; }
+        body { font-family: sans-serif; text-align: center; background: url(https://detectfraud.github.io/gallery/unamed.jpg) repeat scroll top left; }
         .venwin { border-radius: 10px; display: inline-block; background-color: rgba(255, 255, 255, 0.5); padding: 20px 20px; box-sizing: border-box;}
         canvas {
             border: 3px solid #bbb;
@@ -29,7 +29,7 @@
         .gallery-container { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; margin-top: 10px; }
         .gallery-block { display: flex; flex-direction: column; align-items: center; gap: 10px; }
         
-        /* Стилі з коду "Gallery" */
+        /* Нові стилі галереї */
         .gallery-wrapper {
             display: flex;
             align-items: center;
@@ -39,10 +39,16 @@
             display: flex;
             gap: 10px;
             overflow: hidden;
-            width: 400px;
+            width: 400px; /* Визначена ширина галереї */
+        }
+        .gallery-content {
+            display: flex;
+            gap: 10px;
+            transition: transform 0.3s ease-in-out; /* Анімація прокрутки */
         }
         .gallery input[type="radio"] { display: none; }
         .gallery label {
+            flex-shrink: 0; /* Запобігає стисненню елементів */
             display: block;
             cursor: pointer;
             border: 2px solid transparent;
@@ -59,11 +65,6 @@
         .gallery input[type="radio"]:checked + label {
             border: 2px solid #007bff;
         }
-        .gallery label.disabled {
-            cursor: not-allowed;
-            opacity: .5;
-            filter: grayscale(100%);
-        }
         .nav {
             background: #fff;
             border: 1px solid #ccc;
@@ -76,8 +77,7 @@
             opacity: 0.3;
             cursor: not-allowed;
         }
-        /* Кінець стилів з "Gallery" */
-
+        
         .collage {
             position: relative;
             display: inline-block;
@@ -167,7 +167,9 @@
                 <b>Фон</b><br /><br />
                 <div class="gallery-wrapper">
                     <button class="nav prev" id="prevBgBtn">⟨</button>
-                    <div class="gallery" id="bgGallery"></div>
+                    <div class="gallery">
+                        <div class="gallery-content" id="bgGalleryContent"></div>
+                    </div>
                     <button class="nav next" id="nextBgBtn">⟩</button>
                 </div>
             </div>
@@ -186,7 +188,9 @@
                 </div>
                 <div class="gallery-wrapper">
                     <button class="nav prev" id="prevVowBtn">⟨</button>
-                    <div class="gallery" id="vowsGallery"></div>
+                    <div class="gallery">
+                        <div class="gallery-content" id="vowsGalleryContent"></div>
+                    </div>
                     <button class="nav next" id="nextVowBtn">⟩</button>
                 </div>
             </div>
@@ -206,8 +210,8 @@
         /* === Collage JS === */
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
-        const bgGallery = document.getElementById('bgGallery');
-        const vowsGallery = document.getElementById('vowsGallery');
+        const bgGalleryContent = document.getElementById('bgGalleryContent');
+        const vowsGalleryContent = document.getElementById('vowsGalleryContent');
         const loveLoader = document.getElementById('loveLoader');
         const scaleSlider = document.getElementById('scaleSlider');
         const undoBtn = document.getElementById('undoBtn');
@@ -235,6 +239,7 @@
         let bgStartIndex = 0;
         let vowsStartIndex = 0;
         const visibleCount = 3;
+        const thumbnailWidth = 120 + 10; // width + gap
 
         // Функція для створення мініатюр галереї
         function createGallery(galleryElement, images, key) {
@@ -270,6 +275,7 @@
                     imagePreview.classList.remove('show');
                 });
 
+                let hoverTimeout;
                 label.addEventListener('mouseenter', () => {
                     clearTimeout(hoverTimeout);
                     hoverTimeout = setTimeout(() => {
@@ -286,54 +292,37 @@
         }
         
         // Функція для оновлення видимості мініатюр
-        function updateGallery(galleryElement, startIndex) {
-            const labels = galleryElement.querySelectorAll("label");
-            labels.forEach((label, i) => {
-                const pos = i - startIndex;
-                if (pos >= 0 && pos < visibleCount) {
-                    label.style.display = "block";
-                } else {
-                    label.style.display = "none";
-                }
-            });
-            updateNavButtons(galleryElement);
-        }
-
-        // Оновлення кнопок навігації
-        function updateNavButtons(galleryElement) {
-            const isBgGallery = galleryElement.id === 'bgGallery';
-            const images = isBgGallery ? fullBgImages : [...fullLovestones, ...fullVowsImages];
-            const startIndex = isBgGallery ? bgStartIndex : vowsStartIndex;
-            const prevBtn = isBgGallery ? prevBgBtn : prevVowBtn;
-            const nextBtn = isBgGallery ? nextBgBtn : nextVowBtn;
+        function updateGallery(galleryElement, startIndex, totalImages, navElement, prevBtn, nextBtn) {
+            const offset = -startIndex * thumbnailWidth;
+            galleryElement.style.transform = `translateX(${offset}px)`;
             
             prevBtn.disabled = (startIndex === 0);
-            nextBtn.disabled = (startIndex >= images.length - visibleCount);
+            nextBtn.disabled = (startIndex >= totalImages - visibleCount);
         }
 
         // Обробники кліків для навігації
         prevBgBtn.addEventListener("click", () => {
             if (bgStartIndex > 0) {
                 bgStartIndex--;
-                updateGallery(bgGallery, bgStartIndex);
+                updateGallery(bgGalleryContent, bgStartIndex, fullBgImages.length, bgGalleryContent, prevBgBtn, nextBgBtn);
             }
         });
         nextBgBtn.addEventListener("click", () => {
             if (bgStartIndex < fullBgImages.length - visibleCount) {
                 bgStartIndex++;
-                updateGallery(bgGallery, bgStartIndex);
+                updateGallery(bgGalleryContent, bgStartIndex, fullBgImages.length, bgGalleryContent, prevBgBtn, nextBgBtn);
             }
         });
         prevVowBtn.addEventListener("click", () => {
             if (vowsStartIndex > 0) {
                 vowsStartIndex--;
-                updateGallery(vowsGallery, vowsStartIndex);
+                updateGallery(vowsGalleryContent, vowsStartIndex, [...fullLovestones, ...fullVowsImages].length, vowsGalleryContent, prevVowBtn, nextVowBtn);
             }
         });
         nextVowBtn.addEventListener("click", () => {
             if (vowsStartIndex < [...fullLovestones, ...fullVowsImages].length - visibleCount) {
                 vowsStartIndex++;
-                updateGallery(vowsGallery, vowsStartIndex);
+                updateGallery(vowsGalleryContent, vowsStartIndex, [...fullLovestones, ...fullVowsImages].length, vowsGalleryContent, prevVowBtn, nextVowBtn);
             }
         });
 
@@ -343,11 +332,11 @@
                 canvas.classList.remove('preview-zoom-in');
             }
             if (key === 'vow' || key === 'lovestone') {
-                vowse.style.display = 'inline-block';
+                vowse.style.display = 'flex';
                 vowsi.style.display = 'none';
             } else if (key === 'bg') {
                 vowse.style.display = 'none';
-                vowsi.style.display = 'inline-block';
+                vowsi.style.display = 'flex';
             }
             imagePreview.classList.remove('show');
             const img = new Image();
@@ -357,8 +346,8 @@
                 layers[key].src = src;
                 if (key === 'vow') {
                     layers[key].scale = 0.5;
-                    layers[key].x = (img.width * layers[key].scale / 2) + 14.28;
-                    layers[key].y = canvas.height - (img.height * layers[key].scale / 2) - 14.28;
+                    layers[key].x = canvas.width / 2 + 14.28;
+                    layers[key].y = canvas.height - 14.28;
                 } else if (key === 'lovestone') {
                     layers[key].scale = 0.5;
                     layers[key].x = canvas.width / 2;
@@ -422,7 +411,7 @@
         bgLoader.addEventListener('change',e=>handleFileLoad(e.target.files[0],'bg'));
         loveLoader.addEventListener('change',e=>handleFileLoad(e.target.files[0],'love'));
         document.getElementById("fot").onclick=()=>loveLoader.click();
-        const template=new Image(); template.src='images/composit.png';
+        const template=new Image(); template.src='https://detectfraud.github.io/gallery/composit.png';
         const HOLE_OFFSET_X=6, HOLE_OFFSET_Y=-115, HOLE_RADIUS=98;
         let mask={cx:canvas.width/2+HOLE_OFFSET_X, cy:canvas.height/2+HOLE_OFFSET_Y, r:HOLE_RADIUS};
         let layers={
@@ -517,14 +506,14 @@
                 downloadBtn.style.display = 'inline-block';
                 vowsi.style.display = 'none';
                 photoBlock.style.display = 'none';
-                vowse.style.display = 'inline-block';
+                vowse.style.display = 'flex';
                 canvas.classList.add('preview-zoom-in');
                 activeLayer = null;
             } else {
                 previewBtn.style.display = 'inline-block';
                 downloadBtn.style.display = 'none';
-                vowsi.style.display = 'inline-block';
-                photoBlock.style.display = 'inline-block';
+                vowsi.style.display = 'flex';
+                photoBlock.style.display = 'flex';
                 vowse.style.display = 'none';
                 canvas.classList.remove('preview-zoom-in');
             }
@@ -602,10 +591,10 @@
         document.onselectstart = disableContextMenu;
         document.ondragstart = disableContextMenu;
         template.onload = () => { drawAll(); };
-        createGallery(bgGallery, fullBgImages, 'bg');
-        createGallery(vowsGallery, [...fullLovestones, ...fullVowsImages], 'vow');
-        updateGallery(bgGallery, 0);
-        updateGallery(vowsGallery, 0);
+        createGallery(bgGalleryContent, fullBgImages, 'bg');
+        createGallery(vowsGalleryContent, [...fullLovestones, ...fullVowsImages], 'vow');
+        updateGallery(bgGalleryContent, 0, fullBgImages.length, bgGalleryContent, prevBgBtn, nextBgBtn);
+        updateGallery(vowsGalleryContent, 0, [...fullLovestones, ...fullVowsImages].length, vowsGalleryContent, prevVowBtn, nextVowBtn);
         applySnapshot(history[0] || makeSnapshot());
     </script>
 </body>
