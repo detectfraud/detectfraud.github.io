@@ -234,20 +234,16 @@
 
         let bgStartIndex = 0;
         let vowsStartIndex = 0;
-        let activeThumb = { bg: null, vow: null };
-        let hoverTimeout;
         const visibleCount = 3;
 
-        // Функція для рендерингу галереї
-        function renderGallery(galleryElement, images, key) {
-            galleryElement.innerHTML = '';
-            const startIndex = key === 'bg' ? bgStartIndex : vowsStartIndex;
-            images.slice(startIndex, startIndex + visibleCount).forEach((src, index) => {
+        // Функція для створення мініатюр галереї
+        function createGallery(galleryElement, images, key) {
+            images.forEach((src, index) => {
                 const imgName = src.split("/").pop().split(".")[0];
                 const input = document.createElement("input");
                 input.type = "radio";
                 input.name = `${key}Thumb`;
-                input.id = `${key}Thumb${startIndex + index}`;
+                input.id = `${key}Thumb${index}`;
                 
                 const label = document.createElement("label");
                 label.setAttribute("for", input.id);
@@ -263,23 +259,18 @@
                 
                 if (imgName === "Fon") {
                     label.title = "Завантажити свій фон";
-                    label.addEventListener("click", () => bgLoader.click());
                 }
 
-                // Вибір мініатюри
                 input.addEventListener("change", () => {
-                    if (imgName === "Fon") return;
-                    handleFileFromGallery(src, key);
-                    if (activeThumb[key]) {
-                        activeThumb[key].classList.remove("disabled");
+                    if (imgName === "Fon") {
+                        bgLoader.click();
+                    } else {
+                        handleFileFromGallery(src, key === 'bg' ? 'bg' : (imgName === 'LoveStones' ? 'lovestone' : 'vow'));
                     }
-                    label.classList.add("disabled");
-                    activeThumb[key] = label;
+                    imagePreview.classList.remove('show');
                 });
 
-                // Прев'ю при наведенні
                 label.addEventListener('mouseenter', () => {
-                    if (label.classList.contains("disabled")) return;
                     clearTimeout(hoverTimeout);
                     hoverTimeout = setTimeout(() => {
                         imagePreview.src = src;
@@ -292,15 +283,29 @@
                     imagePreview.classList.remove('show');
                 });
             });
-            updateNavButtons(key);
+        }
+        
+        // Функція для оновлення видимості мініатюр
+        function updateGallery(galleryElement, startIndex) {
+            const labels = galleryElement.querySelectorAll("label");
+            labels.forEach((label, i) => {
+                const pos = i - startIndex;
+                if (pos >= 0 && pos < visibleCount) {
+                    label.style.display = "block";
+                } else {
+                    label.style.display = "none";
+                }
+            });
+            updateNavButtons(galleryElement);
         }
 
         // Оновлення кнопок навігації
-        function updateNavButtons(key) {
-            const startIndex = key === 'bg' ? bgStartIndex : vowsStartIndex;
-            const images = key === 'bg' ? fullBgImages : [...fullLovestones, ...fullVowsImages];
-            const prevBtn = key === 'bg' ? prevBgBtn : prevVowBtn;
-            const nextBtn = key === 'bg' ? nextBgBtn : nextVowBtn;
+        function updateNavButtons(galleryElement) {
+            const isBgGallery = galleryElement.id === 'bgGallery';
+            const images = isBgGallery ? fullBgImages : [...fullLovestones, ...fullVowsImages];
+            const startIndex = isBgGallery ? bgStartIndex : vowsStartIndex;
+            const prevBtn = isBgGallery ? prevBgBtn : prevVowBtn;
+            const nextBtn = isBgGallery ? nextBgBtn : nextVowBtn;
             
             prevBtn.disabled = (startIndex === 0);
             nextBtn.disabled = (startIndex >= images.length - visibleCount);
@@ -310,25 +315,25 @@
         prevBgBtn.addEventListener("click", () => {
             if (bgStartIndex > 0) {
                 bgStartIndex--;
-                renderGallery(bgGallery, fullBgImages, 'bg');
+                updateGallery(bgGallery, bgStartIndex);
             }
         });
         nextBgBtn.addEventListener("click", () => {
             if (bgStartIndex < fullBgImages.length - visibleCount) {
                 bgStartIndex++;
-                renderGallery(bgGallery, fullBgImages, 'bg');
+                updateGallery(bgGallery, bgStartIndex);
             }
         });
         prevVowBtn.addEventListener("click", () => {
             if (vowsStartIndex > 0) {
                 vowsStartIndex--;
-                renderGallery(vowsGallery, [...fullLovestones, ...fullVowsImages], 'vow');
+                updateGallery(vowsGallery, vowsStartIndex);
             }
         });
         nextVowBtn.addEventListener("click", () => {
-            if (vowsStartIndex < fullVowsImages.length - visibleCount) {
+            if (vowsStartIndex < [...fullLovestones, ...fullVowsImages].length - visibleCount) {
                 vowsStartIndex++;
-                renderGallery(vowsGallery, [...fullLovestones, ...fullVowsImages], 'vow');
+                updateGallery(vowsGallery, vowsStartIndex);
             }
         });
 
@@ -597,8 +602,10 @@
         document.onselectstart = disableContextMenu;
         document.ondragstart = disableContextMenu;
         template.onload = () => { drawAll(); };
-        renderGallery(bgGallery, fullBgImages, 'bg');
-        renderGallery(vowsGallery, [...fullLovestones, ...fullVowsImages], 'vow');
+        createGallery(bgGallery, fullBgImages, 'bg');
+        createGallery(vowsGallery, [...fullLovestones, ...fullVowsImages], 'vow');
+        updateGallery(bgGallery, 0);
+        updateGallery(vowsGallery, 0);
         applySnapshot(history[0] || makeSnapshot());
     </script>
 </body>
