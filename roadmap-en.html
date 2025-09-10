@@ -1,703 +1,142 @@
+<!-- Collage (10.09.2025 07:30) -->
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-    <meta charset="UTF-8" />
-    <title>Камінь любові — редактор</title>
-    <style>
-        body { font-family: sans-serif; text-align: center; background: url(images/unamed.jpg) repeat scroll top left; }
-        .venwin { border-radius: 10px; display: inline-block; background-color: rgba(255, 255, 255, 0.5); padding: 20px 20px; box-sizing: border-box;}
-        canvas {
-            border: 3px solid #bbb;
-            border-radius: 6px;
-            box-shadow: 0 6px 18px rgba(0,0,0,.1);
-            display: block;
-            margin: 10px auto;
-            width: 630px;
-            height: 420px;
-            transition: transform 0.3s ease-in-out;
-            transform-origin: center center;
-            cursor:pointer;
-            position: relative;
-            z-index: 10;
-        }
-        .preview-zoom-in:hover {
-            transform: scale(1.43);
-        }
-        #scaleSlider { width: 420px; }
-        button { padding: 8px 12px; cursor: pointer; border-radius: 8px; }
-        .disabled { pointer-events: none; opacity: .5; filter: grayscale(100%); }
-        .gallery-container { display: flex; align-items: flex-start; justify-content: center; gap: 10px; margin-top: 10px; }
-        .gallery-block { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+<meta charset="UTF-8">
+<title>Collage з інтегрованою галереєю</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+  }
 
-        /* Стилі для нової галереї фонів, адаптовані з "Gallery" */
-        .gallery-wrapper {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            width: 630px; /* Адаптуємо під ширинуthumbnails з Collage */
-            justify-content: center;
-        }
-        .gallery {
-            display: flex;
-            gap: 10px;
-            overflow: hidden;
-            width: calc(3 * 120px + 2 * 10px); /* 3 мініатюри * 120px + 2 проміжки по 10px */
-        }
-        .gallery-content { /* Додано для JS прокрутки */
-            display: flex;
-            gap: 10px;
-            transition: transform 0.3s ease-in-out;
-        }
-        .gallery input[type="radio"] { display: none; }
-        .gallery label {
-            flex-shrink: 0; /* Щоб мініатюри не стискалися */
-            display: block;
-            cursor: pointer;
-            border: 2px solid transparent;
-            border-radius: 8px;
-            overflow: hidden;
-            transition: border 0.3s;
-        }
-        .gallery label img {
-            width: 120px;
-            height: 80px;
-            object-fit: cover;
-            display: block;
-        }
-        .gallery input[type="radio"]:checked + label {
-            border: 2px solid #007bff;
-        }
-        /* Стиль для активної/вибраної мініатюри, щоб вона була disabled */
-        .gallery label.disabled-thumb {
-            cursor: not-allowed;
-            opacity: .5;
-            filter: grayscale(100%);
-            border: 2px solid red; /* Додаємо рамку для disabled */
-        }
-        .nav {
-            background: #fff;
-            border: 1px solid #ccc;
-            padding: 5px 10px;
-            font-size: 20px;
-            cursor: pointer;
-            border-radius: 6px;
-        }
-        .nav:disabled {
-            opacity: 0.3;
-            cursor: not-allowed;
-        }
-        /* Кінець стилів для нової галереї */
+  #canvas {
+    border: 2px solid #333;
+    display: block;
+    margin: 0 auto 20px;
+  }
 
+  /* === Галерея фонів === */
+  .gallery-wrapper {
+    width: 630px;
+    margin: 0 auto;
+    text-align: center;
+  }
 
-        .collage {
-            position: relative;
-            display: inline-block;
-            margin-top: 0;
-        }
-        .gallery-container.vows .labels { display: grid; grid-template-columns: repeat(4, 1fr); text-align: center; margin-bottom: 5px; }
-        .gallery-container.vows .labels .label1 { grid-column: 1; font-weight: bold; margin-left: 70px; }
-        .gallery-container.vows .labels .label2 { grid-column: 3; font-weight: bold; }
-        /* .arrow, .arow тепер не використовуються для галереї фонів */
-        .button-row { display: flex; justify-content: center; align-items: center; gap: 10px; }
-        #fot { display: inline-block; cursor: pointer; border-radius: 8px; width: 108px; height: 72px; background-image: url(https://detectfraud.github.io/gallery/Para.png); background-repeat: no-repeat; background-size: contain; }
-        #fot:hover { mix-blend-mode: luminosity; }
-        #fot:active { mix-blend-mode: exclusion; }
-        .imagbox {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%,-50%) scale(0.1);
-            width: 825px;
-            height: 510px;
-            opacity: 0;
-            transition: all 0.9s ease;
-            z-index: 9999;
-            border-radius: 12px;
-            box-shadow: 0 0 25px rgba(0,0,0,0.7);
-            pointer-events: none;
-            background: #fff;
-            object-fit: cover;
-        }
-        .imagbox.show {
-            opacity: 1;
-            transform: translate(-50%,-50%) scale(0.6);
-        }
-        .photo-block { margin-left: 100px; }
-        #updateBtn { margin-left: 300px; font-weight: bold; color: red; }
-        .donate-btn {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background-color: #e74c3c;
-            color: white;
-            border-radius: 50%;
-            width: 60px;
-            height: 60px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 28px;
-            text-decoration: none;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-            cursor: pointer;
-            z-index: 1000;
-            animation: pulse 1.5s infinite;
-        }
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
-        }
-        @media (max-width: 768px) {
-            .venwin { padding: 10px; }
-            canvas { width: 95%; height: auto; }
-            #scaleSlider { width: 95%; }
-            .gallery-container { flex-direction: column; align-items: center; }
-            /* Адаптація нової галереї під мобільні */
-            .gallery-wrapper { width: 100%; justify-content: center; }
-            .gallery { width: calc(3 * 108px + 2 * 10px); /* 3 мініатюри * 108px + 2 проміжки */ }
-            .gallery label img { width: 108px; height: 72px; }
-            /* Кінець адаптації */
-            .arrow:first-child, .arrow:last-child { margin: 0 10px; }
-            .arow:first-child, .arow:last-child { margin: 0 10px; }
-            .photo-block { margin-left: 0; }
-            #updateBtn { margin-left: 0; margin-top: 10px; }
-            .gallery-container.vows .labels { grid-template-columns: 1fr 1fr; }
-            .gallery-container.vows .labels .label1, .gallery-container.vows .labels .label2 { margin: 0; }
-            .donate-btn { bottom: 10px; right: 10px; width: 50px; height: 50px; font-size: 24px; }
-        }
-    </style>
+  #gallery-display {
+    width: 630px;
+    height: 420px;
+    overflow: hidden;
+    border: 2px solid #aaa;
+    margin-bottom: 10px;
+  }
+
+  #gallery-display img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .gallery {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 5px;
+  }
+
+  .gallery input {
+    display: none;
+  }
+
+  .gallery label {
+    cursor: pointer;
+  }
+
+  .gallery img {
+    width: 100px;
+    height: 70px;
+    object-fit: cover;
+    border: 2px solid transparent;
+    border-radius: 4px;
+    transition: 0.3s;
+  }
+
+  .gallery input:checked + label img {
+    border-color: #007bff;
+  }
+</style>
 </head>
 <body>
-    <fieldset class="venwin" style="height:auto;">
-        <div class="collage" id="collage">
-            <canvas id="canvas" width="900" height="600" style="cursor: pointer;border:1px solid #ccc;"></canvas>
-            <img id="imagePreview" class="imagbox" src="" alt="Image Preview">
-        </div>
-        <br>
-        <b style="text-align: center;">Розмір</b>
-        <br>
-        <input type="range" id="scaleSlider" min="0.1" max="3" step="0.01" value="1" style="cursor: pointer;">
-        <div class="gallery-container">
-            <div class="gallery-block" id="vowsi">
-                <b>Фон</b><br /><br />
-                <div class="gallery-wrapper">
-                    <button class="nav prev" id="prevBgBtn">⟨</button>
-                    <div class="gallery" id="bgGallery">
-                        <div class="gallery-content" id="bgGalleryContent"></div>
-                    </div>
-                    <button class="nav next" id="nextBgBtn">⟩</button>
-                </div>
-                </div>
-            <div class="gallery-block photo-block">
-                <b>Ваше фото</b><br /><br />
-                <div>
-                    <label id="fot" class="disabled" title="Фото закоханих"></label>
-                </div>
-            </div>
-        </div>
-        <div class="gallery-container vows" id="vowse" style="display:none;">
-            <div class="gallery-block">
-                <div class="labels">
-                    <span class="label1">Надпис</span>
-                    <span class="label2">Клятва закоханих</span>
-                </div>
-                <div class="gallery-row">
-                    <span class="arow" onclick="prevVow()">&#10094;</span>
-                    <div class="thumbnails" id="thumbsVows"></div>
-                    <span class="arow" onclick="nextVow()">&#10095;</span>
-                </div>
-            </div>
-        </div>
-        <p class="button-row">
-            <button id="undoBtn" type="button">⟲ Undo</button>
-            <button id="previewBtn" type="button" class="disabled">👁 Перегляд</button>
-            <button id="downloadBtn" type="button" style="display:none;">📥 Завантажити</button>
-            <button id="updateBtn" type="button">UPDATE</button>
-        </p>
-        <br>
-    </fieldset>
-    <a href="https://example.com/donate" class="donate-btn" target="_blank" title="Підтримати проєкт">❤️</a>
-    <input type="file" id="bgLoader" style="display:none">
-    <input type="file" id="loveLoader" style="display:none">
-    <script>
-        /* === Collage JS === */
-        const canvas = document.getElementById('canvas');
-        const ctx = canvas.getContext('2d');
-        // Старі елементи галереї фонів видалено
-        const thumbsVows = document.getElementById('thumbsVows'); // Залишається для галереї клятв
-        const loveLoader = document.getElementById('loveLoader');
-        const scaleSlider = document.getElementById('scaleSlider');
-        const undoBtn = document.getElementById('undoBtn');
-        const previewBtn = document.getElementById('previewBtn');
-        const downloadBtn = document.getElementById('downloadBtn');
-        const bgLoader = document.getElementById('bgLoader');
-        const collage = document.getElementById('collage');
-        const vowse = document.getElementById('vowse');
-        const vowsi = document.getElementById('vowsi');
-        const photoBlock = document.querySelector('.photo-block');
-        const loveStoneName = "LoveStones";
-        const DONATE_URL = "https://example.com/donate";
-        const imagePreview = document.getElementById('imagePreview');
 
-        // Нові елементи для інтегрованої галереї фонів
-        const bgGalleryContent = document.getElementById('bgGalleryContent');
-        const prevBgBtn = document.getElementById('prevBgBtn');
-        const nextBgBtn = document.getElementById('nextBgBtn');
+<h2>Collage з інтегрованою галереєю</h2>
 
-        const url = "https://detectfraud.github.io/gallery/";
-        const bgImages = [ "nature(1)","nature(2)","nature(3)","nature(4)","nature(5)", "nature(6)","nature(7)","nature(8)","nature(9)","Fon" ];
-        const fullBgImages = bgImages.map(name => url + name + ".jpeg");
-        let bgStartIndex = 0; // Для нової галереї фонів
-        const visibleBgCount = 3; // Кількість видимих мініатюр для фонів
-        const thumbnailBgWidth = 130; // 120px width + 10px gap
+<!-- Полотно -->
+<canvas id="canvas" width="630" height="420"></canvas>
 
-        const vows = ["Eternity","Fidelity","Joy","Love","Strength","Tenderness","Trust","Unity","Heart","Hearts"];
-        const fullVows = vows.map(name => url + name + ".png");
-        let vowIndex = 0; // Для старої галереї клятв
-        const lovestoneImages = ["LoveStones"];
-        const fullLovestones = lovestoneImages.map(name => url + name + ".png");
-        let lovestoneIndex = 0; // Для старої галереї клятв
+<!-- Галерея -->
+<div class="gallery-block" id="vowsi">
+  <b>Фон</b><br /><br />
+  <div class="gallery-wrapper">
+    <div id="gallery-display">
+      <img id="selected-img" src="" alt="Вибране фото" />
+    </div>
+    <div class="gallery">
+      <!-- JS вставить прев’ю -->
+    </div>
+  </div>
+</div>
 
-        let activeThumb = null; // Для старої галереї клятв
-        let activeBgRadio = null; // Для нової галереї фонів
+<script>
+  // === Масив зображень для галереї ===
+  const galleryImages = [
+    "img/bg1.jpg",
+    "img/bg2.jpg",
+    "img/bg3.jpg"
+  ]; // заміни на свої
 
-        // Оновлена функція для встановлення активної мініатюри (для старої галереї клятв)
-        function setActiveThumb(thumbElement) {
-            const allThumbs = document.querySelectorAll('#thumbsVows .thumb');
-            allThumbs.forEach(thumb => {
-                thumb.classList.remove('active');
-                thumb.classList.remove('disabled');
-            });
-            thumbElement.classList.add('active');
-            thumbElement.classList.add('disabled');
-            activeThumb = thumbElement;
-        }
+  // Відмальовка галереї
+  function renderGallery() {
+    const gallery = document.querySelector(".gallery");
+    gallery.innerHTML = "";
+    galleryImages.forEach((src, index) => {
+      const id = "bg" + index;
+      gallery.innerHTML += `
+        <input type="radio" name="gallery" id="${id}" ${index === 0 ? "checked" : ""}>
+        <label for="${id}">
+          <img src="${src}" alt="bg${index}">
+        </label>
+      `;
+    });
 
-        // --- НОВІ ФУНКЦІЇ ДЛЯ ІНТЕГРОВАНОЇ ГАЛЕРЕЇ ФОНІВ ---
-        function createBgGallery() {
-            bgGalleryContent.innerHTML = '';
-            fullBgImages.forEach((src, index) => {
-                const imgName = src.split("/").pop().split(".")[0];
-                const input = document.createElement("input");
-                input.type = "radio";
-                input.name = "bgThumb";
-                input.id = `bgThumb${index}`;
+    // Завантажуємо перше фото
+    setGalleryImage(galleryImages[0]);
 
-                const label = document.createElement("label");
-                label.setAttribute("for", input.id);
+    // Слухачі
+    document.querySelectorAll('.gallery input').forEach((input, i) => {
+      input.addEventListener("change", () => {
+        setGalleryImage(galleryImages[i]);
+      });
+    });
+  }
 
-                const img = new Image();
-                img.src = src;
-                img.alt = imgName;
-                label.appendChild(img);
+  // Встановлення фонового зображення
+  function setGalleryImage(src) {
+    // показати у великому блоці
+    document.getElementById("selected-img").src = src;
 
-                if (imgName === "Fon") {
-                    label.title = "Завантажити свій фон";
-                }
+    // підвантажити у canvas
+    const img = new Image();
+    img.src = src;
+    img.onload = () => {
+      const ctx = document.getElementById("canvas").getContext("2d");
+      ctx.clearRect(0, 0, 630, 420);
+      ctx.drawImage(img, 0, 0, 630, 420);
+    };
+  }
 
-                input.addEventListener("change", () => {
-                    if (imgName === "Fon") {
-                        bgLoader.click();
-                    } else {
-                        handleFileFromGallery(src, 'bg');
-                    }
-                    imagePreview.classList.remove('show');
-                    if (activeBgRadio) {
-                        activeBgRadio.classList.remove('disabled-thumb');
-                    }
-                    label.classList.add('disabled-thumb');
-                    activeBgRadio = label;
-                });
+  // Запускаємо
+  renderGallery();
+</script>
 
-                let hoverTimeout;
-                label.addEventListener('mouseenter', () => {
-                    clearTimeout(hoverTimeout);
-                    hoverTimeout = setTimeout(() => {
-                        imagePreview.src = src;
-                        imagePreview.classList.add('show');
-                    }, 700);
-                });
-
-                label.addEventListener('mouseleave', () => {
-                    clearTimeout(hoverTimeout);
-                    imagePreview.classList.remove('show');
-                });
-                bgGalleryContent.appendChild(input);
-                bgGalleryContent.appendChild(label);
-            });
-            // Вибираємо перший елемент за замовчуванням
-            const firstRadio = bgGalleryContent.querySelector('input[type="radio"]');
-            if(firstRadio) {
-                firstRadio.checked = true;
-                const firstLabel = firstRadio.nextElementSibling;
-                firstLabel.classList.add('disabled-thumb');
-                activeBgRadio = firstLabel;
-                handleFileFromGallery(fullBgImages[0], 'bg'); // Завантажуємо перший фон
-            }
-        }
-
-        function updateBgGalleryDisplay() {
-            const offset = -bgStartIndex * thumbnailBgWidth;
-            bgGalleryContent.style.transform = `translateX(${offset}px)`;
-
-            prevBgBtn.disabled = (bgStartIndex === 0);
-            nextBgBtn.disabled = (bgStartIndex >= fullBgImages.length - visibleBgCount);
-        }
-
-        prevBgBtn.addEventListener("click", () => {
-            if (bgStartIndex > 0) {
-                bgStartIndex--;
-                updateBgGalleryDisplay();
-            }
-        });
-        nextBgBtn.addEventListener("click", () => {
-            if (bgStartIndex < fullBgImages.length - visibleBgCount) {
-                bgStartIndex++;
-                updateBgGalleryDisplay();
-            }
-        });
-        // --- КІНЕЦЬ НОВИХ ФУНКЦІЙ ДЛЯ ГАЛЕРЕЇ ФОНІВ ---
-
-
-        // --- ФУНКЦІЇ ДЛЯ СТАРОЇ ГАЛЕРЕЇ КЛЯТВ (без змін) ---
-        function renderVows() {
-            thumbsVows.innerHTML = "";
-            activeThumb = null;
-            const combinedVows = [...fullLovestones, ...fullVows]; // Об'єднано для єдиної галереї
-            combinedVows.slice(vowIndex, vowIndex + 3).forEach(src => {
-                const key = src.includes(loveStoneName) ? 'lovestone' : 'vow';
-                createThumb(src, thumbsVows, key);
-            });
-        }
-        function createThumb(src, container, key) {
-            const wrapper = document.createElement("div");
-            wrapper.className = "thumb-wrapper";
-            const imgName = src.split("/").pop().split(".")[0];
-            const thumb = document.createElement("img");
-            thumb.className = "thumb";
-            thumb.src = src;
-            let timer;
-            wrapper.addEventListener('mouseenter', () => {
-                timer = setTimeout(() => {
-                    imagePreview.src = src;
-                    imagePreview.classList.add('show');
-                }, 700);
-            });
-            wrapper.addEventListener('mouseleave', () => {
-                clearTimeout(timer);
-                imagePreview.classList.remove('show');
-            });
-            thumb.onclick = () => {
-                handleFileFromGallery(src, key);
-                setActiveThumb(thumb);
-            };
-            wrapper.appendChild(thumb);
-            container.appendChild(wrapper);
-        }
-        function prevVow(){ vowIndex=(vowIndex-3+ (fullLovestones.length + fullVows.length))%(fullLovestones.length + fullVows.length); renderVows(); }
-        function nextVow(){ vowIndex=(vowIndex+3)%(fullLovestones.length + fullVows.length); renderVows(); }
-        // --- КІНЕЦЬ ФУНКЦІЙ ДЛЯ СТАРОЇ ГАЛЕРЕЇ КЛЯТВ ---
-
-        function handleFileFromGallery(src, key) {
-            if (previewMode) {
-                previewMode = false;
-                canvas.classList.remove('preview-zoom-in');
-            }
-            if (key === 'vow' || key === 'lovestone') {
-                vowse.style.display = 'flex'; // Використовуємо flex для коректного відображення галереї vows
-                vowsi.style.display = 'none';
-                photoBlock.style.display = 'none';
-            } else if (key === 'bg') {
-                vowse.style.display = 'none';
-                vowsi.style.display = 'flex';
-                photoBlock.style.display = 'flex';
-            }
-            imagePreview.classList.remove('show');
-            const img = new Image();
-            img.crossOrigin = "anonymous";
-            img.onload = () => {
-                layers[key].img = img;
-                layers[key].src = src;
-                if (key === 'vow') {
-                    layers[key].scale = 0.5;
-                    layers[key].x = (canvas.width / 2) + 14.28;
-                    layers[key].y = (canvas.height) - 14.28;
-                } else if (key === 'lovestone') {
-                    layers[key].scale = 0.5;
-                    layers[key].x = canvas.width / 2;
-                    layers[key].y = canvas.height / 2;
-                } else {
-                    layers[key].x = canvas.width / 2;
-                    layers[key].y = canvas.height / 2;
-                    layers[key].scale = 1;
-                }
-                activeLayer = key;
-                if (activeLayer) {
-                    scaleSlider.value = layers[activeLayer].scale;
-                }
-                scaleSlider.disabled = false;
-                scaleSlider.classList.remove('disabled');
-                pushHistory();
-                drawAll();
-                if (key === 'bg') {
-                    document.getElementById('fot').classList.remove('disabled');
-                }
-                if (layers.love.img || layers.lovestone.img) {
-                    document.getElementById('previewBtn').classList.remove('disabled');
-                }
-                previewBtn.style.display = 'inline-block';
-                downloadBtn.style.display = 'none';
-            };
-            img.src = src;
-        }
-
-        function handleFileLoad(file,key){
-            if(!file) return;
-            const reader=new FileReader();
-            reader.onload=e=>{
-                const data=e.target.result;
-                const img=new Image();
-                img.onload=()=>{
-                    layers[key].img=img;
-                    layers[key].src=data;
-                    layers[key].x = canvas.width / 2;
-                    layers[key].y = canvas.height / 2;
-                    layers[key].scale = 1;
-                    activeLayer = key;
-                    if (activeLayer) {
-                        scaleSlider.value = layers[activeLayer].scale;
-                    }
-                    scaleSlider.disabled = false;
-                    scaleSlider.classList.remove('disabled');
-                    pushHistory();
-                    drawAll();
-                    if (key === 'bg') {
-                        document.getElementById('fot').classList.remove('disabled');
-                        // Оновлюємо активну мініатюру для "Fon" у новій галереї фонів
-                        const fonLabel = bgGalleryContent.querySelector(`label[title="Завантажити свій фон"]`);
-                        if(fonLabel) {
-                            if (activeBgRadio) activeBgRadio.classList.remove('disabled-thumb');
-                            fonLabel.classList.add('disabled-thumb');
-                            fonLabel.previousElementSibling.checked = true; // Позначаємо радіокнопку
-                            activeBgRadio = fonLabel;
-                        }
-                    }
-                    if (key === 'love') {
-                        document.getElementById('previewBtn').classList.remove('disabled');
-                    }
-                };
-                img.src=data;
-            };
-            reader.readAsDataURL(file);
-        }
-        bgLoader.addEventListener('change',e=>handleFileLoad(e.target.files[0],'bg'));
-        loveLoader.addEventListener('change',e=>handleFileLoad(e.target.files[0],'love'));
-        document.getElementById("fot").onclick=()=>loveLoader.click();
-        const template=new Image(); template.src='images/composit.png';
-        const HOLE_OFFSET_X=6, HOLE_OFFSET_Y=-115, HOLE_RADIUS=98;
-        let mask={cx:canvas.width/2+HOLE_OFFSET_X, cy:canvas.height/2+HOLE_OFFSET_Y, r:HOLE_RADIUS};
-        let layers={
-            bg:{img:null,src:null,x:canvas.width/2,y:canvas.height/2,scale:1},
-            love:{img:null,src:null,x:canvas.width/2,y:canvas.height/2,scale:1},
-            vow:{img:null,src:null,x:canvas.width/2,y:canvas.height/2,scale:1},
-            lovestone:{img:null,src:null,x:canvas.width/2,y:canvas.height/2,scale:1}
-        };
-        let activeLayer=null, previewMode=false, bgHoleActive=true;
-        const history=[]; const MAX_HISTORY=20;
-        function makeSnapshot(){ return { bg:{...layers.bg}, love:{...layers.love}, loveScale: scaleSlider.value, vow:{...layers.vow}, lovestone:{...layers.lovestone}, previewMode, activeLayer, bgHoleActive, bgStartIndex, activeBgRadioId: activeBgRadio ? activeBgRadio.id : null }; }
-
-        function pushHistory(){ history.push(makeSnapshot()); if(history.length>MAX_HISTORY) history.shift(); }
-        function applySnapshot(s){
-            previewMode=!!s.previewMode; activeLayer=s.activeLayer||null; bgHoleActive=!!s.bgHoleActive;
-            bgStartIndex = s.bgStartIndex !== undefined ? s.bgStartIndex : 0; // Відновлюємо bgStartIndex
-            updateBgGalleryDisplay(); // Оновлюємо відображення галереї фонів
-
-            if (s.activeBgRadioId) {
-                const radio = document.getElementById(s.activeBgRadioId);
-                if (radio) {
-                    radio.checked = true;
-                    const label = radio.nextElementSibling;
-                    if (activeBgRadio) activeBgRadio.classList.remove('disabled-thumb');
-                    label.classList.add('disabled-thumb');
-                    activeBgRadio = label;
-                }
-            } else {
-                if (activeBgRadio) activeBgRadio.classList.remove('disabled-thumb');
-                activeBgRadio = null;
-            }
-
-            if (s.bg.img) {
-                document.getElementById('fot').classList.remove('disabled');
-            } else {
-                document.getElementById('fot').classList.add('disabled');
-            }
-            if (s.love.img) {
-                document.getElementById('previewBtn').classList.remove('disabled');
-            } else {
-                document.getElementById('previewBtn').classList.add('disabled');
-            }
-            ['bg','love','vow','lovestone'].forEach(key=>{
-                const v=s[key];
-                if(v && v.src){
-                    const img=new Image();
-                    img.onload=()=>{ layers[key].img=img; layers[key].src=v.src; layers[key].x=v.x; layers[key].y=v.y; layers[key].scale=v.scale; drawAll(); };
-                    img.src=v.src;
-                } else {
-                    layers[key].img=null; layers[key].src=null;
-                    layers[key].x=v? v.x: canvas.width/2;
-                    layers[key].y=v? v.y: canvas.height/2;
-                    layers[key].scale=v? v.scale:1;
-                }
-            });
-            toggleButtons();
-        }
-        function drawLayerTo(ctxTarget, layer){
-            if(!layer||!layer.img) return;
-            const w = layer.img.width * layer.scale;
-            const h = layer.img.height * layer.scale;
-            const x = layer.x;
-            const y = layer.y;
-            ctxTarget.drawImage(layer.img, x - w/2, y - h/2, w, h);
-        }
-        function drawLove(ctxTarget, clip=false){
-            const L=layers.love;
-            if(!L||!L.img) return;
-            const w = L.img.width * L.scale;
-            const h = L.img.height * L.scale;
-            const x = L.x;
-            const y = L.y;
-            ctxTarget.save();
-            if(clip && mask.r>0){
-                ctxTarget.beginPath();
-                ctxTarget.arc(mask.cx, mask.cy, mask.r, 0, Math.PI * 2);
-                ctxTarget.clip();
-            }
-            ctxTarget.drawImage(L.img, x - w/2, y - h/2, w, h);
-            ctxTarget.restore();
-        }
-        function drawBgWithHole(ctxTarget){
-            if(!layers.bg.img) return;
-            if(!bgHoleActive||mask.r<=0){ drawLayerTo(ctxTarget,layers.bg); return; }
-            const off = document.createElement('canvas');
-            off.width = canvas.width;
-            off.height = canvas.height;
-            const octx = off.getContext('2d');
-            drawLayerTo(octx, layers.bg);
-            octx.globalCompositeOperation = 'destination-out';
-            octx.beginPath();
-            octx.arc(mask.cx, mask.cy, mask.r, 0, Math.PI * 2);
-            octx.fill();
-            octx.globalCompositeOperation = 'source-over';
-            ctxTarget.drawImage(off, 0, 0);
-        }
-        function drawAll(){
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            drawBgWithHole(ctx);
-            drawLove(ctx, previewMode);
-            if(template.complete) {
-                ctx.drawImage(template, 0, 0, canvas.width, canvas.height);
-            }
-            drawLayerTo(ctx, layers.vow);
-            drawLayerTo(ctx, layers.lovestone);
-        }
-        function toggleButtons(){
-            if(previewMode){
-                previewBtn.style.display = 'none';
-                downloadBtn.style.display = 'inline-block';
-                vowsi.style.display = 'none';
-                photoBlock.style.display = 'none';
-                vowse.style.display = 'flex'; // Використовуємо flex
-                canvas.classList.add('preview-zoom-in');
-                activeLayer = null;
-            } else {
-                previewBtn.style.display = 'inline-block';
-                downloadBtn.style.display = 'none';
-                vowsi.style.display = 'flex'; // Використовуємо flex
-                photoBlock.style.display = 'flex'; // Використовуємо flex
-                vowse.style.display = 'none';
-                canvas.classList.remove('preview-zoom-in');
-            }
-        }
-        scaleSlider.addEventListener('input',()=>{
-            if(!activeLayer) return;
-            layers[activeLayer].scale=parseFloat(scaleSlider.value);
-            drawAll();
-        });
-        let dragging=false, dragStartX=0, dragStartY=0;
-        canvas.addEventListener('mousedown',e=>{
-            if(previewMode || !activeLayer) return;
-            dragging=true;
-            dragStartX=e.offsetX-layers[activeLayer].x;
-            dragStartY=e.offsetY-layers[activeLayer].y;
-        });
-        canvas.addEventListener('mousemove',e=>{
-            if(!dragging || previewMode || !activeLayer) return;
-            layers[activeLayer].x=e.offsetX-dragStartX;
-            layers[activeLayer].y=e.offsetY-dragStartY;
-            drawAll();
-        });
-        function stopDrag(){
-            if(dragging){ dragging=false; pushHistory(); }
-        }
-        canvas.addEventListener('mouseup',stopDrag);
-        canvas.addEventListener('mouseleave',stopDrag);
-        canvas.addEventListener('touchstart',e=>{
-            if(previewMode || !activeLayer) return;
-            const t=e.touches[0],rect=canvas.getBoundingClientRect();
-            dragging=true;
-            dragStartX=(t.clientX-rect.left) * (canvas.width/rect.width) - layers[activeLayer].x;
-            dragStartY=(t.clientY-rect.top) * (canvas.height/rect.height) - layers[activeLayer].y;
-            e.preventDefault();
-        });
-        canvas.addEventListener('touchmove',e=>{
-            if(!dragging || previewMode || !activeLayer) return;
-            const t=e.touches[0],rect=canvas.getBoundingClientRect();
-            layers[activeLayer].x=(t.clientX-rect.left) * (canvas.width/rect.width) - dragStartX;
-            layers[activeLayer].y=(t.clientY-rect.top) * (canvas.height/rect.height) - dragStartY;
-            drawAll();
-            e.preventDefault();
-        });
-        canvas.addEventListener('touchend',stopDrag);
-        undoBtn.addEventListener('click',()=>{
-            if(history.length<=1) return;
-            history.pop();
-            applySnapshot(history[history.length-1]);
-        });
-        previewBtn.addEventListener('click',()=>{
-            previewMode=true;
-            scaleSlider.disabled = true;
-            scaleSlider.classList.add('disabled');
-            pushHistory();
-            toggleButtons();
-            drawAll();
-        });
-        downloadBtn.addEventListener('click',()=>{
-            const link=document.createElement('a');
-            link.download='collage.jpg';
-            link.href=canvas.toDataURL('image/jpeg');
-            link.click();
-        });
-        document.getElementById('updateBtn').addEventListener('click', function () {
-            const confirmUpdate = confirm("Ви впевнені, що хочете оновити сторінку? Усі незавершені зміни буде втрачено.");
-            if (confirmUpdate) {
-                const url = window.location.href.split('?')[0];
-                window.location.href = url + '?_=' + new Date().getTime();
-            }
-        });
-        function disableContextMenu() {
-            return false;
-        }
-        document.oncontextmenu = disableContextMenu;
-        document.onselectstart = disableContextMenu;
-        document.ondragstart = disableContextMenu;
-        template.onload = () => { drawAll(); };
-
-        // Ініціалізація нових та старих галерей
-        createBgGallery();
-        updateBgGalleryDisplay();
-        renderVows();
-        applySnapshot(history[0] || makeSnapshot());
-    </script>
 </body>
 </html>
