@@ -606,7 +606,7 @@
             link.click();
         });
         document.getElementById('updateBtn').addEventListener('click', function () {
-            const confirmUpdate = confirm("Ви впевнені, що хочете оновити сторінку?\n Усі незавершені зміни буде втрачено.");
+            const confirmUpdate = confirm("Ви впевнені, що хочете оновити сторінку? Усі незавершені зміни буде втрачено.");
             if (confirmUpdate) {
                 const url = window.location.href.split('?')[0];
                 window.location.href = url + '?_=' + new Date().getTime();
