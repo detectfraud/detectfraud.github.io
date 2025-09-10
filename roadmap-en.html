@@ -198,22 +198,46 @@
             const allThumbs = document.querySelectorAll('.thumb');
             allThumbs.forEach(thumb => {
                 thumb.classList.remove('active');
+                // Видаляємо клас disabled та повертаємо обробники подій
                 thumb.classList.remove('disabled');
+                // Важливо: перестворюємо або відновлюємо обробники подій 'mouseenter' та 'mouseleave'
+                // Для простоти, ми можемо перерендерити галерею, або ж зберегти обробники та відновити їх.
+                // В даному випадку, найпростіше - прибрати клас disabled.
+                // Якщо потрібно повністю відключати/включати обробники, їх треба зберігати або перестворювати.
+                // Для поточного прикладу достатньо керувати класом 'disabled'.
+                // Якщо мініатюра вже не активна, ми прибираємо з неї disabled, що дозволяє прев'ю.
             });
             thumbElement.classList.add('active');
-            thumbElement.classList.add('disabled');
-            activeThumb = thumbElement;
+            thumbElement.classList.add('disabled'); // Активна мініатюра тепер "вимкнена" для взаємодії
         }
         function renderThumbnails() {
             thumbs.innerHTML = "";
-            activeThumb = null;
+            // activeThumb = null; // Не обнуляємо activeThumb тут, щоб коректно відновити стан після оновлення
             fullImages.slice(startIndex, startIndex + 3).forEach(src => createThumb(src, thumbs, 'bg'));
+            // Після рендерингу відновлюємо стан активної мініатюри, якщо вона існує
+            if (activeThumb) {
+                const currentActiveThumbSrc = activeThumb.src;
+                const reRenderedActiveThumb = Array.from(thumbs.querySelectorAll('.thumb')).find(t => t.src === currentActiveThumbSrc);
+                if (reRenderedActiveThumb) {
+                    reRenderedActiveThumb.classList.add('active');
+                    reRenderedActiveThumb.classList.add('disabled');
+                }
+            }
         }
         function renderVows() {
             thumbsVows.innerHTML = "";
-            activeThumb = null;
+            // activeThumb = null; // Не обнуляємо activeThumb тут
             fullLovestones.slice(lovestoneIndex, lovestoneIndex + 1).forEach(src => createThumb(src, thumbsVows, 'lovestone'));
             fullVows.slice(vowIndex, vowIndex + 3).forEach(src => createThumb(src, thumbsVows, 'vow'));
+             // Після рендерингу відновлюємо стан активної мініатюри, якщо вона існує
+            if (activeThumb) {
+                const currentActiveThumbSrc = activeThumb.src;
+                const reRenderedActiveThumb = Array.from(thumbsVows.querySelectorAll('.thumb')).find(t => t.src === currentActiveThumbSrc);
+                if (reRenderedActiveThumb) {
+                    reRenderedActiveThumb.classList.add('active');
+                    reRenderedActiveThumb.classList.add('disabled');
+                }
+            }
         }
         function createThumb(src, container, key) {
             const wrapper = document.createElement("div");
@@ -223,28 +247,64 @@
             thumb.className = "thumb";
             thumb.src = src;
             let timer;
-            wrapper.addEventListener('mouseenter', () => {
-                timer = setTimeout(() => {
-                    imagePreview.src = src;
-                    imagePreview.classList.add('show');
-                }, 700);
+
+            const addPreviewHandlers = () => {
+                thumb.addEventListener('mouseenter', () => {
+                    // Перевіряємо, чи мініатюра не має класу 'disabled'
+                    if (!thumb.classList.contains('disabled')) {
+                        timer = setTimeout(() => {
+                            imagePreview.src = src;
+                            imagePreview.classList.add('show');
+                        }, 700);
+                    }
+                });
+                thumb.addEventListener('mouseleave', () => {
+                    clearTimeout(timer);
+                    imagePreview.classList.remove('show');
+                });
+            };
+
+            const removePreviewHandlers = () => {
+                thumb.removeEventListener('mouseenter', addPreviewHandlers); // Видаляємо, щоб не було дублів
+                thumb.removeEventListener('mouseleave', addPreviewHandlers);
+            };
+
+            // Додаємо обробники спочатку
+            addPreviewHandlers();
+
+            // Спостерігаємо за зміною класу 'disabled'
+            const observer = new MutationObserver((mutationsList) => {
+                for (const mutation of mutationsList) {
+                    if (mutation.attributeName === 'class') {
+                        if (thumb.classList.contains('disabled')) {
+                            // Якщо додано disabled, вимикаємо прев'ю
+                            clearTimeout(timer);
+                            imagePreview.classList.remove('show');
+                            // Додатково можна видалити обробники, якщо це необхідно для оптимізації
+                            // removePreviewHandlers(); // Але для прев'ю, краще просто перевіряти статус всередині обробника
+                        } else {
+                            // Якщо disabled видалено, переконайтеся, що обробники активні
+                            // addPreviewHandlers(); // Якщо вони не видалялися, повторно додавати не потрібно
+                        }
+                    }
+                }
             });
-            wrapper.addEventListener('mouseleave', () => {
-                clearTimeout(timer);
-                imagePreview.classList.remove('show');
-            });
+            observer.observe(thumb, { attributes: true });
+
+
             if (imgName === "Fon") {
                 thumb.title = "Завантажити свій фон";
                 thumb.onclick = () => {
                     bgLoader.click();
                     imagePreview.classList.remove('show');
+                    // Додаємо disabled до "Fon" після кліку, щоб відключити прев'ю для нього
+                    setActiveThumb(thumb);
                 };
             } else {
                 thumb.onclick = () => {
                     handleFileFromGallery(src, key);
-                    if (key === 'bg') {
-                        setActiveThumb(thumb);
-                    }
+                    // Активна мініатюра отримує клас disabled
+                    setActiveThumb(thumb);
                 };
             }
             wrapper.appendChild(thumb);
@@ -262,9 +322,11 @@
             if (key === 'vow' || key === 'lovestone') {
                 vowse.style.display = 'inline-block';
                 vowsi.style.display = 'none';
+                photoBlock.style.display = 'none';
             } else if (key === 'bg') {
                 vowse.style.display = 'none';
                 vowsi.style.display = 'inline-block';
+                photoBlock.style.display = 'inline-block';
             }
             imagePreview.classList.remove('show');
             const img = new Image();
@@ -326,6 +388,11 @@
                     drawAll();
                     if (key === 'bg') {
                         document.getElementById('fot').classList.remove('disabled');
+                        // Оновлюємо активну мініатюру для "Fon"
+                        const fonThumb = Array.from(thumbs.querySelectorAll('.thumb')).find(t => t.title === "Завантажити свій фон");
+                        if (fonThumb) {
+                            setActiveThumb(fonThumb);
+                        }
                     }
                     if (key === 'love') {
                         document.getElementById('previewBtn').classList.remove('disabled');
@@ -349,7 +416,8 @@
         };
         let activeLayer=null, previewMode=false, bgHoleActive=true;
         const history=[]; const MAX_HISTORY=20;
-        function makeSnapshot(){ return { bg:{...layers.bg}, love:{...layers.love}, loveScale: scaleSlider.value, vow:{...layers.vow}, lovestone:{...layers.lovestone}, previewMode, activeLayer, bgHoleActive }; }
+        function makeSnapshot(){ return { bg:{...layers.bg}, love:{...layers.love}, loveScale: scaleSlider.value, vow:{...layers.vow}, lovestone:{...layers.lovestone}, previewMode, activeLayer, bgHoleActive, activeThumbSrc: activeThumb ? activeThumb.src : null }; }
+
         function pushHistory(){ history.push(makeSnapshot()); if(history.length>MAX_HISTORY) history.shift(); }
         function applySnapshot(s){
             previewMode=!!s.previewMode; activeLayer=s.activeLayer||null; bgHoleActive=!!s.bgHoleActive;
@@ -367,7 +435,7 @@
                 const v=s[key];
                 if(v && v.src){
                     const img=new Image();
-                    img.onload=()=>{ layers[key].img=img; layers[key].src=v.src; layers[key].x=v.x; layers[key].y=v.y; layers[key].scale=v.scale; drawAll(); };
+                    img.onload=()=>{ layers[key].img=img; layers[key].src=v.src; layers[layer].x=v.x; layers[key].y=v.y; layers[key].scale=v.scale; drawAll(); };
                     img.src=v.src;
                 } else {
                     layers[key].img=null; layers[key].src=null;
@@ -376,6 +444,15 @@
                     layers[key].scale=v? v.scale:1;
                 }
             });
+            if (s.activeThumbSrc) {
+                // Відновлюємо активну мініатюру після завантаження зображень
+                setTimeout(() => { // Затримка, щоб DOM встиг оновитися
+                    const reRenderedActiveThumb = Array.from(document.querySelectorAll('.thumb')).find(t => t.src === s.activeThumbSrc);
+                    if (reRenderedActiveThumb) {
+                        setActiveThumb(reRenderedActiveThumb);
+                    }
+                }, 100);
+            }
             toggleButtons();
         }
         function drawLayerTo(ctxTarget, layer){
