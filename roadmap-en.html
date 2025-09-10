@@ -197,17 +197,28 @@
         // Оновлена функція для встановлення активної мініатюри
         function setActiveThumb(thumbElement, galleryType) {
             const allThumbsInGallery = document.querySelectorAll(`#${galleryType === 'bg' ? 'thumbs' : 'thumbsVows'} .thumb`);
+
             allThumbsInGallery.forEach(thumb => {
                 thumb.classList.remove('active');
-                thumb.classList.remove('disabled');
+                // Знімаємо disabled з усіх, крім "Fon" (для bg) та "LoveStones" (для vow)
+                if (galleryType === 'bg' && thumb.dataset.imgName === "Fon") {
+                    // "Fon" ніколи не отримує disabled, тому нічого не робимо
+                } else if (galleryType === 'vow' && thumb.dataset.imgName === "LoveStones") {
+                    // "LoveStones" зберігає disabled, якщо він вже був встановлений.
+                    // Знімати його тут не потрібно, він буде встановлений при активації,
+                    // або відновлений через історію.
+                }
+                else {
+                    thumb.classList.remove('disabled');
+                }
             });
+
             thumbElement.classList.add('active');
 
             if (galleryType === 'bg' && thumbElement.dataset.imgName === "Fon") {
-                // "Fon" ніколи не отримує disabled
-                // console.log("Fon selected, not disabling");
+                // "Fon" ніколи не отримує disabled при активації
             } else if (galleryType === 'vow' && thumbElement.dataset.imgName === "LoveStones") {
-                // "LoveStones" завжди отримує disabled
+                // "LoveStones" завжди отримує disabled при активації
                 thumbElement.classList.add('disabled');
             } else {
                 // Решта мініатюр отримують disabled при активації
@@ -239,8 +250,14 @@
                 const reRenderedActiveThumb = Array.from(thumbsVows.querySelectorAll('.thumb')).find(t => t.src === activeThumb.vow.src);
                 if (reRenderedActiveThumb) {
                     reRenderedActiveThumb.classList.add('active');
-                    reRenderedActiveThumb.classList.add('disabled'); // LoveStones завжди disabled після вибору
+                    // LoveStones завжди disabled після вибору, інші клятви теж
+                    reRenderedActiveThumb.classList.add('disabled');
                 }
+            }
+            // Додатково перевіряємо, чи LoveStones має бути disabled незалежно від активності інших
+            const loveStonesThumb = Array.from(thumbsVows.querySelectorAll('.thumb')).find(t => t.dataset.imgName === "LoveStones");
+            if (loveStonesThumb && layers.lovestone.img) { // Якщо LoveStones завантажено
+                 loveStonesThumb.classList.add('disabled');
             }
         }
         function createThumb(src, container, key) {
@@ -474,6 +491,16 @@
                     }
                 } else {
                     activeThumb.vow = null;
+                }
+                // Після завантаження історії, перевіряємо стан LoveStones окремо
+                const loveStonesThumb = Array.from(thumbsVows.querySelectorAll('.thumb')).find(t => t.dataset.imgName === "LoveStones");
+                if (loveStonesThumb && layers.lovestone.img && !loveStonesThumb.classList.contains('active')) {
+                    // Якщо LoveStones завантажено, але не є активною клятвою (бо активна інша клятва),
+                    // то LoveStones має бути disabled
+                    loveStonesThumb.classList.add('disabled');
+                } else if (loveStonesThumb && layers.lovestone.img && loveStonesThumb.classList.contains('active')) {
+                    // Якщо LoveStones завантажено і є активною, вона теж disabled
+                    loveStonesThumb.classList.add('disabled');
                 }
             }, 100); // Невелика затримка, щоб DOM встиг оновитися після рендерингу
 
