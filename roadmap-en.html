@@ -25,70 +25,19 @@
         }
         #scaleSlider { width: 420px; }
         button { padding: 8px 12px; cursor: pointer; border-radius: 8px; }
-        .disabled { pointer-events: none; opacity: .5; filter: grayscale(100%); }
+        .disabled {/*cursor: not-allowed; */ pointer-events: none;opacity: .5; filter: grayscale(100%); }
         .gallery-container { display: flex; align-items: flex-start; justify-content: center; gap: 10px; margin-top: 10px; }
         .gallery-block { display: flex; flex-direction: column; align-items: center; gap: 10px; }
-
-        /* Стилі для нової галереї фонів, адаптовані з "Gallery" */
-        .gallery-wrapper {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            width: 630px; /* Адаптуємо під ширинуthumbnails з Collage */
-            justify-content: center;
-        }
-        .gallery {
-            display: flex;
-            gap: 10px;
-            overflow: hidden;
-            width: calc(3 * 120px + 2 * 10px); /* 3 мініатюри * 120px + 2 проміжки по 10px */
-        }
-        .gallery-content { /* Додано для JS прокрутки */
-            display: flex;
-            gap: 10px;
-            transition: transform 0.3s ease-in-out;
-        }
-        .gallery input[type="radio"] { display: none; }
-        .gallery label {
-            flex-shrink: 0; /* Щоб мініатюри не стискалися */
-            display: block;
-            cursor: pointer;
-            border: 2px solid transparent;
-            border-radius: 8px;
-            overflow: hidden;
-            transition: border 0.3s;
-        }
-        .gallery label img {
-            width: 120px;
-            height: 80px;
-            object-fit: cover;
-            display: block;
-        }
-        .gallery input[type="radio"]:checked + label {
-            border: 2px solid #007bff;
-        }
-        /* Стиль для активної/вибраної мініатюри, щоб вона була disabled */
-        .gallery label.disabled-thumb {
-            cursor: not-allowed;
-            opacity: .5;
-            filter: grayscale(100%);
-            border: 2px solid red; /* Додаємо рамку для disabled */
-        }
-        .nav {
-            background: #fff;
-            border: 1px solid #ccc;
-            padding: 5px 10px;
-            font-size: 20px;
-            cursor: pointer;
-            border-radius: 6px;
-        }
-        .nav:disabled {
-            opacity: 0.3;
-            cursor: not-allowed;
-        }
-        /* Кінець стилів для нової галереї */
-
-
+        .gallery-block > div { display: flex; align-items: center; justify-content: center;}
+        .arrow, .arow { font-size: 20px; cursor: pointer; user-select: none; padding: 3px; line-height: 1; display: flex; align-items: center; justify-content: center; }
+        .arrow:first-child { margin-right: -130px; }
+        .arrow:last-child { margin-left: -130px; }
+        .arow:first-child { margin-right: -60px; }
+        .arow:last-child { margin-left: -60px; }
+        .thumbnails { display: flex; gap: 10px; overflow: hidden; width: 630px; justify-content: center; }
+        .thumb-wrapper { position: relative; }
+        .thumb { width: 108px; height: 72px; object-fit: cover; cursor: pointer; box-shadow: 0 0 6px rgba(0,0,0,0.3); transition: all 0.3s ease; z-index: 1; border-radius: 10px; }
+        .thumb.active { border: 3px solid red; box-shadow: 0 0 10px red; }
         .collage {
             position: relative;
             display: inline-block;
@@ -97,7 +46,7 @@
         .gallery-container.vows .labels { display: grid; grid-template-columns: repeat(4, 1fr); text-align: center; margin-bottom: 5px; }
         .gallery-container.vows .labels .label1 { grid-column: 1; font-weight: bold; margin-left: 70px; }
         .gallery-container.vows .labels .label2 { grid-column: 3; font-weight: bold; }
-        /* .arrow, .arow тепер не використовуються для галереї фонів */
+        .arrow, .arow { position: relative; z-index: 3; }
         .button-row { display: flex; justify-content: center; align-items: center; gap: 10px; }
         #fot { display: inline-block; cursor: pointer; border-radius: 8px; width: 108px; height: 72px; background-image: url(https://detectfraud.github.io/gallery/Para.png); background-repeat: no-repeat; background-size: contain; }
         #fot:hover { mix-blend-mode: luminosity; }
@@ -116,7 +65,6 @@
             box-shadow: 0 0 25px rgba(0,0,0,0.7);
             pointer-events: none;
             background: #fff;
-            object-fit: cover;
         }
         .imagbox.show {
             opacity: 1;
@@ -153,11 +101,7 @@
             canvas { width: 95%; height: auto; }
             #scaleSlider { width: 95%; }
             .gallery-container { flex-direction: column; align-items: center; }
-            /* Адаптація нової галереї під мобільні */
-            .gallery-wrapper { width: 100%; justify-content: center; }
-            .gallery { width: calc(3 * 108px + 2 * 10px); /* 3 мініатюри * 108px + 2 проміжки */ }
-            .gallery label img { width: 108px; height: 72px; }
-            /* Кінець адаптації */
+            .thumbnails { width: 100%; justify-content: center; }
             .arrow:first-child, .arrow:last-child { margin: 0 10px; }
             .arow:first-child, .arow:last-child { margin: 0 10px; }
             .photo-block { margin-left: 0; }
@@ -181,14 +125,12 @@
         <div class="gallery-container">
             <div class="gallery-block" id="vowsi">
                 <b>Фон</b><br /><br />
-                <div class="gallery-wrapper">
-                    <button class="nav prev" id="prevBgBtn">⟨</button>
-                    <div class="gallery" id="bgGallery">
-                        <div class="gallery-content" id="bgGalleryContent"></div>
-                    </div>
-                    <button class="nav next" id="nextBgBtn">⟩</button>
+                <div>
+                    <span class="arrow" onclick="prevSlide()">&#10094;</span>
+                    <div class="thumbnails" id="thumbs"></div>
+                    <span class="arrow" onclick="nextSlide()">&#10095;</span>
                 </div>
-                </div>
+            </div>
             <div class="gallery-block photo-block">
                 <b>Ваше фото</b><br /><br />
                 <div>
@@ -224,8 +166,8 @@
         /* === Collage JS === */
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
-        // Старі елементи галереї фонів видалено
-        const thumbsVows = document.getElementById('thumbsVows'); // Залишається для галереї клятв
+        const thumbs = document.getElementById('thumbs');
+        const thumbsVows = document.getElementById('thumbsVows');
         const loveLoader = document.getElementById('loveLoader');
         const scaleSlider = document.getElementById('scaleSlider');
         const undoBtn = document.getElementById('undoBtn');
@@ -240,31 +182,20 @@
         const DONATE_URL = "https://example.com/donate";
         const imagePreview = document.getElementById('imagePreview');
 
-        // Нові елементи для інтегрованої галереї фонів
-        const bgGalleryContent = document.getElementById('bgGalleryContent');
-        const prevBgBtn = document.getElementById('prevBgBtn');
-        const nextBgBtn = document.getElementById('nextBgBtn');
-
         const url = "https://detectfraud.github.io/gallery/";
-        const bgImages = [ "nature(1)","nature(2)","nature(3)","nature(4)","nature(5)", "nature(6)","nature(7)","nature(8)","nature(9)","Fon" ];
-        const fullBgImages = bgImages.map(name => url + name + ".jpeg");
-        let bgStartIndex = 0; // Для нової галереї фонів
-        const visibleBgCount = 3; // Кількість видимих мініатюр для фонів
-        const thumbnailBgWidth = 130; // 120px width + 10px gap
-
+        const images = [ "nature(1)","nature(2)","nature(3)","nature(4)","nature(5)", "nature(6)","nature(7)","nature(8)","nature(9)","Fon" ];
+        const fullImages = images.map(name => url + name + ".jpeg");
+        let startIndex = 0;
         const vows = ["Eternity","Fidelity","Joy","Love","Strength","Tenderness","Trust","Unity","Heart","Hearts"];
         const fullVows = vows.map(name => url + name + ".png");
-        let vowIndex = 0; // Для старої галереї клятв
+        let vowIndex = 0;
         const lovestoneImages = ["LoveStones"];
         const fullLovestones = lovestoneImages.map(name => url + name + ".png");
-        let lovestoneIndex = 0; // Для старої галереї клятв
-
-        let activeThumb = null; // Для старої галереї клятв
-        let activeBgRadio = null; // Для нової галереї фонів
-
-        // Оновлена функція для встановлення активної мініатюри (для старої галереї клятв)
+        let lovestoneIndex = 0;
+        let activeThumb = null;
+        // Оновлена функція для встановлення активної мініатюри
         function setActiveThumb(thumbElement) {
-            const allThumbs = document.querySelectorAll('#thumbsVows .thumb');
+            const allThumbs = document.querySelectorAll('.thumb');
             allThumbs.forEach(thumb => {
                 thumb.classList.remove('active');
                 thumb.classList.remove('disabled');
@@ -273,102 +204,16 @@
             thumbElement.classList.add('disabled');
             activeThumb = thumbElement;
         }
-
-        // --- НОВІ ФУНКЦІЇ ДЛЯ ІНТЕГРОВАНОЇ ГАЛЕРЕЇ ФОНІВ ---
-        function createBgGallery() {
-            bgGalleryContent.innerHTML = '';
-            fullBgImages.forEach((src, index) => {
-                const imgName = src.split("/").pop().split(".")[0];
-                const input = document.createElement("input");
-                input.type = "radio";
-                input.name = "bgThumb";
-                input.id = `bgThumb${index}`;
-
-                const label = document.createElement("label");
-                label.setAttribute("for", input.id);
-
-                const img = new Image();
-                img.src = src;
-                img.alt = imgName;
-                label.appendChild(img);
-
-                if (imgName === "Fon") {
-                    label.title = "Завантажити свій фон";
-                }
-
-                input.addEventListener("change", () => {
-                    if (imgName === "Fon") {
-                        bgLoader.click();
-                    } else {
-                        handleFileFromGallery(src, 'bg');
-                    }
-                    imagePreview.classList.remove('show');
-                    if (activeBgRadio) {
-                        activeBgRadio.classList.remove('disabled-thumb');
-                    }
-                    label.classList.add('disabled-thumb');
-                    activeBgRadio = label;
-                });
-
-                let hoverTimeout;
-                label.addEventListener('mouseenter', () => {
-                    clearTimeout(hoverTimeout);
-                    hoverTimeout = setTimeout(() => {
-                        imagePreview.src = src;
-                        imagePreview.classList.add('show');
-                    }, 700);
-                });
-
-                label.addEventListener('mouseleave', () => {
-                    clearTimeout(hoverTimeout);
-                    imagePreview.classList.remove('show');
-                });
-                bgGalleryContent.appendChild(input);
-                bgGalleryContent.appendChild(label);
-            });
-            // Вибираємо перший елемент за замовчуванням
-            const firstRadio = bgGalleryContent.querySelector('input[type="radio"]');
-            if(firstRadio) {
-                firstRadio.checked = true;
-                const firstLabel = firstRadio.nextElementSibling;
-                firstLabel.classList.add('disabled-thumb');
-                activeBgRadio = firstLabel;
-                handleFileFromGallery(fullBgImages[0], 'bg'); // Завантажуємо перший фон
-            }
+        function renderThumbnails() {
+            thumbs.innerHTML = "";
+            activeThumb = null;
+            fullImages.slice(startIndex, startIndex + 3).forEach(src => createThumb(src, thumbs, 'bg'));
         }
-
-        function updateBgGalleryDisplay() {
-            const offset = -bgStartIndex * thumbnailBgWidth;
-            bgGalleryContent.style.transform = `translateX(${offset}px)`;
-
-            prevBgBtn.disabled = (bgStartIndex === 0);
-            nextBgBtn.disabled = (bgStartIndex >= fullBgImages.length - visibleBgCount);
-        }
-
-        prevBgBtn.addEventListener("click", () => {
-            if (bgStartIndex > 0) {
-                bgStartIndex--;
-                updateBgGalleryDisplay();
-            }
-        });
-        nextBgBtn.addEventListener("click", () => {
-            if (bgStartIndex < fullBgImages.length - visibleBgCount) {
-                bgStartIndex++;
-                updateBgGalleryDisplay();
-            }
-        });
-        // --- КІНЕЦЬ НОВИХ ФУНКЦІЙ ДЛЯ ГАЛЕРЕЇ ФОНІВ ---
-
-
-        // --- ФУНКЦІЇ ДЛЯ СТАРОЇ ГАЛЕРЕЇ КЛЯТВ (без змін) ---
         function renderVows() {
             thumbsVows.innerHTML = "";
             activeThumb = null;
-            const combinedVows = [...fullLovestones, ...fullVows]; // Об'єднано для єдиної галереї
-            combinedVows.slice(vowIndex, vowIndex + 3).forEach(src => {
-                const key = src.includes(loveStoneName) ? 'lovestone' : 'vow';
-                createThumb(src, thumbsVows, key);
-            });
+            fullLovestones.slice(lovestoneIndex, lovestoneIndex + 1).forEach(src => createThumb(src, thumbsVows, 'lovestone'));
+            fullVows.slice(vowIndex, vowIndex + 3).forEach(src => createThumb(src, thumbsVows, 'vow'));
         }
         function createThumb(src, container, key) {
             const wrapper = document.createElement("div");
@@ -388,30 +233,38 @@
                 clearTimeout(timer);
                 imagePreview.classList.remove('show');
             });
-            thumb.onclick = () => {
-                handleFileFromGallery(src, key);
-                setActiveThumb(thumb);
-            };
+            if (imgName === "Fon") {
+                thumb.title = "Завантажити свій фон";
+                thumb.onclick = () => {
+                    bgLoader.click();
+                    imagePreview.classList.remove('show');
+                };
+            } else {
+                thumb.onclick = () => {
+                    handleFileFromGallery(src, key);
+                    if (key === 'bg') {
+                        setActiveThumb(thumb);
+                    }
+                };
+            }
             wrapper.appendChild(thumb);
             container.appendChild(wrapper);
         }
-        function prevVow(){ vowIndex=(vowIndex-3+ (fullLovestones.length + fullVows.length))%(fullLovestones.length + fullVows.length); renderVows(); }
-        function nextVow(){ vowIndex=(vowIndex+3)%(fullLovestones.length + fullVows.length); renderVows(); }
-        // --- КІНЕЦЬ ФУНКЦІЙ ДЛЯ СТАРОЇ ГАЛЕРЕЇ КЛЯТВ ---
-
+        function prevSlide(){ startIndex=(startIndex-3+fullImages.length)%fullImages.length; renderThumbnails(); }
+        function nextSlide(){ startIndex=(startIndex+3)%fullImages.length; renderThumbnails(); }
+        function prevVow(){ vowIndex=(vowIndex-3+fullVows.length)%fullVows.length; renderVows(); }
+        function nextVow(){ vowIndex=(vowIndex+3)%fullVows.length; renderVows(); }
         function handleFileFromGallery(src, key) {
             if (previewMode) {
                 previewMode = false;
                 canvas.classList.remove('preview-zoom-in');
             }
             if (key === 'vow' || key === 'lovestone') {
-                vowse.style.display = 'flex'; // Використовуємо flex для коректного відображення галереї vows
+                vowse.style.display = 'inline-block';
                 vowsi.style.display = 'none';
-                photoBlock.style.display = 'none';
             } else if (key === 'bg') {
                 vowse.style.display = 'none';
-                vowsi.style.display = 'flex';
-                photoBlock.style.display = 'flex';
+                vowsi.style.display = 'inline-block';
             }
             imagePreview.classList.remove('show');
             const img = new Image();
@@ -421,8 +274,8 @@
                 layers[key].src = src;
                 if (key === 'vow') {
                     layers[key].scale = 0.5;
-                    layers[key].x = (canvas.width / 2) + 14.28;
-                    layers[key].y = (canvas.height) - 14.28;
+                    layers[key].x = (img.width * layers[key].scale / 2) + 14.28;
+                    layers[key].y = canvas.height - (img.height * layers[key].scale / 2) - 14.28;
                 } else if (key === 'lovestone') {
                     layers[key].scale = 0.5;
                     layers[key].x = canvas.width / 2;
@@ -443,7 +296,7 @@
                 if (key === 'bg') {
                     document.getElementById('fot').classList.remove('disabled');
                 }
-                if (layers.love.img || layers.lovestone.img) {
+                if (key === 'love' || key === 'lovestone') {
                     document.getElementById('previewBtn').classList.remove('disabled');
                 }
                 previewBtn.style.display = 'inline-block';
@@ -451,7 +304,6 @@
             };
             img.src = src;
         }
-
         function handleFileLoad(file,key){
             if(!file) return;
             const reader=new FileReader();
@@ -474,14 +326,6 @@
                     drawAll();
                     if (key === 'bg') {
                         document.getElementById('fot').classList.remove('disabled');
-                        // Оновлюємо активну мініатюру для "Fon" у новій галереї фонів
-                        const fonLabel = bgGalleryContent.querySelector(`label[title="Завантажити свій фон"]`);
-                        if(fonLabel) {
-                            if (activeBgRadio) activeBgRadio.classList.remove('disabled-thumb');
-                            fonLabel.classList.add('disabled-thumb');
-                            fonLabel.previousElementSibling.checked = true; // Позначаємо радіокнопку
-                            activeBgRadio = fonLabel;
-                        }
                     }
                     if (key === 'love') {
                         document.getElementById('previewBtn').classList.remove('disabled');
@@ -505,28 +349,10 @@
         };
         let activeLayer=null, previewMode=false, bgHoleActive=true;
         const history=[]; const MAX_HISTORY=20;
-        function makeSnapshot(){ return { bg:{...layers.bg}, love:{...layers.love}, loveScale: scaleSlider.value, vow:{...layers.vow}, lovestone:{...layers.lovestone}, previewMode, activeLayer, bgHoleActive, bgStartIndex, activeBgRadioId: activeBgRadio ? activeBgRadio.id : null }; }
-
+        function makeSnapshot(){ return { bg:{...layers.bg}, love:{...layers.love}, loveScale: scaleSlider.value, vow:{...layers.vow}, lovestone:{...layers.lovestone}, previewMode, activeLayer, bgHoleActive }; }
         function pushHistory(){ history.push(makeSnapshot()); if(history.length>MAX_HISTORY) history.shift(); }
         function applySnapshot(s){
             previewMode=!!s.previewMode; activeLayer=s.activeLayer||null; bgHoleActive=!!s.bgHoleActive;
-            bgStartIndex = s.bgStartIndex !== undefined ? s.bgStartIndex : 0; // Відновлюємо bgStartIndex
-            updateBgGalleryDisplay(); // Оновлюємо відображення галереї фонів
-
-            if (s.activeBgRadioId) {
-                const radio = document.getElementById(s.activeBgRadioId);
-                if (radio) {
-                    radio.checked = true;
-                    const label = radio.nextElementSibling;
-                    if (activeBgRadio) activeBgRadio.classList.remove('disabled-thumb');
-                    label.classList.add('disabled-thumb');
-                    activeBgRadio = label;
-                }
-            } else {
-                if (activeBgRadio) activeBgRadio.classList.remove('disabled-thumb');
-                activeBgRadio = null;
-            }
-
             if (s.bg.img) {
                 document.getElementById('fot').classList.remove('disabled');
             } else {
@@ -607,14 +433,14 @@
                 downloadBtn.style.display = 'inline-block';
                 vowsi.style.display = 'none';
                 photoBlock.style.display = 'none';
-                vowse.style.display = 'flex'; // Використовуємо flex
+                vowse.style.display = 'inline-block';
                 canvas.classList.add('preview-zoom-in');
                 activeLayer = null;
             } else {
                 previewBtn.style.display = 'inline-block';
                 downloadBtn.style.display = 'none';
-                vowsi.style.display = 'flex'; // Використовуємо flex
-                photoBlock.style.display = 'flex'; // Використовуємо flex
+                vowsi.style.display = 'inline-block';
+                photoBlock.style.display = 'inline-block';
                 vowse.style.display = 'none';
                 canvas.classList.remove('preview-zoom-in');
             }
@@ -692,10 +518,7 @@
         document.onselectstart = disableContextMenu;
         document.ondragstart = disableContextMenu;
         template.onload = () => { drawAll(); };
-
-        // Ініціалізація нових та старих галерей
-        createBgGallery();
-        updateBgGalleryDisplay();
+        renderThumbnails();
         renderVows();
         applySnapshot(history[0] || makeSnapshot());
     </script>
