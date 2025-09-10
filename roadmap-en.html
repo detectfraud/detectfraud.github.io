@@ -28,7 +28,8 @@
         .disabled { pointer-events: none; opacity: .5; filter: grayscale(100%); }
         .gallery-container { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; margin-top: 10px; }
         .gallery-block { display: flex; flex-direction: column; align-items: center; gap: 10px; }
-        
+
+        /* Нові стилі для інтегрованої галереї */
         .gallery-wrapper {
             display: flex;
             align-items: center;
@@ -76,7 +77,7 @@
             opacity: 0.3;
             cursor: not-allowed;
         }
-        
+
         .collage {
             position: relative;
             display: inline-block;
@@ -239,6 +240,7 @@
         const visibleCount = 3;
         const thumbnailWidth = 130; // 120px width + 10px gap
 
+        // Функція для створення галереї з радіокнопками та переглядом
         function createGallery(galleryElement, images, key) {
             galleryElement.innerHTML = '';
             images.forEach((src, index) => {
@@ -288,6 +290,7 @@
             });
         }
         
+        // Функція для оновлення видимої частини галереї за допомогою transform
         function updateGallery(galleryElement, startIndex, totalImages, prevBtn, nextBtn) {
             const offset = -startIndex * thumbnailWidth;
             galleryElement.style.transform = `translateX(${offset}px)`;
