@@ -650,14 +650,7 @@
         renderThumbnails();
         renderVows();
         applySnapshot(history[0] || makeSnapshot());
-        //iframe
-canvas.addEventListener('click', () => {
-    window.parent.postMessage({
-        action: 'showImage',
-        imageUrl: canvas.toDataURL()
-    }, '*');
-});
-        //
+
     </script>
 </body>
 </html>
