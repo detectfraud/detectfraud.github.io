@@ -164,6 +164,45 @@
     <input type="file" id="bgLoader" style="display:none">
     <input type="file" id="loveLoader" style="display:none">
     <script>
+const allowedHost = 'intuit-portal.blogspot.com';
+let isAllowed = false;
+
+// Пріоритетна перевірка: чи належить батьківський хост до дозволених
+try {
+    if (window.top.location.hostname.includes(allowedHost)) {
+        isAllowed = true;
+    }
+} catch (e) {
+    // Якщо доступ заблоковано (Same-Origin Policy), перевіряємо referrer
+    if (document.referrer.includes(allowedHost)) {
+        isAllowed = true;
+    }
+}
+
+// Додаткова перевірка: чи існують на сторінці Blogger унікальні елементи
+function hasBloggerElements() {
+    try {
+        const hasHeader = window.top.document.getElementById('header-wrapper') !== null;
+        const hasMain = window.top.document.getElementById('main-wrapper') !== null;
+        return hasHeader && hasMain;
+    } catch (e) {
+        // Якщо доступ заблоковано, повертаємо false
+        return false;
+    }
+}
+
+if (!isAllowed || !hasBloggerElements()) {
+    // Якщо будь-яка з перевірок не пройдена, забороняємо доступ
+    document.body.innerHTML = '<div style="text-align:center; padding: 20px;">' +
+        '<h1>Доступ заборонено</h1>' +
+        '<p>Цей додаток може бути вбудований лише на офіційному сайті ' + allowedHost + '</p>' +
+        '</div>';
+    throw new Error('Доступ заборонено');
+}
+
+// Ваш основний код JS починається тут
+// ...
+        
         /* === Collage JS === */
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
