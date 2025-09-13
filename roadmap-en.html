@@ -164,45 +164,18 @@
     <input type="file" id="bgLoader" style="display:none">
     <input type="file" id="loveLoader" style="display:none">
     <script>
-const allowedHost = 'https://intuit-portal.blogspot.com/p/lovestone2.html';
-let isAllowed = false;
+const allowedDomains = ['intuit-portal.blogspot.com', 'detectfraud.github.io'];
+const currentHost = window.location.hostname;
+const referrerHost = document.referrer ? new URL(document.referrer).hostname : '';
 
-// Пріоритетна перевірка: чи належить батьківський хост до дозволених
-try {
-    if (window.top.location.hostname.includes(allowedHost)) {
-        isAllowed = true;
-    }
-} catch (e) {
-    // Якщо доступ заблоковано (Same-Origin Policy), перевіряємо referrer
-    if (document.referrer.includes(allowedHost)) {
-        isAllowed = true;
-    }
-}
+const isAllowed = allowedDomains.some(domain => currentHost.includes(domain)) ||
+                  allowedDomains.some(domain => referrerHost.includes(domain));
 
-// Додаткова перевірка: чи існують на сторінці Blogger унікальні елементи
-function hasBloggerElements() {
-    try {
-        const hasHeader = window.top.document.getElementById('header-wrapper') !== null;
-        const hasMain = window.top.document.getElementById('main-wrapper') !== null;
-        return hasHeader && hasMain;
-    } catch (e) {
-        // Якщо доступ заблоковано, повертаємо false
-        return false;
-    }
-}
-
-if (!isAllowed || !hasBloggerElements()) {
-    // Якщо будь-яка з перевірок не пройдена, забороняємо доступ
-    document.body.innerHTML = '<div style="text-align:center; padding: 20px;">' +
-        '<h1>Доступ заборонено</h1>' +
-        '<p>Цей додаток може бути вбудований лише на офіційному сайті ' + allowedHost + '</p>' +
-        '</div>';
+if (!isAllowed) {
+    document.body.innerHTML = '<h1>Доступ заборонено</h1><p>Цей додаток може бути вбудований лише на офіційному сайті intuit-portal.blogspot.com</p>';
     throw new Error('Доступ заборонено');
 }
 
-// Ваш основний код JS починається тут
-// ...
-        
         /* === Collage JS === */
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
