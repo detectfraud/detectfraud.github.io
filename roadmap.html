@@ -114,7 +114,7 @@
     </style>
 </head>
 <body>
-    <fieldset class="venwin" style="height:auto;">
+    <fieldset class="venwin" id="desktop" style="height:auto;">
         <div class="collage" id="collage">
             <canvas id="canvas" width="900" height="600" style="cursor: pointer;border:1px solid #ccc;"></canvas>
             <img id="imagePreview" class="imagbox" src="" alt="Image Preview">
@@ -190,6 +190,7 @@ if (!isAllowed) {
         const collage = document.getElementById('collage');
         const vowse = document.getElementById('vowse');
         const vowsi = document.getElementById('vowsi');
+        const vowsi = document.getElementById('desktop');
         const photoBlock = document.querySelector('.photo-block');
         const loveStoneName = "LoveStones";
         const DONATE_URL = "https://example.com/donate";
@@ -668,8 +669,7 @@ const isMobile = /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(
 
 if(isMobile){
     // Приховуємо десктопні елементи
-    vowsi.style.display = 'none';
-    photoBlock.style.display = 'none';
+    desktop.style.display = 'none';
 
     // Мобільний контейнер
     const mobileContainer = document.createElement('div');
