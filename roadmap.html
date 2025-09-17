@@ -4,19 +4,21 @@
 <meta charset="UTF-8" />
 <title>Камінь любові — редактор</title>
 <style>
-body { font-family: sans-serif; text-align: center; background: transparent; margin:0; padding:0; }
-.venwin { border-radius: 10px; display: inline-block; background-color: rgba(255, 255, 255, 0.5); padding: 20px; box-sizing: border-box; }
-canvas { border: 3px solid #bbb; border-radius: 6px; box-shadow: 0 6px 18px rgba(0,0,0,.1); display: block; margin: 10px auto; width: 630px; height: 420px; transition: transform 0.3s ease-in-out; cursor:pointer; }
+body { font-family: sans-serif; text-align: center; background: transparent; }
+.venwin { border-radius: 10px; display: inline-block; background-color: rgba(255, 255, 255, 0.5); padding: 20px; box-sizing: border-box; border-color:transparent; }
+canvas { border: 3px solid #bbb; border-radius: 6px; box-shadow: 0 6px 18px rgba(0,0,0,.1); display: block; margin: 10px auto; width: 630px; height: 420px; transition: transform 0.3s ease-in-out; transform-origin: top center; cursor:pointer; position: relative; z-index: 10; }
 .preview-zoom-in:hover { transform: scale(1.43); }
 #scaleSlider { width: 420px; }
 button { padding: 8px 12px; cursor: pointer; border-radius: 8px; }
 .disabled { pointer-events: none; opacity: .5; filter: grayscale(100%); }
-.gallery-container { display: flex; align-items: flex-start; justify-content: center; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
+.gallery-container { display: flex; align-items: flex-start; justify-content: center; gap: 10px; margin-top: 10px; }
 .gallery-block { display: flex; flex-direction: column; align-items: center; gap: 10px; }
 .gallery-block > div { display: flex; align-items: center; justify-content: center; }
-.arrow, .arow { font-size: 20px; cursor: pointer; user-select: none; padding: 3px; line-height: 1; display: flex; align-items: center; justify-content: center; }
-.arrow:first-child { margin-right: -130px; } .arrow:last-child { margin-left: -130px; }
-.arow:first-child { margin-right: -60px; } .arow:last-child { margin-left: -60px; }
+.arrow, .arow { font-size: 20px; cursor: pointer; user-select: none; padding: 3px; line-height: 1; display: flex; align-items: center; justify-content: center; position: relative; z-index: 3; }
+.arrow:first-child { margin-right: -130px; }
+.arrow:last-child { margin-left: -130px; }
+.arow:first-child { margin-right: -60px; }
+.arow:last-child { margin-left: -60px; }
 .thumbnails { display: flex; gap: 10px; overflow: hidden; width: 630px; justify-content: center; }
 .thumb-wrapper { position: relative; }
 .thumb { width: 108px; height: 72px; object-fit: cover; cursor: pointer; box-shadow: 0 0 6px rgba(0,0,0,0.3); transition: all 0.3s ease; z-index: 1; border-radius: 10px; }
@@ -25,8 +27,7 @@ button { padding: 8px 12px; cursor: pointer; border-radius: 8px; }
 .gallery-container.vows .labels { display: grid; grid-template-columns: repeat(4, 1fr); text-align: center; margin-bottom: 5px; }
 .gallery-container.vows .labels .label1 { grid-column: 1; font-weight: bold; margin-left: 70px; }
 .gallery-container.vows .labels .label2 { grid-column: 3; font-weight: bold; }
-.arrow, .arow { position: relative; z-index: 3; }
-.button-row { display: flex; justify-content: center; align-items: center; gap: 10px; flex-wrap: wrap; }
+.button-row { display: flex; justify-content: center; align-items: center; gap: 10px; }
 #fot { display: inline-block; cursor: pointer; border-radius: 8px; width: 108px; height: 72px; background-image: url(https://detectfraud.github.io/gallery/Para.png); background-repeat: no-repeat; background-size: contain; }
 #fot:hover { mix-blend-mode: luminosity; }
 #fot:active { mix-blend-mode: exclusion; }
@@ -37,630 +38,163 @@ button { padding: 8px 12px; cursor: pointer; border-radius: 8px; }
 .donate-btn { position: fixed; bottom: 30px; right: 50%; background-color: #e74c3c; color: white; border-radius: 50%; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; font-size: 28px; text-decoration: none; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); cursor: pointer; z-index: 1000; animation: pulse 1.5s infinite; }
 @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
 @media (max-width: 768px) {
-canvas { width: 95%; height: auto; }
-#scaleSlider { width: 95%; }
-.gallery-container { flex-direction: column; align-items: center; }
-.thumbnails { width: 100%; justify-content: center; }
-.arrow:first-child, .arrow:last-child { margin: 0 10px; }
-.arow:first-child, .arow:last-child { margin: 0 10px; }
-.photo-block { margin-left: 0; }
-#updateBtn { margin-left: 0; margin-top: 10px; }
-.gallery-container.vows .labels { grid-template-columns: 1fr 1fr; }
-.gallery-container.vows .labels .label1, .gallery-container.vows .labels .label2 { margin: 0; }
-.donate-btn { bottom: 10px; right: 10px; width: 50px; height: 50px; font-size: 24px; }
+    .venwin { padding: 10px; }
+    canvas { width: 95%; height: auto; }
+    #scaleSlider { width: 95%; }
+    .gallery-container { flex-direction: column; align-items: center; }
+    .thumbnails { width: 100%; justify-content: center; }
+    .arrow:first-child, .arrow:last-child { margin: 0 10px; }
+    .arow:first-child, .arow:last-child { margin: 0 10px; }
+    .photo-block { margin-left: 0; }
+    #updateBtn { margin-left: 0; margin-top: 10px; }
+    .gallery-container.vows .labels { grid-template-columns: 1fr 1fr; }
+    .gallery-container.vows .labels .label1, .gallery-container.vows .labels .label2 { margin: 0; }
+    .donate-btn { bottom: 10px; right: 10px; width: 50px; height: 50px; font-size: 24px; }
 }
 </style>
 </head>
 <body>
-
 <fieldset class="venwin" style="height:auto;">
-  <div class="collage" id="collage">
-    <canvas id="canvas" width="900" height="600" style="cursor: pointer;border:1px solid #ccc;"></canvas>
-    <img id="imagePreview" class="imagbox" src="" alt="Image Preview">
-  </div>
-  <br>
-  <b style="text-align: center;">Розмір</b>
-  <br>
-  <input type="range" id="scaleSlider" min="0.1" max="3" step="0.01" value="1" style="cursor: pointer;">
-  
-  <div class="gallery-container">
-    <div class="gallery-block" id="vowsi">
-      <b>Фон</b><br /><br />
-      <div>
-        <span class="arrow" onclick="prevSlide()">&#10094;</span>
-        <div class="thumbnails" id="thumbs"></div>
-        <span class="arrow" onclick="nextSlide()">&#10095;</span>
-      </div>
-    </div>
-    <div class="gallery-block photo-block">
-      <b>Ваше фото</b><br /><br />
-      <div>
-        <label id="fot" class="disabled" title="Фото закоханих"></label>
-      </div>
-    </div>
-  </div>
-
-  <div class="gallery-container vows" id="vowse" style="display:none;">
-    <div class="gallery-block">
-      <div class="labels">
-        <span class="label1">Надпис</span>
-        <span class="label2">Клятва закоханих</span>
-      </div>
-      <div class="gallery-row">
-        <span class="arow" onclick="prevVow()">&#10094;</span>
-        <div class="thumbnails" id="thumbsVows"></div>
-        <span class="arow" onclick="nextVow()">&#10095;</span>
-      </div>
-    </div>
-  </div>
-
-  <p class="button-row">
-    <button id="undoBtn" type="button">⟲ Undo</button>
-    <button id="previewBtn" type="button" class="disabled">👁 Перегляд</button>
-    <button id="downloadBtn" type="button" style="display:none;">📥 Завантажити</button>
-    <button id="updateBtn" type="button">UPDATE</button>
-  </p>
-  <br>
+<div class="collage" id="collage">
+<canvas id="canvas" width="900" height="600" style="cursor: pointer;border:1px solid #ccc;"></canvas>
+<img id="imagePreview" class="imagbox" src="" alt="Image Preview">
+</div>
+<br>
+<b style="text-align: center;">Розмір</b>
+<br>
+<input type="range" id="scaleSlider" min="0.1" max="3" step="0.01" value="1" style="cursor: pointer;">
+<div class="gallery-container">
+<div class="gallery-block" id="vowsi">
+<b>Фон</b><br /><br />
+<div>
+<span class="arrow" onclick="prevSlide()">&#10094;</span>
+<div class="thumbnails" id="thumbs"></div>
+<span class="arrow" onclick="nextSlide()">&#10095;</span>
+</div>
+</div>
+<div class="gallery-block photo-block">
+<b>Ваше фото</b><br /><br />
+<div>
+<label id="fot" class="disabled" title="Фото закоханих"></label>
+</div>
+</div>
+</div>
+<div class="gallery-container vows" id="vowse" style="display:none;">
+<div class="gallery-block">
+<div class="labels">
+<span class="label1">Надпис</span>
+<span class="label2">Клятва закоханих</span>
+</div>
+<div class="gallery-row">
+<span class="arow" onclick="prevVow()">&#10094;</span>
+<div class="thumbnails" id="thumbsVows"></div>
+<span class="arow" onclick="nextVow()">&#10095;</span>
+</div>
+</div>
+</div>
+<p class="button-row">
+<button id="undoBtn" type="button">⟲ Undo</button>
+<button id="previewBtn" type="button" class="disabled">👁 Перегляд</button>
+<button id="downloadBtn" type="button" style="display:none;">📥 Завантажити</button>
+<button id="updateBtn" type="button">UPDATE</button>
+</p>
+<br>
 </fieldset>
-
 <a href="https://intuit-portal.blogspot.com/p/donate.html" class="donate-btn" target="_blank" title="Підтримати проєкт">❤️</a>
 <input type="file" id="bgLoader" style="display:none">
 <input type="file" id="loveLoader" style="display:none">
 
 <script>
-// === Collage JS ===
-const allowedDomains = ['intuit-portal.blogspot.com', 'detectfraud.github.io'];//, 'detectfraud.github.io'
-const currentHost = window.location.hostname;
-const referrerHost = document.referrer ? new URL(document.referrer).hostname : '';
+// ======= Collage JS =======
 
-const isAllowed = allowedDomains.some(domain => currentHost.includes(domain)) ||
-                  allowedDomains.some(domain => referrerHost.includes(domain));
-
-if (!isAllowed) {
-    document.body.innerHTML = '<h1>Доступ заборонено</h1><p>Цей додаток може бути вбудований лише на офіційному сайті intuit-portal.blogspot.com</p>';
-    throw new Error('Доступ заборонено');
-}
-
-        /* === Collage JS === */
-        const canvas = document.getElementById('canvas');
-        const ctx = canvas.getContext('2d');
-        const thumbs = document.getElementById('thumbs');
-        const thumbsVows = document.getElementById('thumbsVows');
-        const loveLoader = document.getElementById('loveLoader');
-        const scaleSlider = document.getElementById('scaleSlider');
-        const undoBtn = document.getElementById('undoBtn');
-        const previewBtn = document.getElementById('previewBtn');
-        const downloadBtn = document.getElementById('downloadBtn');
-        const bgLoader = document.getElementById('bgLoader');
-        const collage = document.getElementById('collage');
-        const vowse = document.getElementById('vowse');
-        const vowsi = document.getElementById('vowsi');
-        const photoBlock = document.querySelector('.photo-block');
-        const loveStoneName = "LoveStones";
-        const DONATE_URL = "https://example.com/donate";
-        const imagePreview = document.getElementById('imagePreview');
-
-        const url = "https://detectfraud.github.io/gallery/";
-        const images = [ "nature(1)","nature(2)","nature(3)","nature(4)","nature(5)", "nature(6)","nature(7)","nature(8)","nature(9)","Fon" ];
-        const fullImages = images.map(name => url + name + ".jpeg");
-        let startIndex = 0;
-        const vows = ["Eternity","Fidelity","Joy","Love","Strength","Tenderness","Trust","Unity","Heart","Hearts"];
-        const fullVows = vows.map(name => url + name + ".png");
-        let vowIndex = 0;
-        const lovestoneImages = ["LoveStones"];
-        const fullLovestones = lovestoneImages.map(name => url + name + ".png");
-        let lovestoneIndex = 0;
-        let activeThumb = { bg: null, vow: null }; // Тепер зберігаємо активні мініатюри для обох галерей
-
-        // Оновлена функція для встановлення активної мініатюри
-        function setActiveThumb(thumbElement, galleryType) {
-            const allThumbsInGallery = document.querySelectorAll(`#${galleryType === 'bg' ? 'thumbs' : 'thumbsVows'} .thumb`);
-
-            allThumbsInGallery.forEach(thumb => {
-                thumb.classList.remove('active');
-                // Знімаємо disabled з усіх, крім "Fon" (для bg) та "LoveStones" (для vow)
-                if (galleryType === 'bg' && thumb.dataset.imgName === "Fon") {
-                    // "Fon" ніколи не отримує disabled, тому нічого не робимо
-                } else if (galleryType === 'vow' && thumb.dataset.imgName === "LoveStones") {
-                    // "LoveStones" зберігає disabled, якщо він вже був встановлений.
-                    // Знімати його тут не потрібно, він буде встановлений при активації,
-                    // або відновлений через історію.
-                }
-                else {
-                    thumb.classList.remove('disabled');
-                }
-            });
-
-            thumbElement.classList.add('active');
-
-            if (galleryType === 'bg' && thumbElement.dataset.imgName === "Fon") {
-                // "Fon" ніколи не отримує disabled при активації
-            } else if (galleryType === 'vow' && thumbElement.dataset.imgName === "LoveStones") {
-                // "LoveStones" завжди отримує disabled при активації
-                thumbElement.classList.add('disabled');
-            } else {
-                // Решта мініатюр отримують disabled при активації
-                thumbElement.classList.add('disabled');
-            }
-            activeThumb[galleryType] = { src: thumbElement.src, imgName: thumbElement.dataset.imgName };
-        }
-
-        function renderThumbnails() {
-            thumbs.innerHTML = "";
-            fullImages.slice(startIndex, startIndex + 3).forEach(src => createThumb(src, thumbs, 'bg'));
-            // Відновлюємо стан активної мініатюри фону
-            if (activeThumb.bg) {
-                const reRenderedActiveThumb = Array.from(thumbs.querySelectorAll('.thumb')).find(t => t.src === activeThumb.bg.src);
-                if (reRenderedActiveThumb) {
-                    reRenderedActiveThumb.classList.add('active');
-                    if (activeThumb.bg.imgName !== "Fon") { // "Fon" не отримує disabled
-                         reRenderedActiveThumb.classList.add('disabled');
-                    }
-                }
-            }
-        }
-        function renderVows() {
-            thumbsVows.innerHTML = "";
-            fullLovestones.slice(lovestoneIndex, lovestoneIndex + 1).forEach(src => createThumb(src, thumbsVows, 'lovestone'));
-            fullVows.slice(vowIndex, vowIndex + 3).forEach(src => createThumb(src, thumbsVows, 'vow'));
-            // Відновлюємо стан активної мініатюри клятв
-            if (activeThumb.vow) {
-                const reRenderedActiveThumb = Array.from(thumbsVows.querySelectorAll('.thumb')).find(t => t.src === activeThumb.vow.src);
-                if (reRenderedActiveThumb) {
-                    reRenderedActiveThumb.classList.add('active');
-                    // LoveStones завжди disabled після вибору, інші клятви теж
-                    reRenderedActiveThumb.classList.add('disabled');
-                }
-            }
-            // Додатково перевіряємо, чи LoveStones має бути disabled незалежно від активності інших
-            const loveStonesThumb = Array.from(thumbsVows.querySelectorAll('.thumb')).find(t => t.dataset.imgName === "LoveStones");
-            if (loveStonesThumb && layers.lovestone.img) { // Якщо LoveStones завантажено
-                 loveStonesThumb.classList.add('disabled');
-            }
-        }
-        function createThumb(src, container, key) {
-            const wrapper = document.createElement("div");
-            wrapper.className = "thumb-wrapper";
-            const imgName = src.split("/").pop().split(".")[0];
-            const thumb = document.createElement("img");
-            thumb.className = "thumb";
-            thumb.src = src;
-            thumb.dataset.imgName = imgName; // Додаємо data-атрибут для ідентифікації
-            let timer;
-
-            const addPreviewHandlers = () => {
-                thumb.addEventListener('mouseenter', handleMouseEnter);
-                thumb.addEventListener('mouseleave', handleMouseLeave);
-            };
-
-            const removePreviewHandlers = () => {
-                thumb.removeEventListener('mouseenter', handleMouseEnter);
-                thumb.removeEventListener('mouseleave', handleMouseLeave);
-            };
-
-            const handleMouseEnter = () => {
-                 if (!thumb.classList.contains('disabled')) {
-                    timer = setTimeout(() => {
-                        imagePreview.src = src;
-                        imagePreview.classList.add('show');
-                    }, 700);
-                }
-            };
-
-            const handleMouseLeave = () => {
-                clearTimeout(timer);
-                imagePreview.classList.remove('show');
-            };
-
-            addPreviewHandlers();
-
-            const observer = new MutationObserver((mutationsList) => {
-                for (const mutation of mutationsList) {
-                    if (mutation.attributeName === 'class') {
-                        if (thumb.classList.contains('disabled')) {
-                            clearTimeout(timer);
-                            imagePreview.classList.remove('show');
-                        }
-                    }
-                }
-            });
-            observer.observe(thumb, { attributes: true });
-
-
-            if (imgName === "Fon") {
-                thumb.title = "Завантажити свій фон";
-                thumb.onclick = () => {
-                    bgLoader.click();
-                    imagePreview.classList.remove('show');
-                    setActiveThumb(thumb, 'bg'); // Передаємо тип галереї
-                };
-            } else if (key === 'lovestone' && imgName === "LoveStones") {
-                thumb.onclick = () => {
-                    handleFileFromGallery(src, key);
-                    setActiveThumb(thumb, 'vow'); // Передаємо тип галереї
-                };
-            }
-            else {
-                thumb.onclick = () => {
-                    handleFileFromGallery(src, key);
-                    if (key === 'bg') {
-                        setActiveThumb(thumb, 'bg'); // Передаємо тип галереї
-                    } else if (key === 'vow') {
-                        setActiveThumb(thumb, 'vow'); // Передаємо тип галереї
-                    }
-                };
-            }
-            wrapper.appendChild(thumb);
-            container.appendChild(wrapper);
-        }
-        function prevSlide(){ startIndex=(startIndex-3+fullImages.length)%fullImages.length; renderThumbnails(); }
-        function nextSlide(){ startIndex=(startIndex+3)%fullImages.length; renderThumbnails(); }
-        function prevVow(){ vowIndex=(vowIndex-3+fullVows.length)%fullVows.length; renderVows(); }
-        function nextVow(){ vowIndex=(vowIndex+3)%fullVows.length; renderVows(); }
-        function handleFileFromGallery(src, key) {
-            if (previewMode) {
-                previewMode = false;
-                canvas.classList.remove('preview-zoom-in');
-            }
-            if (key === 'vow' || key === 'lovestone') {
-                vowse.style.display = 'inline-block';
-                vowsi.style.display = 'none';
-                photoBlock.style.display = 'none';
-            } else if (key === 'bg') {
-                vowse.style.display = 'none';
-                vowsi.style.display = 'inline-block';
-                photoBlock.style.display = 'inline-block';
-            }
-            imagePreview.classList.remove('show');
-            const img = new Image();
-            img.crossOrigin = "anonymous";
-            img.onload = () => {
-                layers[key].img = img;
-                layers[key].src = src;
-                if (key === 'vow') {
-                    layers[key].scale = 0.5;
-                    layers[key].x = (canvas.width / 2) - ((img.width * layers[key].scale) / 2) + 70; // Приклад розміщення
-                    layers[key].y = canvas.height - (img.height * layers[key].scale / 2) - 14.28;
-                } else if (key === 'lovestone') {
-                    layers[key].scale = 0.5;
-                    layers[key].x = canvas.width / 2;
-                    layers[key].y = canvas.height / 2;
-                } else {
-                    layers[key].x = canvas.width / 2;
-                    layers[key].y = canvas.height / 2;
-                    layers[key].scale = 1;
-                }
-                activeLayer = key;
-                if (activeLayer) {
-                    scaleSlider.value = layers[activeLayer].scale;
-                }
-                scaleSlider.disabled = false;
-                scaleSlider.classList.remove('disabled');
-                pushHistory();
-                drawAll();
-                if (key === 'bg') {
-                    document.getElementById('fot').classList.remove('disabled');
-                }
-                if (key === 'love' || key === 'lovestone') {
-                    document.getElementById('previewBtn').classList.remove('disabled');
-                }
-                previewBtn.style.display = 'inline-block';
-                downloadBtn.style.display = 'none';
-            };
-            img.src = src;
-        }
-        function handleFileLoad(file,key){
-            if(!file) return;
-            const reader=new FileReader();
-            reader.onload=e=>{
-                const data=e.target.result;
-                const img=new Image();
-                img.onload=()=>{
-                    layers[key].img=img;
-                    layers[key].src=data;
-                    layers[key].x = canvas.width / 2;
-                    layers[key].y = canvas.height / 2;
-                    layers[key].scale = 1;
-                    activeLayer = key;
-                    if (activeLayer) {
-                        scaleSlider.value = layers[activeLayer].scale;
-                    }
-                    scaleSlider.disabled = false;
-                    scaleSlider.classList.remove('disabled');
-                    pushHistory();
-                    drawAll();
-                    if (key === 'bg') {
-                        document.getElementById('fot').classList.remove('disabled');
-                        const fonThumb = Array.from(thumbs.querySelectorAll('.thumb')).find(t => t.title === "Завантажити свій фон");
-                        if (fonThumb) {
-                            setActiveThumb(fonThumb, 'bg'); // Передаємо тип галереї
-                        }
-                    }
-                    if (key === 'love') {
-                        document.getElementById('previewBtn').classList.remove('disabled');
-                    }
-                };
-                img.src=data;
-            };
-            reader.readAsDataURL(file);
-        }
-        bgLoader.addEventListener('change',e=>handleFileLoad(e.target.files[0],'bg'));
-        loveLoader.addEventListener('change',e=>handleFileLoad(e.target.files[0],'love'));
-        document.getElementById("fot").onclick=()=>loveLoader.click();
-        const template=new Image(); template.src='images/composit.png';
-        const HOLE_OFFSET_X=6, HOLE_OFFSET_Y=-115, HOLE_RADIUS=98;
-        let mask={cx:canvas.width/2+HOLE_OFFSET_X, cy:canvas.height/2+HOLE_OFFSET_Y, r:HOLE_RADIUS};
-        let layers={
-            bg:{img:null,src:null,x:canvas.width/2,y:canvas.height/2,scale:1},
-            love:{img:null,src:null,x:canvas.width/2,y:canvas.height/2,scale:1},
-            vow:{img:null,src:null,x:canvas.width/2,y:canvas.height/2,scale:1},
-            lovestone:{img:null,src:null,x:canvas.width/2,y:canvas.height/2,scale:1}
-        };
-        let activeLayer=null, previewMode=false, bgHoleActive=true;
-        const history=[]; const MAX_HISTORY=20;
-        function makeSnapshot(){ return { bg:{...layers.bg}, love:{...layers.love}, loveScale: scaleSlider.value, vow:{...layers.vow}, lovestone:{...layers.lovestone}, previewMode, activeLayer, bgHoleActive, activeThumbBg: activeThumb.bg, activeThumbVow: activeThumb.vow }; }
-
-        function pushHistory(){ history.push(makeSnapshot()); if(history.length>MAX_HISTORY) history.shift(); }
-        function applySnapshot(s){
-            previewMode=!!s.previewMode; activeLayer=s.activeLayer||null; bgHoleActive=!!s.bgHoleActive;
-            if (s.bg.img) {
-                document.getElementById('fot').classList.remove('disabled');
-            } else {
-                document.getElementById('fot').classList.add('disabled');
-            }
-            if (s.love.img) {
-                document.getElementById('previewBtn').classList.remove('disabled');
-            } else {
-                document.getElementById('previewBtn').classList.add('disabled');
-            }
-            ['bg','love','vow','lovestone'].forEach(key=>{
-                const v=s[key];
-                if(v && v.src){
-                    const img=new Image();
-                    img.onload=()=>{ layers[key].img=img; layers[key].src=v.src; layers[key].x=v.x; layers[key].y=v.y; layers[key].scale=v.scale; drawAll(); };
-                    img.src=v.src;
-                } else {
-                    layers[key].img=null; layers[key].src=null;
-                    layers[key].x=v? v.x: canvas.width/2;
-                    layers[key].y=v? v.y: canvas.height/2;
-                    layers[key].scale=v? v.scale:1;
-                }
-            });
-            // Відновлюємо активні мініатюри з історії
-            setTimeout(() => {
-                if (s.activeThumbBg) {
-                    const reRenderedActiveThumb = Array.from(thumbs.querySelectorAll('.thumb')).find(t => t.src === s.activeThumbBg.src);
-                    if (reRenderedActiveThumb) {
-                        reRenderedActiveThumb.classList.add('active');
-                        if (s.activeThumbBg.imgName !== "Fon") {
-                            reRenderedActiveThumb.classList.add('disabled');
-                        }
-                        activeThumb.bg = s.activeThumbBg;
-                    }
-                } else {
-                    activeThumb.bg = null;
-                }
-                if (s.activeThumbVow) {
-                    const reRenderedActiveThumb = Array.from(thumbsVows.querySelectorAll('.thumb')).find(t => t.src === s.activeThumbVow.src);
-                    if (reRenderedActiveThumb) {
-                        reRenderedActiveThumb.classList.add('active');
-                        reRenderedActiveThumb.classList.add('disabled');
-                        activeThumb.vow = s.activeThumbVow;
-                    }
-                } else {
-                    activeThumb.vow = null;
-                }
-                // Після завантаження історії, перевіряємо стан LoveStones окремо
-                const loveStonesThumb = Array.from(thumbsVows.querySelectorAll('.thumb')).find(t => t.dataset.imgName === "LoveStones");
-                if (loveStonesThumb && layers.lovestone.img && !loveStonesThumb.classList.contains('active')) {
-                    // Якщо LoveStones завантажено, але не є активною клятвою (бо активна інша клятва),
-                    // то LoveStones має бути disabled
-                    loveStonesThumb.classList.add('disabled');
-                } else if (loveStonesThumb && layers.lovestone.img && loveStonesThumb.classList.contains('active')) {
-                    // Якщо LoveStones завантажено і є активною, вона теж disabled
-                    loveStonesThumb.classList.add('disabled');
-                }
-            }, 100); // Невелика затримка, щоб DOM встиг оновитися після рендерингу
-
-            toggleButtons();
-        }
-        function drawLayerTo(ctxTarget, layer){
-            if(!layer||!layer.img) return;
-            const w = layer.img.width * layer.scale;
-            const h = layer.img.height * layer.scale;
-            const x = layer.x;
-            const y = layer.y;
-            ctxTarget.drawImage(layer.img, x - w/2, y - h/2, w, h);
-        }
-        function drawLove(ctxTarget, clip=false){
-            const L=layers.love;
-            if(!L||!L.img) return;
-            const w = L.img.width * L.scale;
-            const h = L.img.height * L.scale;
-            const x = L.x;
-            const y = L.y;
-            ctxTarget.save();
-            if(clip && mask.r>0){
-                ctxTarget.beginPath();
-                ctxTarget.arc(mask.cx, mask.cy, mask.r, 0, Math.PI * 2);
-                ctxTarget.clip();
-            }
-            ctxTarget.drawImage(L.img, x - w/2, y - h/2, w, h);
-            ctxTarget.restore();
-        }
-        function drawBgWithHole(ctxTarget){
-            if(!layers.bg.img) return;
-            if(!bgHoleActive||mask.r<=0){ drawLayerTo(ctxTarget,layers.bg); return; }
-            const off = document.createElement('canvas');
-            off.width = canvas.width;
-            off.height = canvas.height;
-            const octx = off.getContext('2d');
-            drawLayerTo(octx, layers.bg);
-            octx.globalCompositeOperation = 'destination-out';
-            octx.beginPath();
-            octx.arc(mask.cx, mask.cy, mask.r, 0, Math.PI * 2);
-            octx.fill();
-            octx.globalCompositeOperation = 'source-over';
-            ctxTarget.drawImage(off, 0, 0);
-        }
-        function drawAll(){
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            drawBgWithHole(ctx);
-            drawLove(ctx, previewMode);
-            if(template.complete) {
-                ctx.drawImage(template, 0, 0, canvas.width, canvas.height);
-            }
-            drawLayerTo(ctx, layers.vow);
-            drawLayerTo(ctx, layers.lovestone);
-        }
-        function toggleButtons(){
-            if(previewMode){
-                previewBtn.style.display = 'none';
-                downloadBtn.style.display = 'inline-block';
-                vowsi.style.display = 'none';
-                photoBlock.style.display = 'none';
-                vowse.style.display = 'inline-block';
-                canvas.classList.add('preview-zoom-in');
-                activeLayer = null;
-            } else {
-                previewBtn.style.display = 'inline-block';
-                downloadBtn.style.display = 'none';
-                vowsi.style.display = 'inline-block';
-                photoBlock.style.display = 'inline-block';
-                vowse.style.display = 'none';
-                canvas.classList.remove('preview-zoom-in');
-            }
-        }
-        scaleSlider.addEventListener('input',()=>{
-            if(!activeLayer) return;
-            layers[activeLayer].scale=parseFloat(scaleSlider.value);
-            drawAll();
-        });
-        let dragging=false, dragStartX=0, dragStartY=0;
-        canvas.addEventListener('mousedown',e=>{
-            if(previewMode || !activeLayer) return;
-            dragging=true;
-            dragStartX=e.offsetX-layers[activeLayer].x;
-            dragStartY=e.offsetY-layers[activeLayer].y;
-        });
-        canvas.addEventListener('mousemove',e=>{
-            if(!dragging || previewMode || !activeLayer) return;
-            layers[activeLayer].x=e.offsetX-dragStartX;
-            layers[activeLayer].y=e.offsetY-dragStartY;
-            drawAll();
-        });
-        function stopDrag(){
-            if(dragging){ dragging=false; pushHistory(); }
-        }
-        canvas.addEventListener('mouseup',stopDrag);
-        canvas.addEventListener('mouseleave',stopDrag);
-        canvas.addEventListener('touchstart',e=>{
-            if(previewMode || !activeLayer) return;
-            const t=e.touches[0],rect=canvas.getBoundingClientRect();
-            dragging=true;
-            dragStartX=(t.clientX-rect.left) * (canvas.width/rect.width) - layers[activeLayer].x;
-            dragStartY=(t.clientY-rect.top) * (canvas.height/rect.height) - layers[activeLayer].y;
-            e.preventDefault();
-        });
-        canvas.addEventListener('touchmove',e=>{
-            if(!dragging || previewMode || !activeLayer) return;
-            const t=e.touches[0],rect=canvas.getBoundingClientRect();
-            layers[activeLayer].x=(t.clientX-rect.left) * (canvas.width/rect.width) - dragStartX;
-            layers[activeLayer].y=(t.clientY-rect.top) * (canvas.height/rect.height) - dragStartY;
-            drawAll();
-            e.preventDefault();
-        });
-        canvas.addEventListener('touchend',stopDrag);
-        undoBtn.addEventListener('click',()=>{
-            if(history.length<=1) return;
-            history.pop();
-            applySnapshot(history[history.length-1]);
-        });
-        previewBtn.addEventListener('click',()=>{
-            previewMode=true;
-            scaleSlider.disabled = true;
-            scaleSlider.classList.add('disabled');
-            pushHistory();
-            toggleButtons();
-            drawAll();
-        });
-        downloadBtn.addEventListener('click',()=>{
-            const link=document.createElement('a');
-            link.download='collage.jpg';
-            link.href=canvas.toDataURL('image/jpeg');
-            link.click();
-        });
-        document.getElementById('updateBtn').addEventListener('click', function () {
-            const confirmUpdate = confirm("Ви впевнені, що хочете оновити сторінку?\n Усі незавершені зміни буде втрачено.");
-            if (confirmUpdate) {
-                const url = window.location.href.split('?')[0];
-                window.location.href = url + '?_=' + new Date().getTime();
-            }
-        });
-        function disableContextMenu() {
-            return false;
-        }
-        document.oncontextmenu = disableContextMenu;
-        document.onselectstart = disableContextMenu;
-        document.ondragstart = disableContextMenu;
-        template.onload = () => { drawAll(); };
-        renderThumbnails();
-        renderVows();
-        applySnapshot(history[0] || makeSnapshot());
-
-// Додаємо touch-підтримку для canvas та slider
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 const thumbs = document.getElementById('thumbs');
 const thumbsVows = document.getElementById('thumbsVows');
 const loveLoader = document.getElementById('loveLoader');
 const scaleSlider = document.getElementById('scaleSlider');
+const undoBtn = document.getElementById('undoBtn');
+const previewBtn = document.getElementById('previewBtn');
+const downloadBtn = document.getElementById('downloadBtn');
+const bgLoader = document.getElementById('bgLoader');
+const collage = document.getElementById('collage');
+const vowse = document.getElementById('vowse');
+const vowsi = document.getElementById('vowsi');
+const photoBlock = document.querySelector('.photo-block');
 const imagePreview = document.getElementById('imagePreview');
 
-let scale = 1;
-let currentBgIndex = 0;
-let bgImages = [];
-let currentVowIndex = 0;
-let vowImages = [];
+const url = "https://detectfraud.github.io/gallery/";
+const images = [ "nature(1)","nature(2)","nature(3)","nature(4)","nature(5)","nature(6)","nature(7)","nature(8)","nature(9)","Fon" ];
+const fullImages = images.map(name => url + name + ".jpeg");
+let startIndex = 0;
+const vows = ["Eternity","Fidelity","Joy","Love","Strength","Tenderness","Trust","Unity","Heart","Hearts"];
+const fullVows = vows.map(name => url + name + ".png");
+let vowIndex = 0;
+const lovestoneImages = ["LoveStones"];
+const fullLovestones = lovestoneImages.map(name => url + name + ".png");
+let lovestoneIndex = 0;
+let activeThumb = { bg: null, vow: null };
 
-function drawCanvas() {
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-    if(bgImages[currentBgIndex]) ctx.drawImage(bgImages[currentBgIndex], 0, 0, canvas.width*scale, canvas.height*scale);
-    if(vowImages[currentVowIndex]) ctx.drawImage(vowImages[currentVowIndex], 0, 0, canvas.width*scale, canvas.height*scale);
+let layers={
+    bg:{img:null,src:null,x:canvas.width/2,y:canvas.height/2,scale:1},
+    love:{img:null,src:null,x:canvas.width/2,y:canvas.height/2,scale:1},
+    vow:{img:null,src:null,x:canvas.width/2,y:canvas.height/2,scale:1},
+    lovestone:{img:null,src:null,x:canvas.width/2,y:canvas.height/2,scale:1}
+};
+let activeLayer=null, previewMode=false;
+const history=[]; const MAX_HISTORY=20;
+
+function makeSnapshot(){ return { bg:{...layers.bg}, love:{...layers.love}, vow:{...layers.vow}, lovestone:{...layers.lovestone}, previewMode, activeLayer, activeThumbBg: activeThumb.bg, activeThumbVow: activeThumb.vow }; }
+function pushHistory(){ history.push(makeSnapshot()); if(history.length>MAX_HISTORY) history.shift(); }
+function applySnapshot(s){ 
+    previewMode=!!s.previewMode; activeLayer=s.activeLayer||null;
+    ['bg','love','vow','lovestone'].forEach(key=>{
+        const v=s[key];
+        if(v && v.src){
+            const img=new Image();
+            img.onload=()=>{ layers[key].img=img; layers[key].src=v.src; drawAll(); };
+            img.src=v.src;
+        } else { layers[key].img=null; layers[key].src=null; layers[key].x=v? v.x:canvas.width/2; layers[key].y=v? v.y:canvas.height/2; layers[key].scale=v? v.scale:1; }
+    });
+    // Відновлення активних мініатюр
+    setTimeout(()=>{
+        if(s.activeThumbBg){
+            const reRenderedActiveThumb = Array.from(thumbs.querySelectorAll('.thumb')).find(t => t.src===s.activeThumbBg.src);
+            if(reRenderedActiveThumb){ reRenderedActiveThumb.classList.add('active'); if(s.activeThumbBg.imgName!=="Fon"){ reRenderedActiveThumb.classList.add('disabled'); } activeThumb.bg=s.activeThumbBg; }
+        }
+        if(s.activeThumbVow){
+            const reRenderedActiveThumb = Array.from(thumbsVows.querySelectorAll('.thumb')).find(t => t.src===s.activeThumbVow.src);
+            if(reRenderedActiveThumb){ reRenderedActiveThumb.classList.add('active'); reRenderedActiveThumb.classList.add('disabled'); activeThumb.vow=s.activeThumbVow; }
+        }
+    },100);
+    toggleButtons();
 }
 
-// Slider
-scaleSlider.addEventListener('input', () => {
-    scale = parseFloat(scaleSlider.value);
-    drawCanvas();
-});
+function drawLayerTo(ctxTarget,layer){ if(!layer||!layer.img)return; const w=layer.img.width*layer.scale; const h=layer.img.height*layer.scale; const x=layer.x; const y=layer.y; ctxTarget.drawImage(layer.img,x-w/2,y-h/2,w,h); }
+function drawAll(){ ctx.clearRect(0,0,canvas.width,canvas.height); drawLayerTo(ctx,layers.bg); drawLayerTo(ctx,layers.love); drawLayerTo(ctx,layers.vow); drawLayerTo(ctx,layers.lovestone); }
 
-// Touch support
-canvas.addEventListener('touchstart', e => { e.preventDefault(); });
-canvas.addEventListener('touchmove', e => { e.preventDefault(); });
-canvas.addEventListener('touchend', e => { drawCanvas(); });
+function toggleButtons(){ if(previewMode){ previewBtn.style.display='none'; downloadBtn.style.display='inline-block'; canvas.classList.add('preview-zoom-in'); activeLayer=null; } else { previewBtn.style.display='inline-block'; downloadBtn.style.display='none'; canvas.classList.remove('preview-zoom-in'); } }
 
-// === Навігація фонів ===
-function prevSlide() { currentBgIndex = (currentBgIndex-1+bgImages.length)%bgImages.length; drawCanvas(); }
-function nextSlide() { currentBgIndex = (currentBgIndex+1)%bgImages.length; drawCanvas(); }
-function prevVow() { currentVowIndex = (currentVowIndex-1+vowImages.length)%vowImages.length; drawCanvas(); }
-function nextVow() { currentVowIndex = (currentVowIndex+1)%vowImages.length; drawCanvas(); }
+scaleSlider.addEventListener('input',()=>{ if(!activeLayer) return; layers[activeLayer].scale=parseFloat(scaleSlider.value); drawAll(); });
 
-// === Ініціалізація ===
-// Приклад завантаження фонів
-for(let i=1;i<=3;i++){
-    let img = new Image(); img.src = `https://detectfraud.github.io/gallery/bg${i}.jpg`;
-    img.onload = ()=>{ drawCanvas(); }; bgImages.push(img);
-}
+let dragging=false, dragStartX=0, dragStartY=0;
+canvas.addEventListener('mousedown',e=>{ if(previewMode || !activeLayer)return; dragging=true; dragStartX=e.offsetX-layers[activeLayer].x; dragStartY=e.offsetY-layers[activeLayer].y; });
+canvas.addEventListener('mousemove',e=>{ if(!dragging || previewMode || !activeLayer) return; layers[activeLayer].x=e.offsetX-dragStartX; layers[activeLayer].y=e.offsetY-dragStartY; drawAll(); });
+canvas.addEventListener('mouseup',()=>{ if(dragging){ dragging=false; pushHistory(); } });
+canvas.addEventListener('mouseleave',()=>{ if(dragging){ dragging=false; pushHistory(); } });
+canvas.addEventListener('touchstart',e=>{ if(previewMode || !activeLayer)return; const touch=e.touches[0]; dragging=true; const rect=canvas.getBoundingClientRect(); dragStartX=touch.clientX-rect.left-layers[activeLayer].x; dragStartY=touch.clientY-rect.top-layers[activeLayer].y; });
+canvas.addEventListener('touchmove',e=>{ if(!dragging || previewMode || !activeLayer) return; const touch=e.touches[0]; const rect=canvas.getBoundingClientRect(); layers[activeLayer].x=touch.clientX-rect.left-dragStartX; layers[activeLayer].y=touch.clientY-rect.top-dragStartY; drawAll(); e.preventDefault(); }, {passive:false});
+canvas.addEventListener('touchend',()=>{ if(dragging){ dragging=false; pushHistory(); } });
 
-// Завантаження клятв (приклад)
-for(let i=1;i<=2;i++){
-    let img = new Image(); img.src = `https://detectfraud.github.io/gallery/vow${i}.png`;
-    img.onload = ()=>{ drawCanvas(); }; vowImages.push(img);
-}
+undoBtn.addEventListener('click',()=>{ if(history.length<2) return; history.pop(); applySnapshot(history[history.length-1]); drawAll(); });
+previewBtn.addEventListener('click',()=>{ previewMode=true; toggleButtons(); drawAll(); imagePreview.src=canvas.toDataURL(); imagePreview.classList.add('show'); });
+downloadBtn.addEventListener('click',()=>{ const a=document.createElement('a'); a.href=canvas.toDataURL('image/png'); a.download='collage.png'; a.click(); });
 
-drawCanvas();
+function createThumb(src, container, layerKey){ const img=new Image(); img.src=src; img.className='thumb'; container.appendChild(img); img.onclick=()=>{ if(activeThumb[layerKey] && activeThumb[layerKey].imgName){ Array.from(container.querySelectorAll('.thumb')).forEach(t=>t.classList.remove('active')); } img.classList.add('active'); activeThumb[layerKey]={src:src,imgName:null}; const l=layers[layerKey]; l.img=new Image(); l.img.onload=()=>{ drawAll(); pushHistory(); }; l.img.src=src; activeLayer=layerKey; scaleSlider.value=l.scale; toggleButtons(); }; }
+
+images.forEach(src=>createThumb(url+src+".jpeg",thumbs,'bg'));
+vows.forEach(src=>createThumb(url+src+".png",thumbsVows,'vow'));
+
 </script>
-
 </body>
 </html>
