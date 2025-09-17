@@ -1,169 +1,114 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-    <meta charset="UTF-8" />
-    <title>Камінь любові — редактор</title>
-    <style>
-        body { font-family: sans-serif; text-align: center; background: transparent; }
-        .venwin { border-radius: 10px; display: inline-block; background-color: rgba(255, 255, 255, 0.5); padding: 20px 20px;box-sizing: border-box;border-color:transparent;/* */}
-        canvas {
-            border: 3px solid #bbb;
-            border-radius: 6px;
-            box-shadow: 0 6px 18px rgba(0,0,0,.1);
-            display: block;
-            margin: 10px auto;
-            width: 630px;
-            height: 420px;
-            transition: transform 0.3s ease-in-out;
-            transform-origin: center center;
-            cursor:pointer;
-            position: relative;
-            z-index: 10;
-            transform-origin: top center;
-        }
-        .preview-zoom-in:hover {
-            transform: scale(1.43);
-        }
-        #scaleSlider { width: 420px; }
-        button { padding: 8px 12px; cursor: pointer; border-radius: 8px; }
-        .disabled {/*cursor: not-allowed; */ pointer-events: none;opacity: .5; filter: grayscale(100%); }
-        .gallery-container { display: flex; align-items: flex-start; justify-content: center; gap: 10px; margin-top: 10px; }
-        .gallery-block { display: flex; flex-direction: column; align-items: center; gap: 10px; }
-        .gallery-block > div { display: flex; align-items: center; justify-content: center;}
-        .arrow, .arow { font-size: 20px; cursor: pointer; user-select: none; padding: 3px; line-height: 1; display: flex; align-items: center; justify-content: center; }
-        .arrow:first-child { margin-right: -130px; }
-        .arrow:last-child { margin-left: -130px; }
-        .arow:first-child { margin-right: -60px; }
-        .arow:last-child { margin-left: -60px; }
-        .thumbnails { display: flex; gap: 10px; overflow: hidden; width: 630px; justify-content: center; }
-        .thumb-wrapper { position: relative; }
-        .thumb { width: 108px; height: 72px; object-fit: cover; cursor: pointer; box-shadow: 0 0 6px rgba(0,0,0,0.3); transition: all 0.3s ease; z-index: 1; border-radius: 10px; }
-        .thumb.active { border: 3px solid red; box-shadow: 0 0 10px red; }
-        .collage {
-            position: relative;
-            display: inline-block;
-            margin-top: 0;
-        }
-        .gallery-container.vows .labels { display: grid; grid-template-columns: repeat(4, 1fr); text-align: center; margin-bottom: 5px; }
-        .gallery-container.vows .labels .label1 { grid-column: 1; font-weight: bold; margin-left: 70px; }
-        .gallery-container.vows .labels .label2 { grid-column: 3; font-weight: bold; }
-        .arrow, .arow { position: relative; z-index: 3; }
-        .button-row { display: flex; justify-content: center; align-items: center; gap: 10px; }
-        #fot { display: inline-block; cursor: pointer; border-radius: 8px; width: 108px; height: 72px; background-image: url(https://detectfraud.github.io/gallery/Para.png); background-repeat: no-repeat; background-size: contain; }
-        #fot:hover { mix-blend-mode: luminosity; }
-        #fot:active { mix-blend-mode: exclusion; }
-        .imagbox {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%,-50%) scale(0.1);
-            width: 825px;
-            height: 510px;
-            opacity: 0;
-            transition: all 0.9s ease;
-            z-index: 9999;
-            border-radius: 12px;
-            box-shadow: 0 0 25px rgba(0,0,0,0.7);
-            pointer-events: none;
-            background: #fff;
-        }
-        .imagbox.show {
-            opacity: 1;
-            transform: translate(-50%,-50%) scale(0.6);
-        }
-        .photo-block { margin-left: 100px; }
-        #updateBtn { margin-left: 300px; font-weight: bold; color: red; }
-        .donate-btn {
-            position: fixed;
-            bottom: 30px;
-            right: 50%;
-            background-color: #e74c3c;
-            color: white;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 28px;
-            text-decoration: none;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-            cursor: pointer;
-            z-index: 1000;
-            animation: pulse 1.5s infinite;
-        }
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
-        }
-        @media (max-width: 768px) {
-            .venwin { padding: 10px; }
-            canvas { width: 95%; height: auto; }
-            #scaleSlider { width: 95%; }
-            .gallery-container { flex-direction: column; align-items: center; }
-            .thumbnails { width: 100%; justify-content: center; }
-            .arrow:first-child, .arrow:last-child { margin: 0 10px; }
-            .arow:first-child, .arow:last-child { margin: 0 10px; }
-            .photo-block { margin-left: 0; }
-            #updateBtn { margin-left: 0; margin-top: 10px; }
-            .gallery-container.vows .labels { grid-template-columns: 1fr 1fr; }
-            .gallery-container.vows .labels .label1, .gallery-container.vows .labels .label2 { margin: 0; }
-            .donate-btn { bottom: 10px; right: 10px; width: 50px; height: 50px; font-size: 24px; }
-        }
-    </style>
+<meta charset="UTF-8" />
+<title>Камінь любові — редактор</title>
+<style>
+body { font-family: sans-serif; text-align: center; background: transparent; margin:0; padding:0; }
+.venwin { border-radius: 10px; display: inline-block; background-color: rgba(255, 255, 255, 0.5); padding: 20px; box-sizing: border-box; }
+canvas { border: 3px solid #bbb; border-radius: 6px; box-shadow: 0 6px 18px rgba(0,0,0,.1); display: block; margin: 10px auto; width: 630px; height: 420px; transition: transform 0.3s ease-in-out; cursor:pointer; }
+.preview-zoom-in:hover { transform: scale(1.43); }
+#scaleSlider { width: 420px; }
+button { padding: 8px 12px; cursor: pointer; border-radius: 8px; }
+.disabled { pointer-events: none; opacity: .5; filter: grayscale(100%); }
+.gallery-container { display: flex; align-items: flex-start; justify-content: center; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
+.gallery-block { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.gallery-block > div { display: flex; align-items: center; justify-content: center; }
+.arrow, .arow { font-size: 20px; cursor: pointer; user-select: none; padding: 3px; line-height: 1; display: flex; align-items: center; justify-content: center; }
+.arrow:first-child { margin-right: -130px; } .arrow:last-child { margin-left: -130px; }
+.arow:first-child { margin-right: -60px; } .arow:last-child { margin-left: -60px; }
+.thumbnails { display: flex; gap: 10px; overflow: hidden; width: 630px; justify-content: center; }
+.thumb-wrapper { position: relative; }
+.thumb { width: 108px; height: 72px; object-fit: cover; cursor: pointer; box-shadow: 0 0 6px rgba(0,0,0,0.3); transition: all 0.3s ease; z-index: 1; border-radius: 10px; }
+.thumb.active { border: 3px solid red; box-shadow: 0 0 10px red; }
+.collage { position: relative; display: inline-block; margin-top: 0; }
+.gallery-container.vows .labels { display: grid; grid-template-columns: repeat(4, 1fr); text-align: center; margin-bottom: 5px; }
+.gallery-container.vows .labels .label1 { grid-column: 1; font-weight: bold; margin-left: 70px; }
+.gallery-container.vows .labels .label2 { grid-column: 3; font-weight: bold; }
+.arrow, .arow { position: relative; z-index: 3; }
+.button-row { display: flex; justify-content: center; align-items: center; gap: 10px; flex-wrap: wrap; }
+#fot { display: inline-block; cursor: pointer; border-radius: 8px; width: 108px; height: 72px; background-image: url(https://detectfraud.github.io/gallery/Para.png); background-repeat: no-repeat; background-size: contain; }
+#fot:hover { mix-blend-mode: luminosity; }
+#fot:active { mix-blend-mode: exclusion; }
+.imagbox { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%) scale(0.1); width: 825px; height: 510px; opacity: 0; transition: all 0.9s ease; z-index: 9999; border-radius: 12px; box-shadow: 0 0 25px rgba(0,0,0,0.7); pointer-events: none; background: #fff; }
+.imagbox.show { opacity: 1; transform: translate(-50%,-50%) scale(0.6); }
+.photo-block { margin-left: 100px; }
+#updateBtn { margin-left: 300px; font-weight: bold; color: red; }
+.donate-btn { position: fixed; bottom: 30px; right: 50%; background-color: #e74c3c; color: white; border-radius: 50%; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; font-size: 28px; text-decoration: none; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); cursor: pointer; z-index: 1000; animation: pulse 1.5s infinite; }
+@keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+@media (max-width: 768px) {
+canvas { width: 95%; height: auto; }
+#scaleSlider { width: 95%; }
+.gallery-container { flex-direction: column; align-items: center; }
+.thumbnails { width: 100%; justify-content: center; }
+.arrow:first-child, .arrow:last-child { margin: 0 10px; }
+.arow:first-child, .arow:last-child { margin: 0 10px; }
+.photo-block { margin-left: 0; }
+#updateBtn { margin-left: 0; margin-top: 10px; }
+.gallery-container.vows .labels { grid-template-columns: 1fr 1fr; }
+.gallery-container.vows .labels .label1, .gallery-container.vows .labels .label2 { margin: 0; }
+.donate-btn { bottom: 10px; right: 10px; width: 50px; height: 50px; font-size: 24px; }
+}
+</style>
 </head>
 <body>
-    <fieldset class="venwin" id="desktop" style="height:auto;">
-        <div class="collage" id="collage">
-            <canvas id="canvas" width="900" height="600" style="cursor: pointer;border:1px solid #ccc;"></canvas>
-            <img id="imagePreview" class="imagbox" src="" alt="Image Preview">
-        </div>
-        <br>
-        <b style="text-align: center;">Розмір</b>
-        <br>
-        <input type="range" id="scaleSlider" min="0.1" max="3" step="0.01" value="1" style="cursor: pointer;">
-        <div class="gallery-container">
-            <div class="gallery-block" id="vowsi">
-                <b>Фон</b><br /><br />
-                <div>
-                    <span class="arrow" onclick="prevSlide()">&#10094;</span>
-                    <div class="thumbnails" id="thumbs"></div>
-                    <span class="arrow" onclick="nextSlide()">&#10095;</span>
-                </div>
-            </div>
-            <div class="gallery-block photo-block">
-                <b>Ваше фото</b><br /><br />
-                <div>
-                    <label id="fot" class="disabled" title="Фото закоханих"></label>
-                </div>
-            </div>
-        </div>
-        <div class="gallery-container vows" id="vowse" style="display:none;">
-            <div class="gallery-block">
-                <div class="labels">
-                    <span class="label1">Надпис</span>
-                    <span class="label2">Клятва закоханих</span>
-                </div>
-                <div class="gallery-row">
-                    <span class="arow" onclick="prevVow()">&#10094;</span>
-                    <div class="thumbnails" id="thumbsVows"></div>
-                    <span class="arow" onclick="nextVow()">&#10095;</span>
-                </div>
-            </div>
-        </div>
-        <p class="button-row">
-            <button id="undoBtn" type="button">⟲ Undo</button>
-            <button id="previewBtn" type="button" class="disabled">👁 Перегляд</button>
-            <button id="downloadBtn" type="button" style="display:none;">📥 Завантажити</button>
-            <button id="updateBtn" type="button">UPDATE</button>
-        </p>
-        <br>
-    </fieldset>
-    <a href="https://intuit-portal.blogspot.com/p/donate.html" class="donate-btn" target="_blank" title="Підтримати проєкт">❤️</a>
-    <input type="file" id="bgLoader" style="display:none">
-    <input type="file" id="loveLoader" style="display:none">
-    <script>
+
+<fieldset class="venwin" style="height:auto;">
+  <div class="collage" id="collage">
+    <canvas id="canvas" width="900" height="600" style="cursor: pointer;border:1px solid #ccc;"></canvas>
+    <img id="imagePreview" class="imagbox" src="" alt="Image Preview">
+  </div>
+  <br>
+  <b style="text-align: center;">Розмір</b>
+  <br>
+  <input type="range" id="scaleSlider" min="0.1" max="3" step="0.01" value="1" style="cursor: pointer;">
+  
+  <div class="gallery-container">
+    <div class="gallery-block" id="vowsi">
+      <b>Фон</b><br /><br />
+      <div>
+        <span class="arrow" onclick="prevSlide()">&#10094;</span>
+        <div class="thumbnails" id="thumbs"></div>
+        <span class="arrow" onclick="nextSlide()">&#10095;</span>
+      </div>
+    </div>
+    <div class="gallery-block photo-block">
+      <b>Ваше фото</b><br /><br />
+      <div>
+        <label id="fot" class="disabled" title="Фото закоханих"></label>
+      </div>
+    </div>
+  </div>
+
+  <div class="gallery-container vows" id="vowse" style="display:none;">
+    <div class="gallery-block">
+      <div class="labels">
+        <span class="label1">Надпис</span>
+        <span class="label2">Клятва закоханих</span>
+      </div>
+      <div class="gallery-row">
+        <span class="arow" onclick="prevVow()">&#10094;</span>
+        <div class="thumbnails" id="thumbsVows"></div>
+        <span class="arow" onclick="nextVow()">&#10095;</span>
+      </div>
+    </div>
+  </div>
+
+  <p class="button-row">
+    <button id="undoBtn" type="button">⟲ Undo</button>
+    <button id="previewBtn" type="button" class="disabled">👁 Перегляд</button>
+    <button id="downloadBtn" type="button" style="display:none;">📥 Завантажити</button>
+    <button id="updateBtn" type="button">UPDATE</button>
+  </p>
+  <br>
+</fieldset>
+
+<a href="https://intuit-portal.blogspot.com/p/donate.html" class="donate-btn" target="_blank" title="Підтримати проєкт">❤️</a>
+<input type="file" id="bgLoader" style="display:none">
+<input type="file" id="loveLoader" style="display:none">
+
+<script>
+// === Collage JS ===
 const allowedDomains = ['intuit-portal.blogspot.com', 'detectfraud.github.io'];//, 'detectfraud.github.io'
 const currentHost = window.location.hostname;
 const referrerHost = document.referrer ? new URL(document.referrer).hostname : '';
@@ -190,7 +135,6 @@ if (!isAllowed) {
         const collage = document.getElementById('collage');
         const vowse = document.getElementById('vowse');
         const vowsi = document.getElementById('vowsi');
-        const desktop = document.getElementById('desktop');
         const photoBlock = document.querySelector('.photo-block');
         const loveStoneName = "LoveStones";
         const DONATE_URL = "https://example.com/donate";
@@ -664,126 +608,58 @@ if (!isAllowed) {
         renderVows();
         applySnapshot(history[0] || makeSnapshot());
 
-//Мобільна версія
-const isMobile = /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent);
+// Додаємо touch-підтримку для canvas та slider
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+const thumbs = document.getElementById('thumbs');
+const thumbsVows = document.getElementById('thumbsVows');
+const loveLoader = document.getElementById('loveLoader');
+const scaleSlider = document.getElementById('scaleSlider');
+const imagePreview = document.getElementById('imagePreview');
 
-if(isMobile){
-    // Приховуємо десктопні елементи
-    desktop.style.display = 'none';
+let scale = 1;
+let currentBgIndex = 0;
+let bgImages = [];
+let currentVowIndex = 0;
+let vowImages = [];
 
-    // Мобільний контейнер
-    const mobileContainer = document.createElement('div');
-    mobileContainer.id = 'mobileCollage';
-    mobileContainer.style.width = '95%';
-    mobileContainer.style.margin = '0 auto';
-    mobileContainer.style.display = 'flex';
-    mobileContainer.style.flexDirection = 'column';
-    mobileContainer.style.alignItems = 'center';
-
-    // Мобільний canvas
-    const mobileCanvas = document.createElement('canvas');
-    mobileCanvas.id = 'mobileCanvas';
-    mobileCanvas.width = 600;
-    mobileCanvas.height = 400;
-    mobileCanvas.style.border = '2px solid #bbb';
-    mobileCanvas.style.borderRadius = '6px';
-    mobileCanvas.style.touchAction = 'none';
-
-    mobileContainer.appendChild(mobileCanvas);
-    collage.parentNode.insertBefore(mobileContainer, collage);
-
-    // Мобільна галерея
-    const mobileGallery = document.createElement('div');
-    mobileGallery.id = 'mobileThumbs';
-    mobileGallery.style.display = 'flex';
-    mobileGallery.style.overflowX = 'auto';
-    mobileGallery.style.gap = '5px';
-    mobileGallery.style.marginTop = '10px';
-    mobileContainer.appendChild(mobileGallery);
-
-    // Мобільний слайдер
-    const mobileSlider = document.createElement('input');
-    mobileSlider.type = 'range';
-    mobileSlider.min = 0.1;
-    mobileSlider.max = 3;
-    mobileSlider.step = 0.01;
-    mobileSlider.value = 1;
-    mobileSlider.style.width = '90%';
-    mobileSlider.style.marginTop = '10px';
-    mobileContainer.appendChild(mobileSlider);
-
-    // Контекст мобільного canvas
-    const mCtx = mobileCanvas.getContext('2d');
-    let mLayers = { bg:null, love:null, vow:null, lovestone:null, x:mobileCanvas.width/2, y:mobileCanvas.height/2, scale:1 };
-
-    // Drag & drop
-    let isDraggingMobile=false, dragStartXMobile=0, dragStartYMobile=0;
-    mobileCanvas.addEventListener('touchstart', e=>{
-        const t=e.touches[0], rect=mobileCanvas.getBoundingClientRect();
-        isDraggingMobile=true;
-        dragStartXMobile=(t.clientX-rect.left)-mLayers.x;
-        dragStartYMobile=(t.clientY-rect.top)-mLayers.y;
-        e.preventDefault();
-    });
-    mobileCanvas.addEventListener('touchmove', e=>{
-        if(!isDraggingMobile) return;
-        const t=e.touches[0], rect=mobileCanvas.getBoundingClientRect();
-        mLayers.x=(t.clientX-rect.left)-dragStartXMobile;
-        mLayers.y=(t.clientY-rect.top)-dragStartYMobile;
-        drawMobileCanvas();
-        e.preventDefault();
-    });
-    mobileCanvas.addEventListener('touchend', e=>{ isDraggingMobile=false; });
-
-    // Масштаб
-    mobileSlider.addEventListener('input', ()=>{
-        mLayers.scale=parseFloat(mobileSlider.value);
-        drawMobileCanvas();
-    });
-
-    function drawMobileCanvas(){
-        mCtx.clearRect(0,0,mobileCanvas.width,mobileCanvas.height);
-        if(mLayers.bg) mCtx.drawImage(mLayers.bg,0,0,mobileCanvas.width,mobileCanvas.height);
-        if(mLayers.love){
-            const w=mLayers.love.width*mLayers.scale;
-            const h=mLayers.love.height*mLayers.scale;
-            mCtx.drawImage(mLayers.love, mLayers.x-w/2, mLayers.y-h/2, w, h);
-        }
-        if(mLayers.vow) mCtx.drawImage(mLayers.vow,0,0);
-        if(mLayers.lovestone) mCtx.drawImage(mLayers.lovestone,0,0);
-    }
-
-    // Завантаження мініатюр у мобільну галерею
-    fullImages.forEach(src=>{
-        const img = document.createElement('img');
-        img.src=src;
-        img.style.width='80px';
-        img.style.height='50px';
-        img.style.objectFit='cover';
-        img.style.cursor='pointer';
-        img.addEventListener('click', ()=>{ 
-            const imgObj=new Image();
-            imgObj.onload=()=>{ mLayers.bg=imgObj; drawMobileCanvas(); };
-            imgObj.src=src;
-        });
-        mobileGallery.appendChild(img);
-    });
-
-    // Можна додати завантаження власного фото та клятв
-    document.getElementById('fot').addEventListener('click', ()=>{
-        loveLoader.click();
-    });
-    loveLoader.addEventListener('change', e=>{
-        if(!e.target.files[0]) return;
-        const reader=new FileReader();
-        reader.onload=function(ev){
-            const img=new Image();
-            img.onload=()=>{ mLayers.love=img; drawMobileCanvas(); };
-            img.src=ev.target.result;
-        };
-        reader.readAsDataURL(e.target.files[0]);
-    });
+function drawCanvas() {
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    if(bgImages[currentBgIndex]) ctx.drawImage(bgImages[currentBgIndex], 0, 0, canvas.width*scale, canvas.height*scale);
+    if(vowImages[currentVowIndex]) ctx.drawImage(vowImages[currentVowIndex], 0, 0, canvas.width*scale, canvas.height*scale);
 }
+
+// Slider
+scaleSlider.addEventListener('input', () => {
+    scale = parseFloat(scaleSlider.value);
+    drawCanvas();
+});
+
+// Touch support
+canvas.addEventListener('touchstart', e => { e.preventDefault(); });
+canvas.addEventListener('touchmove', e => { e.preventDefault(); });
+canvas.addEventListener('touchend', e => { drawCanvas(); });
+
+// === Навігація фонів ===
+function prevSlide() { currentBgIndex = (currentBgIndex-1+bgImages.length)%bgImages.length; drawCanvas(); }
+function nextSlide() { currentBgIndex = (currentBgIndex+1)%bgImages.length; drawCanvas(); }
+function prevVow() { currentVowIndex = (currentVowIndex-1+vowImages.length)%vowImages.length; drawCanvas(); }
+function nextVow() { currentVowIndex = (currentVowIndex+1)%vowImages.length; drawCanvas(); }
+
+// === Ініціалізація ===
+// Приклад завантаження фонів
+for(let i=1;i<=3;i++){
+    let img = new Image(); img.src = `https://detectfraud.github.io/gallery/bg${i}.jpg`;
+    img.onload = ()=>{ drawCanvas(); }; bgImages.push(img);
+}
+
+// Завантаження клятв (приклад)
+for(let i=1;i<=2;i++){
+    let img = new Image(); img.src = `https://detectfraud.github.io/gallery/vow${i}.png`;
+    img.onload = ()=>{ drawCanvas(); }; vowImages.push(img);
+}
+
+drawCanvas();
 </script>
 
 </body>
