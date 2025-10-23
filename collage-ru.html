@@ -2,7 +2,7 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8" />
-    <title>Камінь любові — редактор</title>
+    <title>Камень любви - редактор</title>
     <style>
         body { font-family: sans-serif; text-align: center; background: transparent;}
         .venwin { border-radius: 10px; display: inline-block; background-color: rgba(255, 255, 255, 0.5); padding: 20px 20px;box-sizing: border-box;border-color:transparent;/* */}
@@ -121,7 +121,7 @@
             <img id="imagePreview" class="imagbox" src="" alt="Image Preview">
         </div>
         <br>
-        <b style="text-align: center;">Розмір</b>
+        <b style="text-align: center;">Размер</b>
         <br>
         <input type="range" id="scaleSlider" min="0.1" max="3" step="0.01" value="1" style="cursor: pointer;">
         <div class="gallery-container">
@@ -136,15 +136,15 @@
             <div class="gallery-block photo-block">
                 <b>Ваше фото</b><br /><br />
                 <div>
-                    <label id="fot" class="disabled" title="Фото закоханих"></label>
+                    <label id="fot" class="disabled" title="Фото влюбленных"></label>
                 </div>
             </div>
         </div>
         <div class="gallery-container vows" id="vowse" style="display:none;">
             <div class="gallery-block">
                 <div class="labels">
-                    <span class="label1">Надпис</span>
-                    <span class="label2">Клятва закоханих</span>
+                    <span class="label1">Надпись</span>
+                    <span class="label2">Клятва влюбленных</span>
                 </div>
                 <div class="gallery-row">
                     <span class="arow" onclick="prevVow()">&#10094;</span>
@@ -155,13 +155,13 @@
         </div>
         <p class="button-row">
             <button id="undoBtn" type="button">⟲ Undo</button>
-            <button id="previewBtn" type="button" class="disabled">👁 Перегляд</button>
-            <button id="downloadBtn" type="button" style="display:none;">📥 Завантажити</button>
+            <button id="previewBtn" type="button" class="disabled">👁 Просмотр</button>
+            <button id="downloadBtn" type="button" style="display:none;">📥 Загрузить</button>
             <button id="updateBtn" type="button">UPDATE</button>
         </p>
         <br>
     </fieldset>
-  <!--  <a href="https://intuit-portal.blogspot.com/p/donate.html" class="donate-btn" target="_blank" title="Підтримати проєкт">❤️</a>  -->
+  <!--  <a href="https://intuit-portal.blogspot.com/p/donate.html" class="donate-btn" target="_blank" title="Поддержать проект">❤️</a>  -->
     <input type="file" id="bgLoader" style="display:none">
     <input type="file" id="loveLoader" style="display:none">
     <script>
@@ -173,8 +173,8 @@ const isAllowed = allowedDomains.some(domain => currentHost.includes(domain)) ||
                   allowedDomains.some(domain => referrerHost.includes(domain));
 
 if (!isAllowed) {
-    document.body.innerHTML = '<h1>Доступ заборонено</h1><p>Цей додаток може бути вбудований лише на офіційному сайті intuit-portal.blogspot.com</p>';
-    throw new Error('Доступ заборонено');
+    document.body.innerHTML = '<h1>Доступ запрещен</h1><p>Это приложение может быть встроено только на официальном сайте intuit-portal.blogspot.com</p>';
+    throw new Error('Доступ запрещен');
 }
 
         /* === Collage JS === */
@@ -324,7 +324,7 @@ if (!isAllowed) {
 
 
             if (imgName === "Fon") {
-                thumb.title = "Завантажити свій фон";
+                thumb.title = "Загрузить свой фон";
                 thumb.onclick = () => {
                     bgLoader.click();
                     imagePreview.classList.remove('show');
@@ -427,7 +427,7 @@ if (!isAllowed) {
                     drawAll();
                     if (key === 'bg') {
                         document.getElementById('fot').classList.remove('disabled');
-                        const fonThumb = Array.from(thumbs.querySelectorAll('.thumb')).find(t => t.title === "Завантажити свій фон");
+                        const fonThumb = Array.from(thumbs.querySelectorAll('.thumb')).find(t => t.title === "Загрузить свой фон");
                         if (fonThumb) {
                             setActiveThumb(fonThumb, 'bg'); // Передаємо тип галереї
                         }
@@ -647,7 +647,7 @@ if (!isAllowed) {
             link.click();
         });
         document.getElementById('updateBtn').addEventListener('click', function () {
-            const confirmUpdate = confirm("Ви впевнені, що хочете оновити сторінку?\n Усі незавершені зміни буде втрачено.");
+            const confirmUpdate = confirm("Вы уверены, что хотите обновить страницу?\n Все незавершенные изменения будут потеряны.");
             if (confirmUpdate) {
                 const url = window.location.href.split('?')[0];
                 window.location.href = url + '?_=' + new Date().getTime();
