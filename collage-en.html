@@ -323,7 +323,7 @@ if (!isAllowed) {
             observer.observe(thumb, { attributes: true });
 
 
-            if (imgName === "Fon") {
+            if (imgName === "FonX") {
                 thumb.title = "Upload your background";
                 thumb.onclick = () => {
                     bgLoader.click();
@@ -488,7 +488,7 @@ if (!isAllowed) {
                     const reRenderedActiveThumb = Array.from(thumbs.querySelectorAll('.thumb')).find(t => t.src === s.activeThumbBg.src);
                     if (reRenderedActiveThumb) {
                         reRenderedActiveThumb.classList.add('active');
-                        if (s.activeThumbBg.imgName !== "Fon") {
+                        if (s.activeThumbBg.imgName !== "FonX") {
                             reRenderedActiveThumb.classList.add('disabled');
                         }
                         activeThumb.bg = s.activeThumbBg;
