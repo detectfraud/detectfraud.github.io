@@ -215,7 +215,7 @@ if (!isAllowed) {
             allThumbsInGallery.forEach(thumb => {
                 thumb.classList.remove('active');
                 // Знімаємо disabled з усіх, крім "Fon" (для bg) та "LoveStones" (для vow)
-                if (galleryType === 'bg' && thumb.dataset.imgName === "Fon") {
+                if (galleryType === 'bg' && thumb.dataset.imgName === "FonX") {
                     // "Fon" ніколи не отримує disabled, тому нічого не робимо
                 } else if (galleryType === 'vow' && thumb.dataset.imgName === "LoveStones") {
                     // "LoveStones" зберігає disabled, якщо він вже був встановлений.
