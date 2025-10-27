@@ -249,7 +249,7 @@ if (!isAllowed) {
                 const reRenderedActiveThumb = Array.from(thumbs.querySelectorAll('.thumb')).find(t => t.src === activeThumb.bg.src);
                 if (reRenderedActiveThumb) {
                     reRenderedActiveThumb.classList.add('active');
-                    if (activeThumb.bg.imgName !== "Fon") { // "Fon" не отримує disabled
+                    if (activeThumb.bg.imgName !== "FonX") { // "Fon" не отримує disabled
                          reRenderedActiveThumb.classList.add('disabled');
                     }
                 }
