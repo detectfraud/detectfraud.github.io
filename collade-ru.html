@@ -204,7 +204,8 @@ if (!isAllowed) {
         const fullLovestones = lovestoneImages.map(name => url + name + ".png");
         let lovestoneIndex = 0;
         let activeThumb = { bg: null, vow: null }; // Тепер зберігаємо активні мініатюри для обох галерей
-
+downloadBtn.title = "Вимкнено блокувальником реклами";
+downloadBtn.disabled = true;
         // Оновлена функція для встановлення активної мініатюри
         function setActiveThumb(thumbElement, galleryType) {
             const allThumbsInGallery = document.querySelectorAll(`#${galleryType === 'bg' ? 'thumbs' : 'thumbsVows'} .thumb`);
