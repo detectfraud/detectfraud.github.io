@@ -5,7 +5,7 @@
     <title>Stone of Love — editor</title>
     <style>
         body { font-family: sans-serif; text-align: center; background: transparent;}
-        .venwin { border-radius: 10px; display: inline-block; background-color: rgba(255, 255, 255, 0.5); padding: 20px 20px;box-sizing: border-box;border-color:transparent;/* */}
+        .venwin { border-radius: 10px; display: inline-block; background-color: rgba(255, 255, 255, 0.5); padding: 20px 20px 0; box-sizing: border-box;border-color:transparent;/* */}
         canvas {
             border: 3px solid #bbb;
             border-radius: 6px;
@@ -73,25 +73,21 @@
         }
         .photo-block { margin-left: 100px; }
         #updateBtn { margin-left: 300px; font-weight: bold; color: red; }
-        .donate-btn {
-            position: fixed;
-            bottom: 30px;
-            right: 50%;
-            background-color: #e74c3c;
-            color: white;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 28px;
-            text-decoration: none;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-            cursor: pointer;
-            z-index: 1000;
-            animation: pulse 1.5s infinite;
-        }
+        #downloadBtn:disabled {opacity: 0.5;cursor: not-allowed;}
+#coll {background-color: transparent;
+width: 630px;
+height: 420px;
+color: #990000;
+font-family: verdana;
+font-weight: bold;
+}
+.collade {
+font-size: small;
+}
+.punkt {
+background-color: #fcff01;
+font-family: arial;
+}
         @keyframes pulse {
             0% { transform: scale(1); }
             50% { transform: scale(1.1); }
@@ -161,7 +157,9 @@
         </p>
         <br>
     </fieldset>
-  <!--  <a href="https://intuit-portal.blogspot.com/p/donate.html" class="donate-btn" target="_blank" title="Support the project">❤️</a>  -->
+<fieldset class="venwin" id="coll">
+<span  class="collade">Please disable AdBlock. This will help us maintain the site and ensure access to all its features. If you don't know how to do this, here</span>
+<a href="https://intuit-portal.blogspot.com/p/noadb.html" target="_blank"><span class="punkt"> instruction </span></a></fieldset>
     <input type="file" id="bgLoader" style="display:none">
     <input type="file" id="loveLoader" style="display:none">
     <script>
@@ -207,7 +205,8 @@ if (!isAllowed) {
         const fullLovestones = lovestoneImages.map(name => url + name + ".png");
         let lovestoneIndex = 0;
         let activeThumb = { bg: null, vow: null }; // Тепер зберігаємо активні мініатюри для обох галерей
-
+downloadBtn.title = "Disabled by ad blocker";
+downloadBtn.disabled = true;
         // Оновлена функція для встановлення активної мініатюри
         function setActiveThumb(thumbElement, galleryType) {
             const allThumbsInGallery = document.querySelectorAll(`#${galleryType === 'bg' ? 'thumbs' : 'thumbsVows'} .thumb`);
