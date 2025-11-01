@@ -519,23 +519,15 @@ downloadBtn.disabled = true;
                     activeThumb.bg = null;
                 }
                 if (s.activeThumbVow) {
-const reRenderedActiveThumb = Array.from(thumbsVows.querySelectorAll('.thumb')).find(t => t.src === s.activeThumbVow.src);
-
-if (reRenderedActiveThumb) {
-  reRenderedActiveThumb.classList.add('active');
-  reRenderedActiveThumb.classList.add('disabled');
-  activeThumb.vow = s.activeThumbVow;
-} else {
-  activeThumb.vow = null;
-}
-} else {
-  activeThumb.vow = null;
-}
-}, 0);
-
-drawAll();
-}
-
+                    const reRenderedActiveThumb = Array.from(thumbsVows.querySelectorAll('.thumb')).find(t => t.src === s.activeThumbVow.src);
+                    if (reRenderedActiveThumb) {
+                        reRenderedActiveThumb.classList.add('active');
+                        reRenderedActiveThumb.classList.add('disabled');
+                        activeThumb.vow = s.activeThumbVow;
+                    }
+                } else {
+                    activeThumb.vow = null;
+                }
                 // Після завантаження історії, перевіряємо стан LoveStones окремо
                 const loveStonesThumb = Array.from(thumbsVows.querySelectorAll('.thumb')).find(t => t.dataset.imgName === "LoveStones");
                 if (loveStonesThumb && layers.lovestone.img && !loveStonesThumb.classList.contains('active')) {
