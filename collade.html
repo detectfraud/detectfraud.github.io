@@ -135,7 +135,29 @@
         } 
 
 /* === Фікс розміру fieldset і позиції біжучого рядка для десктопу === */
+@media (min-width: 769px) {
+  fieldset.venwin {
+    position: relative;
+    display: inline-block;
+    vertical-align: top;
+    padding-bottom: 40px; /* місце для біжучого рядка */
+  }
 
+  .marquee-container.inside {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 630px;
+    z-index: 5;
+  }
+
+  canvas {
+    display: block;
+    margin: 10px auto 30px auto; /* нижній відступ, щоб marquee не з'їжджав */
+  }
+}
 </style>
 
 
