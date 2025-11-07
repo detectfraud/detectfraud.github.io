@@ -76,30 +76,51 @@
         #downloadBtn:disabled {opacity: 0.5;cursor: not-allowed;}
 
 
-.marquee {
+.marquee-container {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  background: rgba(255,255,255,0.5);
+  border-radius: 8px;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  margin-top: 8px;
+}
+
+.marquee-content {
   display: inline-block;
   white-space: nowrap;
   animation: scrollText 18s linear infinite;
   font-family: Arial, sans-serif;
   font-size: 15px;
   color: #990000;
-    font-weight: 500;
-   }
-.punkt {
-  color: #0b5394;
-  font-weight: bold;
-  margin-left: 4px;
-  text-decoration: underline;
+  font-weight: 500;
+  padding: 6px 0;
+}
+
+.marquee-content.clone {
+  position: absolute;
+  top: 0;
+  left: 100%;
+}
+
+.collade {
+  color: #990000;
+}
+
+.marquee-container:hover .marquee-content {
+  animation-play-state: paused;
 }
 
 @keyframes scrollText {
   0% {
-    transform: translateX(100%);
+    transform: translateX(0);
   }
   100% {
     transform: translateX(-100%);
   }
 }
+
         @keyframes pulse {
             0% { transform: scale(1); }
             50% { transform: scale(1.1); }
@@ -119,13 +140,7 @@
             .gallery-container.vows .labels { grid-template-columns: 1fr 1fr; }
             .gallery-container.vows .labels .label1, .gallery-container.vows .labels .label2 { margin: 0; }
             .donate-btn { bottom: 10px; left: 55%; width: 50px; height: 50px; font-size: 24px; }
-/* Адаптація для вузьких екранів */
-  .venwin {
-    font-size: 14px;
-  }
-  .marquee {
-    animation-duration: 25s;
-  }
+
         } 
     </style>
 </head>
@@ -175,10 +190,27 @@
             <button id="updateBtn" type="button">UPDATE</button>
         </p>
         <br>
-   
     </fieldset>
-<div class="marquee"><a href="https://intuitportal.blogspot.com/p/noadb.html" target="_blank">
-<span class="collade">   Будь ласка, вимкніть AdBlock. Це допоможе нам підтримувати роботу сайту та забезпечити доступ до всіх його функцій. Якщо не знаєте як це зробити, натисніть на цей рядок.   </span></a></div>
+   
+<div class="marquee-container">
+  <div class="marquee-content">
+    <a href="https://intuitportal.blogspot.com/p/noadb.html" target="_blank">
+      <span class="collade">
+        Будь ласка, вимкніть AdBlock. Це допоможе нам підтримувати роботу сайту та забезпечити доступ до всіх його функцій. 
+        Якщо не знаєте як це зробити, натисніть на цей рядок.
+      </span>
+    </a>
+  </div>
+  <div class="marquee-content clone">
+    <a href="https://intuitportal.blogspot.com/p/noadb.html" target="_blank">
+      <span class="collade">
+        Будь ласка, вимкніть AdBlock. Це допоможе нам підтримувати роботу сайту та забезпечити доступ до всіх його функцій. 
+        Якщо не знаєте як це зробити, натисніть на цей рядок.
+      </span>
+    </a>
+  </div>
+</div>
+
     <input type="file" id="bgLoader" style="display:none">
     <input type="file" id="loveLoader" style="display:none">
     <script>
