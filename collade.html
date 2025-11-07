@@ -41,7 +41,7 @@ button { padding: 8px 12px; cursor: pointer; border-radius: 8px; }
 .photo-block { margin-left: 100px; }
 #updateBtn { margin-left: 300px; font-weight: bold; color: red; }
 
-/* ===== Біжучий рядок ===== */
+/* ===== СТАБІЛЬНИЙ біжучий рядок ===== */
 .marquee-container.inside {
   position: absolute;
   bottom: 5px;
@@ -53,31 +53,43 @@ button { padding: 8px 12px; cursor: pointer; border-radius: 8px; }
   overflow: hidden;
   border: 1px solid #ccc;
   padding: 3px 0;
-  height: 24px;            /* виправлено */
-  line-height: 24px;       /* вирівняно текст */
+  height: 24px;
+  line-height: 24px;
   box-sizing: border-box;
 }
-.marquee-content,
-.marquee-content.clone {
-  display: inline-block;
+
+.marquee-track {
+  display: inline-flex;
   white-space: nowrap;
-  position: absolute;
-  top: 0;
+  animation: scrollLeft 30s linear infinite;
   will-change: transform;
 }
-.marquee-content { 
-  left: 0; 
-  animation: scrollText 18s linear infinite;
+
+@keyframes scrollLeft {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.marquee-text {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.collade {
   font-family: Arial, sans-serif;
   font-size: 15px;
   color: #990000;
   font-weight: 500;
 }
-.marquee-content.clone { left: 100%; }
-.marquee-container:hover .marquee-content { animation-play-state: paused; }
-@keyframes scrollText {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-100%); }
+
+.punkt {
+  color: #0055cc;
+  text-decoration: underline;
+}
+
+.marquee-container:hover .marquee-track {
+  animation-play-state: paused;
 }
 
 @media (max-width: 768px) {
@@ -88,10 +100,9 @@ button { padding: 8px 12px; cursor: pointer; border-radius: 8px; }
   .thumbnails { width: 100%; justify-content: center; }
   .photo-block { margin-left: 0; }
   #updateBtn { margin-left: 0; margin-top: 10px; }
-  .marquee-content { animation-duration: 25s; }
+  .marquee-track { animation-duration: 40s; }
 }
 </style>
-
 
 <fieldset class="venwin">
   <div class="collage" id="collage">
@@ -138,26 +149,23 @@ button { padding: 8px 12px; cursor: pointer; border-radius: 8px; }
     <button id="downloadBtn" type="button" style="display:none;">📥 Завантажити</button>
     <button id="updateBtn" type="button">UPDATE</button>
   </p>
-<br><br>
+
+  <br><br>
   <div class="marquee-container inside">
-    <div class="marquee-content">
-      <a href="https://intuitportal.blogspot.com/p/noadb.html" target="_blank">
-        <span class="collade">
-          Будь ласка, вимкніть AdBlock. Це допоможе нам підтримувати роботу сайту та забезпечити доступ до всіх його функцій. 
-          Якщо не знаєте як це зробити, натисніть на цей рядок.
-        </span>
-      </a>
-    </div>
-    <div class="marquee-content clone">
-      <a href="https://intuitportal.blogspot.com/p/noadb.html" target="_blank">
-        <span class="collade">
-          Будь ласка, вимкніть AdBlock. Це допоможе нам підтримувати роботу сайту та забезпечити доступ до всіх його функцій. 
-          Якщо не знаєте як це зробити, натисніть на цей рядок.
-        </span>
-      </a>
+    <div class="marquee-track">
+      <div class="marquee-text">
+        <a href="https://intuitportal.blogspot.com/p/noadb.html" target="_blank">
+          <span class="collade">Будь ласка, вимкніть AdBlock. Це допоможе нам підтримувати роботу сайту та забезпечити доступ до всіх його функцій. Якщо не знаєте як це зробити, натисніть на цей рядок.</span>
+        </a>
+        &nbsp;&nbsp;&nbsp;
+        <a href="https://intuitportal.blogspot.com/p/noadb.html" target="_blank">
+          <span class="collade">Будь ласка, вимкніть AdBlock. Це допоможе нам підтримувати роботу сайту та забезпечити доступ до всіх його функцій. Якщо не знаєте як це зробити, натисніть на цей рядок.</span>
+        </a>
+      </div>
     </div>
   </div>
 </fieldset>
+
 
 
 
