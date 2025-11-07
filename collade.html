@@ -118,7 +118,7 @@
   animation-play-state: paused;
 }
 
-        @media (max-width: 768px) {
+               @media (max-width: 768px) {
             body {background: url(https://themes.googleusercontent.com/image?id=1i7XdjA0YCh1VU8qGNC9bVCI6WZiohKKGLG6qaW6g3kLtKeAEBLuyhKZz_EUl6wifK7Uz) repeat scroll top left;}
             .venwin { padding: 10px; }
             canvas { width: 95%; height: auto; }
@@ -133,6 +133,33 @@
             .gallery-container.vows .labels .label1, .gallery-container.vows .labels .label2 { margin: 0; }
             .donate-btn { bottom: 10px; left: 55%; width: 50px; height: 50px; font-size: 24px; }
         } 
+
+/* === Фікс розміру fieldset і позиції біжучого рядка для десктопу === */
+@media (min-width: 769px) {
+  fieldset.venwin {
+    position: relative;
+    display: inline-block;
+    vertical-align: top;
+    padding-bottom: 40px; /* місце для біжучого рядка */
+  }
+
+  .marquee-container.inside {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 630px;
+    z-index: 5;
+  }
+
+  canvas {
+    display: block;
+    margin: 10px auto 30px auto; /* нижній відступ, щоб marquee не з'їжджав */
+  }
+}
+</style>
+
 </style>
 
 <fieldset class="venwin">
