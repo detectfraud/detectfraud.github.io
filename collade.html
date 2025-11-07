@@ -91,16 +91,21 @@ button { padding: 8px 12px; cursor: pointer; border-radius: 8px; }
   animation-play-state: paused;
 }
 
-@media (max-width: 768px) {
-  .venwin { padding: 10px; }
-  canvas { width: 95%; height: auto; }
-  #scaleSlider { width: 95%; }
-  .gallery-container { flex-direction: column; align-items: center; }
-  .thumbnails { width: 100%; justify-content: center; }
-  .photo-block { margin-left: 0; }
-  #updateBtn { margin-left: 0; margin-top: 10px; }
-  .marquee-track { animation-duration: 40s; }
-}
+        @media (max-width: 768px) {
+            body {background: url(https://themes.googleusercontent.com/image?id=1i7XdjA0YCh1VU8qGNC9bVCI6WZiohKKGLG6qaW6g3kLtKeAEBLuyhKZz_EUl6wifK7Uz) repeat scroll top left;}
+            .venwin { padding: 10px; }
+            canvas { width: 95%; height: auto; }
+            #scaleSlider { width: 95%; }
+            .gallery-container { flex-direction: column; align-items: center; }
+            .thumbnails { width: 100%; justify-content: center; }
+            .arrow:first-child, .arrow:last-child { margin: 0 10px; }
+            .arow:first-child, .arow:last-child { margin: 0 10px; }
+            .photo-block { margin-left: 0; }
+            #updateBtn { margin-left: 0; margin-top: 10px; }
+            .gallery-container.vows .labels { grid-template-columns: 1fr 1fr; }
+            .gallery-container.vows .labels .label1, .gallery-container.vows .labels .label2 { margin: 0; }
+            .donate-btn { bottom: 10px; left: 55%; width: 50px; height: 50px; font-size: 24px; }
+        } 
 </style>
 
 <fieldset class="venwin">
