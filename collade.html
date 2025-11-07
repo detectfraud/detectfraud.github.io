@@ -3,236 +3,292 @@
 <head>
     <meta charset="UTF-8" />
     <title>Камінь любові — редактор</title>
-    <style>
-        body { font-family: sans-serif; text-align: center; background: transparent;}
-        .venwin { border-radius: 10px; display: inline-block; background-color: rgba(255, 255, 255, 0.5); padding: 20px 20px 0; box-sizing: border-box;border-color:transparent;/* */}
-        canvas {
-            border: 3px solid #bbb;
-            border-radius: 6px;
-            box-shadow: 0 6px 18px rgba(0,0,0,.1);
-            display: block;
-            margin: 10px auto;
-            width: 630px;
-            height: 420px;
-            transition: transform 0.3s ease-in-out;
-            transform-origin: center center;
-            cursor:pointer;
-            position: relative;
-            z-index: 10;
-            transform-origin: top center;
-        }
-        .preview-zoom-in:hover {
-            transform: scale(1.43);
-        }
-        #scaleSlider { width: 420px; }
-        button { padding: 8px 12px; cursor: pointer; border-radius: 8px; }
-        .disabled {/*cursor: not-allowed; */ pointer-events: none;opacity: .5; filter: grayscale(100%); }
-        .gallery-container { display: flex; align-items: flex-start; justify-content: center; gap: 10px; margin-top: 10px; }
-        .gallery-block { display: flex; flex-direction: column; align-items: center; gap: 10px; }
-        .gallery-block > div { display: flex; align-items: center; justify-content: center;}
-        .arrow, .arow { font-size: 20px; cursor: pointer; user-select: none; padding: 3px; line-height: 1; display: flex; align-items: center; justify-content: center; }
-        .arrow:first-child { margin-right: -130px; }
-        .arrow:last-child { margin-left: -130px; }
-        .arow:first-child { margin-right: -60px; }
-        .arow:last-child { margin-left: -60px; }
-        .thumbnails { display: flex; gap: 10px; overflow: hidden; width: 630px; justify-content: center; }
-        .thumb-wrapper { position: relative; }
-        .thumb { width: 108px; height: 72px; object-fit: cover; cursor: pointer; box-shadow: 0 0 6px rgba(0,0,0,0.3); transition: all 0.3s ease; z-index: 1; border-radius: 10px; }
-        .thumb.active { border: 3px solid red; box-shadow: 0 0 10px red; }
-        .collage {
-            position: relative;
-            display: inline-block;
-            margin-top: 0;
-        }
-        .gallery-container.vows .labels { display: grid; grid-template-columns: repeat(4, 1fr); text-align: center; margin-bottom: 5px; }
-        .gallery-container.vows .labels .label1 { grid-column: 1; font-weight: bold; margin-left: 70px; }
-        .gallery-container.vows .labels .label2 { grid-column: 3; font-weight: bold; }
-        .arrow, .arow { position: relative; z-index: 3; }
-        .button-row { display: flex; justify-content: center; align-items: center; gap: 10px; }
-        #fot { display: inline-block; cursor: pointer; border-radius: 8px; width: 108px; height: 72px; background-image: url(https://detectfraud.github.io/gallery/Para.png); background-repeat: no-repeat; background-size: contain; }
-        #fot:hover { mix-blend-mode: luminosity; }
-        #fot:active { mix-blend-mode: exclusion; }
-        .imagbox {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%,-50%) scale(0.1);
-            width: 825px;
-            height: 510px;
-            opacity: 0;
-            transition: all 0.9s ease;
-            z-index: 9999;
-            border-radius: 12px;
-            box-shadow: 0 0 25px rgba(0,0,0,0.7);
-            pointer-events: none;
-            background: #fff;
-        }
-        .imagbox.show {
-            opacity: 1;
-            transform: translate(-50%,-50%) scale(0.6);
-        }
-        .photo-block { margin-left: 100px; }
-        #updateBtn { margin-left: 300px; font-weight: bold; color: red; }
-        #downloadBtn:disabled {opacity: 0.5;cursor: not-allowed;}
-.marquee-container {
-  position: relative;
-  overflow: hidden;
-  width: 100%;
-  background: rgba(255,255,255,0.5);
-  border-radius: 8px;
-  box-sizing: border-box;
-  border: 1px solid #ccc;
-  margin-top: 8px;
-}
-
-.marquee-content {
-  display: inline-block;
-  white-space: nowrap;
-  animation: scrollText 18s linear infinite;
-  font-family: Arial, sans-serif;
-  font-size: 15px;
-  color: #990000;
-  font-weight: 500;
-  padding: 6px 0;
-}
-
-.marquee-content.clone {
-  position: absolute;
-  top: 0;
-  left: 100%;
-}
-
-.collade {
-  color: #990000;
-}
-.marquee-content {
-  min-width: 100%;
-}
-
-.marquee-container:hover .marquee-content {
-  animation-play-state: paused;
-}
-
-@keyframes scrollText {
-  0% {
-    transform: translateX(0);
+   <style>
+  body {
+    font-family: sans-serif;
+    text-align: center;
+    background: transparent;
   }
-  100% {
-    transform: translateX(-100%);
+
+  .venwin {
+    border-radius: 10px;
+    display: inline-block;
+    background-color: rgba(255, 255, 255, 0.5);
+    padding: 20px 20px 0;
+    box-sizing: border-box;
+    border: none;
+    position: relative; /* для absolute всередині */
   }
-}
-.marquee-container.inside {
-  position: absolute;
-  bottom: 5px;           /* трохи піднятий від нижнього краю */
-  left: 50%;
-  transform: translateX(-50%);
-  width: 95%;
-  background: rgba(255,255,255,0.6);
-  border-radius: 6px;
-  overflow: hidden;
-  border: 1px solid #ccc;
-  padding: 3px 0;
-  box-sizing: border-box;
-}
 
-.venwin {
-  position: relative; /* потрібно, щоб всередині можна було ставити absolute */
-}
+  canvas {
+    border: 3px solid #bbb;
+    border-radius: 6px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, .1);
+    display: block;
+    margin: 10px auto;
+    width: 630px;
+    height: 420px;
+    cursor: pointer;
+    position: relative;
+    z-index: 10;
+    transform-origin: top center;
+    transition: transform 0.3s ease-in-out;
+  }
 
-.marquee-content {
-  display: inline-block;
-  white-space: nowrap;
-  animation: scrollText 18s linear infinite;
-  font-family: Arial, sans-serif;
-  font-size: 15px;
-  color: #990000;
-  font-weight: 500;
-}
+  .preview-zoom-in:hover {
+    transform: scale(1.43);
+  }
 
-.marquee-content.clone {
-  position: absolute;
-  top: 0;
-  left: 100%;
-  min-width: 100%;
-}
-.marquee-content {
-  min-width: 100%;
-}
+  #scaleSlider {
+    width: 420px;
+  }
 
-.marquee-container:hover .marquee-content {
-  animation-play-state: paused;
-}
+  button {
+    padding: 8px 12px;
+    cursor: pointer;
+    border-radius: 8px;
+  }
 
-@keyframes scrollText {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-100%); }
-}
+  .disabled {
+    pointer-events: none;
+    opacity: .5;
+    filter: grayscale(100%);
+  }
 
-        @media (max-width: 768px) {
-            body {background: url(https://themes.googleusercontent.com/image?id=1i7XdjA0YCh1VU8qGNC9bVCI6WZiohKKGLG6qaW6g3kLtKeAEBLuyhKZz_EUl6wifK7Uz) repeat scroll top left;}
-            .venwin { padding: 10px; }
-            canvas { width: 95%; height: auto; }
-            #scaleSlider { width: 95%; }
-            .gallery-container { flex-direction: column; align-items: center; }
-            .thumbnails { width: 100%; justify-content: center; }
-            .arrow:first-child, .arrow:last-child { margin: 0 10px; }
-            .arow:first-child, .arow:last-child { margin: 0 10px; }
-            .photo-block { margin-left: 0; }
-            #updateBtn { margin-left: 0; margin-top: 10px; }
-            .gallery-container.vows .labels { grid-template-columns: 1fr 1fr; }
-            .gallery-container.vows .labels .label1, .gallery-container.vows .labels .label2 { margin: 0; }
-            .donate-btn { bottom: 10px; left: 55%; width: 50px; height: 50px; font-size: 24px; }
+  .gallery-container {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 10px;
+  }
 
-        } 
-    </style>
-</head>
-<body>
-    <fieldset class="venwin" style="height:auto;">
-        <div class="collage" id="collage">
-            <canvas id="canvas" width="900" height="600" style="cursor: pointer;border:1px solid #ccc;"></canvas>
-            <img id="imagePreview" class="imagbox" src="" alt="Image Preview">
-        </div>
-        <br>
-        <b style="text-align: center;">Розмір</b>
-        <br>
-        <input type="range" id="scaleSlider" min="0.1" max="3" step="0.01" value="1" style="cursor: pointer;">
-        <div class="gallery-container">
-            <div class="gallery-block" id="vowsi">
-                <b>Фон</b><br /><br />
-                <div>
-                    <span class="arrow" onclick="prevSlide()">&#10094;</span>
-                    <div class="thumbnails" id="thumbs"></div>
-                    <span class="arrow" onclick="nextSlide()">&#10095;</span>
-                </div>
-            </div>
-            <div class="gallery-block photo-block">
-                <b>Ваше фото</b><br /><br />
-                <div>
-                    <label id="fot" class="disabled" title="Фото закоханих"></label>
-                </div>
-            </div>
-        </div>
-        <div class="gallery-container vows" id="vowse" style="display:none;">
-            <div class="gallery-block">
-                <div class="labels">
-                    <span class="label1">Надпис</span>
-                    <span class="label2">Клятва закоханих</span>
-                </div>
-                <div class="gallery-row">
-                    <span class="arow" onclick="prevVow()">&#10094;</span>
-                    <div class="thumbnails" id="thumbsVows"></div>
-                    <span class="arow" onclick="nextVow()">&#10095;</span>
-                </div>
-            </div>
-        </div>
-        <p class="button-row">
-            <button id="undoBtn" type="button">⟲ Undo</button>
-            <button id="previewBtn" type="button" class="disabled">👁 Перегляд</button>
-            <button id="downloadBtn" type="button" style="display:none;">📥 Завантажити</button>
-            <button id="updateBtn" type="button">UPDATE</button>
-        </p>
-        <br><br>
-     <div class="marquee-container inside">
+  .gallery-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .arrow, .arow {
+    font-size: 20px;
+    cursor: pointer;
+    user-select: none;
+    padding: 3px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 3;
+  }
+
+  .arrow:first-child { margin-right: -130px; }
+  .arrow:last-child { margin-left: -130px; }
+  .arow:first-child { margin-right: -60px; }
+  .arow:last-child { margin-left: -60px; }
+
+  .thumbnails {
+    display: flex;
+    gap: 10px;
+    overflow: hidden;
+    width: 630px;
+    justify-content: center;
+  }
+
+  .thumb {
+    width: 108px;
+    height: 72px;
+    object-fit: cover;
+    cursor: pointer;
+    box-shadow: 0 0 6px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+    border-radius: 10px;
+  }
+
+  .thumb.active {
+    border: 3px solid red;
+    box-shadow: 0 0 10px red;
+  }
+
+  .collage {
+    position: relative;
+    display: inline-block;
+    margin-top: 0;
+  }
+
+  .gallery-container.vows .labels {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    text-align: center;
+    margin-bottom: 5px;
+  }
+
+  .gallery-container.vows .labels .label1 {
+    grid-column: 1;
+    font-weight: bold;
+    margin-left: 70px;
+  }
+
+  .gallery-container.vows .labels .label2 {
+    grid-column: 3;
+    font-weight: bold;
+  }
+
+  .button-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+  }
+
+  #fot {
+    display: inline-block;
+    cursor: pointer;
+    border-radius: 8px;
+    width: 108px;
+    height: 72px;
+    background-image: url(https://detectfraud.github.io/gallery/Para.png);
+    background-repeat: no-repeat;
+    background-size: contain;
+  }
+
+  #fot:hover { mix-blend-mode: luminosity; }
+  #fot:active { mix-blend-mode: exclusion; }
+
+  .imagbox {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.1);
+    width: 825px;
+    height: 510px;
+    opacity: 0;
+    transition: all 0.9s ease;
+    z-index: 9999;
+    border-radius: 12px;
+    box-shadow: 0 0 25px rgba(0, 0, 0, 0.7);
+    pointer-events: none;
+    background: #fff;
+  }
+
+  .imagbox.show {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(0.6);
+  }
+
+  .photo-block { margin-left: 100px; }
+  #updateBtn { margin-left: 300px; font-weight: bold; color: red; }
+  #downloadBtn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  /* === MARQUEE === */
+  .marquee-container.inside {
+    position: absolute;
+    bottom: 5px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 95%;
+    background: rgba(255,255,255,0.6);
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid #ccc;
+    padding: 3px 0;
+    box-sizing: border-box;
+  }
+
+  .marquee-content {
+    display: inline-block;
+    white-space: nowrap;
+    animation: scrollText 18s linear infinite;
+    font-family: Arial, sans-serif;
+    font-size: 15px;
+    color: #990000;
+    font-weight: 500;
+    min-width: 100%;
+  }
+
+  .marquee-content.clone {
+    position: absolute;
+    top: 0;
+    left: 100%;
+  }
+
+  .marquee-container:hover .marquee-content {
+    animation-play-state: paused;
+  }
+
+  @keyframes scrollText {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-100%); }
+  }
+
+  /* === АДАПТИВ === */
+  @media (max-width: 768px) {
+    body {
+      background: url(https://themes.googleusercontent.com/image?id=1i7XdjA0YCh1VU8qGNC9bVCI6WZiohKKGLG6qaW6g3kLtKeAEBLuyhKZz_EUl6wifK7Uz) repeat scroll top left;
+    }
+    .venwin { padding: 10px; }
+    canvas { width: 95%; height: auto; }
+    #scaleSlider { width: 95%; }
+    .gallery-container { flex-direction: column; align-items: center; }
+    .thumbnails { width: 100%; }
+    .arrow:first-child, .arrow:last-child,
+    .arow:first-child, .arow:last-child { margin: 0 10px; }
+    .photo-block { margin-left: 0; }
+    #updateBtn { margin: 10px 0 0 0; }
+    .gallery-container.vows .labels { grid-template-columns: 1fr 1fr; }
+    .gallery-container.vows .labels .label1,
+    .gallery-container.vows .labels .label2 { margin: 0; }
+  }
+</style>
+
+<fieldset class="venwin">
+  <div class="collage" id="collage">
+    <canvas id="canvas" width="900" height="600" style="cursor: pointer;border:1px solid #ccc;"></canvas>
+    <img id="imagePreview" class="imagbox" src="" alt="Image Preview">
+  </div>
+
+  <b>Розмір</b><br>
+  <input type="range" id="scaleSlider" min="0.1" max="3" step="0.01" value="1">
+
+  <div class="gallery-container">
+    <div class="gallery-block" id="vowsi">
+      <b>Фон</b><br><br>
+      <div>
+        <span class="arrow" onclick="prevSlide()">&#10094;</span>
+        <div class="thumbnails" id="thumbs"></div>
+        <span class="arrow" onclick="nextSlide()">&#10095;</span>
+      </div>
+    </div>
+
+    <div class="gallery-block photo-block">
+      <b>Ваше фото</b><br><br>
+      <label id="fot" class="disabled" title="Фото закоханих"></label>
+    </div>
+  </div>
+
+  <div class="gallery-container vows" id="vowse" style="display:none;">
+    <div class="gallery-block">
+      <div class="labels">
+        <span class="label1">Надпис</span>
+        <span class="label2">Клятва закоханих</span>
+      </div>
+      <div class="gallery-row">
+        <span class="arow" onclick="prevVow()">&#10094;</span>
+        <div class="thumbnails" id="thumbsVows"></div>
+        <span class="arow" onclick="nextVow()">&#10095;</span>
+      </div>
+    </div>
+  </div>
+
+  <p class="button-row">
+    <button id="undoBtn" type="button">⟲ Undo</button>
+    <button id="previewBtn" type="button" class="disabled">👁 Перегляд</button>
+    <button id="downloadBtn" type="button" style="display:none;">📥 Завантажити</button>
+    <button id="updateBtn" type="button">UPDATE</button>
+  </p>
+
+  <div class="marquee-container inside">
     <div class="marquee-content">
       <a href="https://intuitportal.blogspot.com/p/noadb.html" target="_blank">
         <span class="collade">
@@ -250,7 +306,8 @@
       </a>
     </div>
   </div>
-    </fieldset>
+</fieldset>
+
 
 
     <input type="file" id="bgLoader" style="display:none">
