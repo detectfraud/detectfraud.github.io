@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8" />
     <title>Камень любви - редактор</title>
-    <style>
+<style>
         body { font-family: sans-serif; text-align: center; background: transparent;}
-        .venwin { border-radius: 10px; display: inline-block; background-color: rgba(255, 255, 255, 0.5); padding: 20px 20px 0; box-sizing: border-box;border-color:transparent;/* */}
+        .venwin { border-radius: 10px; display: inline-block; background-color: rgba(255, 255, 255, 0.5); padding: 20px 20px;box-sizing: border-box;border-color:transparent;max-width:650px;/* */}
         canvas {
             border: 3px solid #bbb;
             border-radius: 6px;
@@ -73,29 +73,55 @@
         }
         .photo-block { margin-left: 100px; }
         #updateBtn { margin-left: 300px; font-weight: bold; color: red; }
-        #downloadBtn:disabled {opacity: 0.5;cursor: not-allowed;}
-#coll {background-color: transparent;
-width: 630px;
-height: 420px;
-color: #990000;
-font-family: verdana;
-font-weight: bold;
+     #downloadBtn:disabled {opacity: 0.5;cursor: not-allowed;}
+/* ===== СТАБІЛЬНИЙ біжучий рядок ===== */
+.marquee-container.inside {
+  position: absolute;
+  bottom: 5px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 95%;
+  background: transparent;
+  border-radius: 6px;
+  overflow: hidden;  
+  padding: 3px 0;
+  height: 24px;
+  line-height: 24px;
+  box-sizing: border-box;
 }
+
+.marquee-track {
+  display: inline-flex;
+  white-space: nowrap;
+  animation: scrollLeft 30s linear infinite;
+  will-change: transform;
+}
+
+@keyframes scrollLeft {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.marquee-text {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
 .collade {
-font-size: small;
+  font-family: Arial, sans-serif;
+  font-size: 15px;
+  color: #990000;
+  font-weight: 500;
 }
-.punkt {
-background-color: #fcff01;
-font-family: arial;
+
+.marquee-container:hover .marquee-track {
+  animation-play-state: paused;
 }
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
-        }
-        @media (max-width: 768px) {
+
+               @media (max-width: 768px) {
             body {background: url(https://themes.googleusercontent.com/image?id=1i7XdjA0YCh1VU8qGNC9bVCI6WZiohKKGLG6qaW6g3kLtKeAEBLuyhKZz_EUl6wifK7Uz) repeat scroll top left;}
-            .venwin { padding: 10px; }
+            .venwin { padding: 10px; max-width:650px;}
             canvas { width: 95%; height: auto; }
             #scaleSlider { width: 95%; }
             .gallery-container { flex-direction: column; align-items: center; }
@@ -108,7 +134,32 @@ font-family: arial;
             .gallery-container.vows .labels .label1, .gallery-container.vows .labels .label2 { margin: 0; }
             .donate-btn { bottom: 10px; left: 55%; width: 50px; height: 50px; font-size: 24px; }
         } 
-    </style>
+
+/* === Фікс розміру fieldset і позиції біжучого рядка для десктопу === */
+@media (min-width: 769px) {
+  fieldset.venwin {
+    position: relative;
+    display: inline-block;
+    vertical-align: top;
+    padding-bottom: 40px; /* місце для біжучого рядка */
+  }
+
+  .marquee-container.inside {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 630px;
+    z-index: 5;
+  }
+
+  canvas {
+    display: block;
+    margin: 10px auto 30px auto; /* нижній відступ, щоб marquee не з'їжджав */
+  }
+}
+</style>
 </head>
 <body>
     <fieldset class="venwin" style="height:auto;">
@@ -155,10 +206,21 @@ font-family: arial;
             <button id="downloadBtn" type="button" style="display:none;">📥 Загрузить</button>
             <button id="updateBtn" type="button">UPDATE</button>
         </p>
-<div id="coll">
-<span  class="collade">Пожалуйста, отключите AdBlock. Это поможет нам поддерживать работу сайта и обеспечить доступ ко всем его функциям. Если не знаете как это сделать, здесь</span>
-<a href="https://intuitportal.blogspot.com/p/ru-noadb.html" target="_blank"><span class="punkt"> инструкция </span></a></div>
-    </fieldset>
+        
+  <div class="marquee-container inside">
+    <div class="marquee-track">
+      <div class="marquee-text">
+        <a href="https://intuitportal.blogspot.com/p/noadb.html" target="_blank">
+          <span class="collade">Будь ласка, вимкніть AdBlock. Це допоможе нам підтримувати роботу сайту та забезпечити доступ до всіх його функцій. Якщо не знаєте як це зробити, натисніть на цей рядок.&nbsp;&laquo;</span>
+        </a>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <a href="https://intuitportal.blogspot.com/p/noadb.html" target="_blank">
+          <span class="collade">&raquo;&nbsp;Будь ласка, вимкніть AdBlock. Це допоможе нам підтримувати роботу сайту та забезпечити доступ до всіх його функцій. Якщо не знаєте як це зробити, натисніть на цей рядок.</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</fieldset>
 
     <input type="file" id="bgLoader" style="display:none">
     <input type="file" id="loveLoader" style="display:none">
