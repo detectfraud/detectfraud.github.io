@@ -652,8 +652,7 @@ downloadBtn.addEventListener('click', () => {
         // таймер 0.8 сек (можна 500–1000 мс)
         setTimeout(() => {
             const ok = confirm("«Бажаєте закріпити силу оберега донатом?»");
-            if (ok) {
-                window.location.href = "https://intuitportal.blogspot.com/p/donate.html"; // ← твій URL
+            if (ok) {window.open("https://intuitportal.blogspot.com/p/donate.html", "_blank");
             }
         }, 800);
 
