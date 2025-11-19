@@ -639,12 +639,28 @@ if (!isAllowed) {
             toggleButtons();
             drawAll();
         });
-        downloadBtn.addEventListener('click',()=>{
-            const link=document.createElement('a');
-            link.download='collage.jpg';
-            link.href=canvas.toDataURL('image/jpeg');
-            link.click();
-        });
+downloadBtn.addEventListener('click', () => {
+    const link = document.createElement('a');
+    link.download = 'collage.jpg';
+    link.href = canvas.toDataURL('image/jpeg');
+    link.click();
+
+    // --- УМОВИ ДЛЯ ПОКАЗУ ---
+    if (localStorage.getItem('don') !== 'dnt' && 
+        !sessionStorage.getItem('donShown')) {
+
+        // таймер 0.8 сек (можна 500–1000 мс)
+        setTimeout(() => {
+            const ok = confirm("«Бажаєте закріпити силу оберега донатом?»");
+            if (ok) {
+                window.location.href = "https://intuitportal.blogspot.com/p/donate.html"; // ← твій URL
+            }
+        }, 800);
+
+        // позначаємо, що в цій сесії вже показували
+        sessionStorage.setItem('donShown', '1');
+    }
+});
         document.getElementById('updateBtn').addEventListener('click', function () {
             const confirmUpdate = confirm("Ви впевнені, що хочете оновити сторінку?\n Усі незавершені зміни буде втрачено.");
             if (confirmUpdate) {
