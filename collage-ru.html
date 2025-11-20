@@ -73,30 +73,62 @@
         }
         .photo-block { margin-left: 100px; }
         #updateBtn { margin-left: 300px; font-weight: bold; color: red; }
-        .donate-btn {
-            position: fixed;
-            bottom: 30px;
-            right: 50%;
-            background-color: #e74c3c;
-            color: white;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 28px;
-            text-decoration: none;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-            cursor: pointer;
-            z-index: 1000;
-            animation: pulse 1.5s infinite;
-        }
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
-        }
+#donatePopup, #updatePopup {
+    position: fixed;
+    left: 0; top: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.55);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    transition: opacity 0.25s ease;
+}
+
+.donate-popup-hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.donate-popup-window {
+    background: #e9e9ed;
+    padding: 20px;
+    width: 280px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+    text-align: center;
+    transform: scale(0.85);
+    transition: transform 0.25s ease;
+}
+
+#donatePopup.show .donate-popup-window,
+#updatePopup.show .donate-popup-window {
+    transform: scale(1);
+}
+
+.donate-popup-buttons {
+    margin-top: 15px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.donate-popup-buttons button {
+    width: 48%;
+    padding: 8px 0;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;font-family: georgia;font-weight: 700;
+}
+
+#donateYes {position:relative;height:30px;width:128px;background-image:url(https://raw.githubusercontent.com/detectfraud/detectfraud.github.io/refs/heads/main/images/donates.png);background-repeat:no-repeat;background-size:contain;background-position:center;display:inline-flex;align-items:center;cursor:pointer;overflow:hidden;text-decoration:none;transition:mix-blend-mode .3s ease}
+
+#donateNo { background: #0176d0;color: white; }
+#updateYes { background: brown; color: white; }
+#updateNo {  background: #0176d0;color: white; }
+
+#donateYes:hover, #donateNo:hover, #updateYes:hover, #updateNo:hover { mix-blend-mode: luminosity; }
+#donateYes:active, #donateNo:active, #updateYes:active, #updateNo:active { mix-blend-mode: exclusion; }
         @media (max-width: 768px) {
             body {background: url(https://themes.googleusercontent.com/image?id=1i7XdjA0YCh1VU8qGNC9bVCI6WZiohKKGLG6qaW6g3kLtKeAEBLuyhKZz_EUl6wifK7Uz) repeat scroll top left;}
             .venwin { padding: 10px; }
@@ -161,6 +193,31 @@
         </p>
         <br>
     </fieldset>
+        <!-- Donate Pop-up -->
+<div id="donatePopup" class="donate-popup-hidden">
+    <div class="donate-popup-window">
+        <div class="donate-popup-text">
+            Бажаєте закріпити силу оберега донатом?
+        </div>
+        <div class="donate-popup-buttons">
+            <button id="donateYes"></button>
+            <button id="donateNo">Ні</button>
+        </div>
+    </div>
+</div>
+
+<!-- Update Pop-up -->
+<div id="updatePopup" class="donate-popup-hidden">
+    <div class="donate-popup-window">
+        <div class="donate-popup-text">
+            Ви впевнені, що хочете оновити сторінку?<br>Усі незавершені зміни буде втрачено.
+        </div>
+        <div class="donate-popup-buttons">
+            <button id="updateYes">Так</button>
+            <button id="updateNo">Ні</button>
+        </div>
+    </div>
+</div>
     <input type="file" id="bgLoader" style="display:none">
     <input type="file" id="loveLoader" style="display:none">
     <script>
@@ -639,19 +696,62 @@ if (!isAllowed) {
             toggleButtons();
             drawAll();
         });
-        downloadBtn.addEventListener('click',()=>{
-            const link=document.createElement('a');
-            link.download='collage.jpg';
-            link.href=canvas.toDataURL('image/jpeg');
-            link.click();
-        });
-        document.getElementById('updateBtn').addEventListener('click', function () {
-            const confirmUpdate = confirm("Вы уверены, что хотите обновить страницу?\n Все незавершенные изменения будут потеряны.");
-            if (confirmUpdate) {
-                const url = window.location.href.split('?')[0];
-                window.location.href = url + '?_=' + new Date().getTime();
-            }
-        });
+// === ГАРАНТОВАНЕ СКИДАННЯ sessionStorage ПРИ НОВІЙ ВКЛАДЦІ ===
+if (!window.name) {
+    window.name = "intuit-session-" + Date.now();
+    sessionStorage.clear();
+}
+
+// === POPUP елементи ===
+const donatePopup = document.getElementById("donatePopup");
+const donateYes = document.getElementById("donateYes");
+const donateNo = document.getElementById("donateNo");
+
+const updatePopup = document.getElementById("updatePopup");
+const updateYes = document.getElementById("updateYes");
+const updateNo = document.getElementById("updateNo");
+
+// === DONATE кнопки ===
+donateYes.addEventListener("click", () => {
+    window.open("https://intuitportal.blogspot.com/p/donate.html", "_blank");
+});
+donateNo.addEventListener("click", () => {
+    donatePopup.classList.add("donate-popup-hidden");
+});
+
+// === UPDATE кнопки ===
+updateYes.addEventListener("click", () => {
+    const url = window.location.href.split('?')[0];
+    window.location.href = url + '?_=' + new Date().getTime();
+});
+updateNo.addEventListener("click", () => {
+    updatePopup.classList.add("donate-popup-hidden");
+});
+
+// === DOWNLOAD BTN ===
+downloadBtn.addEventListener('click', () => {
+    const link = document.createElement('a');
+    link.download = 'collage.jpg';
+    link.href = canvas.toDataURL('image/jpeg');
+    link.click();
+
+    if (localStorage.getItem('don') !== 'dnt' &&
+        !sessionStorage.getItem('donShown')) {
+
+        setTimeout(() => {
+            donatePopup.classList.remove("donate-popup-hidden");
+            donatePopup.classList.add("show");
+        }, 800);
+
+        sessionStorage.setItem('donShown', '1');
+    }
+});
+
+// === UPDATE BTN ===
+document.getElementById('updateBtn').addEventListener('click', () => {
+    updatePopup.classList.remove("donate-popup-hidden");
+    updatePopup.classList.add("show");
+});
         function disableContextMenu() {
             return false;
         }
