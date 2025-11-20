@@ -731,8 +731,8 @@ updateNo.addEventListener("click", () => {
 // === DOWNLOAD BTN ===
 downloadBtn.addEventListener('click', () => {
     const link = document.createElement('a');
-    //link.download = 'collage.jpg';
-    //link.href = canvas.toDataURL('image/jpeg');
+    link.download = 'collage.jpg';
+    link.href = canvas.toDataURL('image/jpeg');
     link.click();
 
     if (localStorage.getItem('don') !== 'dnt' &&
