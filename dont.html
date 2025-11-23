@@ -1,13 +1,25 @@
-<script>
-window.addEventListener('DOMContentLoaded', () => {
-  const urlParams = new URLSearchParams(window.location.search);
-  const don = urlParams.get('don');
-  if (don) {
-    localStorage.setItem('don', don);
-    console.log('localStorage.don set to:', localStorage.getItem('don'));
-  }
-});
-</script>
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <title>Don Flag</title>
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      // Отримуємо параметри URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const don = urlParams.get('don');
 
-
-
+      if (don) {
+        // Записуємо в localStorage
+        localStorage.don = don;
+        console.log('localStorage.don встановлено:', localStorage.don);
+      } else {
+        console.log('Параметр don відсутній у URL');
+      }
+    });
+  </script>
+</head>
+<body>
+  <h1>Don Flag Page</h1>
+</body>
+</html>
