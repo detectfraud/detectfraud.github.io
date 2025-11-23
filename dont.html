@@ -1,18 +1,11 @@
 <script>
-  // Список дозволених origin (сторінок, з яких можна отримувати дані)
-  const allowedOrigins = [
-    'https://intuit-portal.blogspot.com/p/donate.html',  // заміни на свій блог
-   ];
-
-  window.addEventListener('message', (event) => {
-    // Перевірка, чи походження повідомлення дозволене
-    if (!allowedOrigins.includes(event.origin)) return;
-
-    // Перевіряємо, чи є параметр don
-    if (event.data && event.data.don === 'dnt') {
-      localStorage.don = 'dnt';
-      console.log('Don received and stored in localStorage.don');
-    }
-  }, false);
+window.addEventListener('message', (event) => {
+  // Приймаємо всі повідомлення, без перевірки origin
+  if (event.data && event.data.don === 'dnt') {
+    localStorage.don = 'dnt';
+    console.log('Don stored in localStorage.don');
+  }
+});
 </script>
+
 
