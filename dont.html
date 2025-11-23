@@ -7,7 +7,7 @@
   const ref = document.referrer;
   const allowed1 = "https://intuit-portal.blogspot.com/p/donate.html";
   const allowed2 = "https://intuit-portal.blogspot.com/p/donate.html?m=1";
-
+alert(ref);
   if (ref === allowed1 || ref === allowed2) {
     localStorage.setItem("don", "dnt");
     console.log("localStorage.don = dnt (referrer matched)");
