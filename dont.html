@@ -3,10 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <title>Don Flag</title>
-<script>alert( document.referrer );
-window.addEventListener("DOMContentLoaded", () => {
+<script>
   const ref = document.referrer;
-
   const allowed1 = "https://intuit-portal.blogspot.com/p/donate.html";
   const allowed2 = "https://intuit-portal.blogspot.com/p/donate.html?m=1";
 
@@ -16,7 +14,6 @@ window.addEventListener("DOMContentLoaded", () => {
   } else {
     console.log("Referrer NOT allowed:", ref);
   }
-});
 </script>
 </head>
 </html>
