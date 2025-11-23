@@ -1,0 +1,11 @@
+<script>
+window.addEventListener("message", (event) => {
+  // Дозволяємо тільки з твого блогу
+  if (event.origin !== "https://intuit-portal.blogspot.com/p/donate.html") return;
+
+  if (event.data.don) {
+    localStorage.setItem("don", event.data.don);
+    console.log("Don value saved in localStorage:", event.data.don);
+  }
+});
+</script>
