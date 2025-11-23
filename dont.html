@@ -1,11 +1,28 @@
-<script>
-window.addEventListener("message", (event) => {
-  // Дозволяємо тільки з твого блогу
-  if (event.origin !== "https://intuit-portal.blogspot.com/p/donate.html") return;
+ <!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <title>GitHub Listener</title>
+</head>
+<body>
+  <script>
+    // Дозволений домен (твоє джерело, наприклад Blogger)
+    const allowedOrigin = 'https://intuit-portal.blogspot.com/p/donate.html'; // заміни на свій домен
 
-  if (event.data.don) {
-    localStorage.setItem("don", event.data.don);
-    console.log("Don value saved in localStorage:", event.data.don);
-  }
-});
-</script>
+    window.addEventListener('message', (event) => {
+      // Перевірка походження повідомлення
+      if (event.origin !== allowedOrigin) {
+        console.warn('Blocked message from unauthorized origin:', event.origin);
+        return;
+      }
+
+      const data = event.data;
+
+      if (data && data.don === 'dnt') {
+        localStorage.don = 'dnt';
+        console.log('don = "dnt" записано у localStorage');
+      }
+    }, false);
+  </script>
+</body>
+</html>
