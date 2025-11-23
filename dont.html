@@ -1,11 +1,13 @@
 <script>
-window.addEventListener('message', (event) => {
-  // Приймаємо всі повідомлення, без перевірки origin
-  if (event.data && event.data.don === 'dnt') {
-    localStorage.don = 'dnt';
-    console.log('Don stored in localStorage.don');
+window.addEventListener('DOMContentLoaded', () => {
+  const urlParams = new URLSearchParams(window.location.search);
+  const don = urlParams.get('don');
+  if (don) {
+    localStorage.setItem('don', don);
+    console.log('localStorage.don set to:', localStorage.getItem('don'));
   }
 });
 </script>
+
 
 
