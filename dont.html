@@ -1,28 +1,18 @@
- <!DOCTYPE html>
-<html lang="uk">
-<head>
-  <meta charset="UTF-8">
-  <title>GitHub Listener</title>
-</head>
-<body>
-  <script>
-    // Дозволений домен (твоє джерело, наприклад Blogger)
-    const allowedOrigin = 'https://intuit-portal.blogspot.com/p/donate.html'; // заміни на свій домен
+<script>
+  // Список дозволених origin (сторінок, з яких можна отримувати дані)
+  const allowedOrigins = [
+    'https://intuit-portal.blogspot.com/p/donate.html',  // заміни на свій блог
+   ];
 
-    window.addEventListener('message', (event) => {
-      // Перевірка походження повідомлення
-      if (event.origin !== allowedOrigin) {
-        console.warn('Blocked message from unauthorized origin:', event.origin);
-        return;
-      }
+  window.addEventListener('message', (event) => {
+    // Перевірка, чи походження повідомлення дозволене
+    if (!allowedOrigins.includes(event.origin)) return;
 
-      const data = event.data;
+    // Перевіряємо, чи є параметр don
+    if (event.data && event.data.don === 'dnt') {
+      localStorage.don = 'dnt';
+      console.log('Don received and stored in localStorage.don');
+    }
+  }, false);
+</script>
 
-      if (data && data.don === 'dnt') {
-        localStorage.don = 'dnt';
-        console.log('don = "dnt" записано у localStorage');
-      }
-    }, false);
-  </script>
-</body>
-</html>
