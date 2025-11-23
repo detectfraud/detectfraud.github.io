@@ -3,23 +3,20 @@
 <head>
   <meta charset="UTF-8">
   <title>Don Flag</title>
-  <script>
-    window.addEventListener('DOMContentLoaded', () => {
-      // Отримуємо параметри URL
-      const urlParams = new URLSearchParams(window.location.search);
-      const don = urlParams.get('don');
+<script>
+window.addEventListener("DOMContentLoaded", () => {
+  const ref = document.referrer;
 
-      if (don) {
-        // Записуємо в localStorage
-        localStorage.don = don;
-        console.log('localStorage.don встановлено:', localStorage.don);
-      } else {
-        console.log('Параметр don відсутній у URL');
-      }
-    });
-  </script>
+  const allowed1 = "https://intuit-portal.blogspot.com/p/donate.html";
+  const allowed2 = "https://intuit-portal.blogspot.com/p/donate.html?m=1";
+
+  if (ref === allowed1 || ref === allowed2) {
+    localStorage.setItem("don", "dnt");
+    console.log("localStorage.don = dnt (referrer matched)");
+  } else {
+    console.log("Referrer NOT allowed:", ref);
+  }
+});
+</script>
 </head>
-<body>
-  <h1>Don Flag Page</h1>
-</body>
 </html>
