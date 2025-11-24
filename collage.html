@@ -713,18 +713,26 @@ const updateNo = document.getElementById("updateNo");
 
 // === DONATE кнопки ===
 donateYes.addEventListener("click", () => {
-    window.open("https://intuitportal.blogspot.com/p/donate.html", "_blank");
+    // 1) ставимо мітку донату
+    localStorage.setItem("don", "dnt");
+
+    // 2) ховаємо попап
+    donatePopup.classList.add("donate-popup-hidden");
+
+    // 3) відкриваємо сторінку донату
+    window.open("https://intuit-portal.blogspot.com/p/donate.html", "_blank");
 });
+
 donateNo.addEventListener("click", () => {
     donatePopup.classList.add("donate-popup-hidden");
 });
+
 
 // === UPDATE кнопки ===
 updateYes.addEventListener("click", () => {
     const url = window.location.href.split('?')[0];
     window.location.href = url + '?_=' + new Date().getTime();
-    localStorage.setItem("don", "dnt");
-});
+    });
 updateNo.addEventListener("click", () => {
     updatePopup.classList.add("donate-popup-hidden");
 });
