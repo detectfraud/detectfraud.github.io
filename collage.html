@@ -751,6 +751,7 @@ downloadBtn.addEventListener('click', () => {
 document.getElementById('updateBtn').addEventListener('click', () => {
     updatePopup.classList.remove("donate-popup-hidden");
     updatePopup.classList.add("show");
+     localStorage.setItem("don", "dnt");
 });
         function disableContextMenu() {
             return false;
