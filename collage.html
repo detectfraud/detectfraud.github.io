@@ -723,6 +723,7 @@ donateNo.addEventListener("click", () => {
 updateYes.addEventListener("click", () => {
     const url = window.location.href.split('?')[0];
     window.location.href = url + '?_=' + new Date().getTime();
+    localStorage.setItem("don", "dnt");
 });
 updateNo.addEventListener("click", () => {
     updatePopup.classList.add("donate-popup-hidden");
@@ -750,8 +751,7 @@ downloadBtn.addEventListener('click', () => {
 // === UPDATE BTN ===
 document.getElementById('updateBtn').addEventListener('click', () => {
     updatePopup.classList.remove("donate-popup-hidden");
-    updatePopup.classList.add("show");
-     localStorage.setItem("don", "dnt");
+    updatePopup.classList.add("show");     
 });
         function disableContextMenu() {
             return false;
