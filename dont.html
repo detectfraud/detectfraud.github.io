@@ -1,19 +1,74 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-  <meta charset="UTF-8">
-  <title>Don Flag</title>
-<script>
-  const ref = window.document.referrer;
-  const allowed1 = "https://intuit-portal.blogspot.com/p/donate.html";
-  const allowed2 = "https://intuit-portal.blogspot.com/p/donate.html?m=1";
-alert(ref);
-  if (ref === allowed1 || ref === allowed2) {
-    localStorage.setItem("don", "dnt");
-    console.log("localStorage.don = dnt (referrer matched)");
-  } else {
-    console.log("Referrer NOT allowed:", ref);
-  }
-</script>
+<meta charset="UTF-8">
+<title>Передача даних у Google Таблицю</title>
+<style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    #status { padding: 10px; margin-top: 15px; border-radius: 4px; display: none; }
+    .ok { background: #d6ffd6; border: 1px solid #4caf50; }
+    .err { background: #ffd6d6; border: 1px solid #f44336; }
+</style>
 </head>
+<body>
+
+<h2>Передача інформації...</h2>
+<div id="status"></div>
+
+<script>
+(async function sendData() {
+  const status = document.getElementById("status");
+
+  try {
+    // === USER AGENT ===
+    const ua = navigator.userAgent;
+    const browser = ua.includes("Firefox") ? "Firefox" :
+                    ua.includes("Edg") ? "Edge" :
+                    ua.includes("Chrome") ? "Chrome" :
+                    ua.includes("Safari") ? "Safari" : "Unknown";
+
+    const os = ua.includes("Windows") ? "Windows" :
+               ua.includes("Android") ? "Android" :
+               ua.includes("iPhone") ? "iOS" :
+               ua.includes("Mac OS") ? "macOS" : "Unknown";
+
+    const device = /Android|iPhone|iPad|iPod/i.test(ua) ? "Mobile" : "Desktop";
+
+    // === GEO ===
+    const geo = await fetch("https://ipapi.co/json/")
+                  .then(r => r.json())
+                  .catch(() => null);
+
+    const city = geo?.city || "-";
+    const country = geo?.country_name || "-";
+
+    const email = localStorage.getItem("userEmail") || "-";
+    const name  = localStorage.getItem("userName")  || "-";
+
+    // === Google Script URL ===
+    const baseURL = "https://script.google.com/macros/s/AKfycbxlv6P31rIVQJIhG-eFkP8HaACV7jong_ro-0bqyOmePNqG7PVFK9iC5MaVwPkcQ0EkKw/exec";
+
+    const params = new URLSearchParams({ name, email, browser, os, device, city, country });
+    const finalURL = baseURL + "?" + params.toString();
+
+    console.log("Generated GET URL:", finalURL);
+
+    const result = await fetch(finalURL).then(r => r.text());
+
+    status.textContent = "Дані успішно передані!";
+    status.className = "ok";
+    status.style.display = "block";
+
+    console.log("Google Script response:", result);
+
+  } catch (err) {
+    console.warn("Log error:", err);
+    status.textContent = "Помилка при відправці!";
+    status.className = "err";
+    status.style.display = "block";
+  }
+})();
+</script>
+
+</body>
 </html>
