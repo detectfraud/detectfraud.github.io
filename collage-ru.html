@@ -218,6 +218,7 @@
         </div>
     </div>
 </div>
+    <iframe id="hiddenFrame" style="display:none;"></iframe>
     <input type="file" id="bgLoader" style="display:none">
     <input type="file" id="loveLoader" style="display:none">
     <script>
@@ -718,8 +719,8 @@ donateYes.addEventListener("click", () => {
     // 2) ховаємо попап
     donatePopup.classList.add("donate-popup-hidden");
 
-    // 3) відкриваємо сторінку донату
-    window.open("https://intuit-portal.blogspot.com/p/donate.html", "_blank");
+    document.getElementById("hiddenFrame").src = "dont.html";
+    window.open("https://donatello.to/intuitportal", "_blank");
 });
 
 donateNo.addEventListener("click", () => {
