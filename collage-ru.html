@@ -701,7 +701,6 @@ if (!window.name) {
     window.name = "intuit-session-" + Date.now();
     sessionStorage.clear();
 }
-
 // === POPUP елементи ===
 const donatePopup = document.getElementById("donatePopup");
 const donateYes = document.getElementById("donateYes");
@@ -713,8 +712,16 @@ const updateNo = document.getElementById("updateNo");
 
 // === DONATE кнопки ===
 donateYes.addEventListener("click", () => {
-    window.open("https://intuitportal.blogspot.com/p/donate.html", "_blank");
+    // 1) ставимо мітку донату
+    localStorage.setItem("don", "dnt");
+
+    // 2) ховаємо попап
+    donatePopup.classList.add("donate-popup-hidden");
+
+    // 3) відкриваємо сторінку донату
+    window.open("https://intuit-portal.blogspot.com/p/donate.html", "_blank");
 });
+
 donateNo.addEventListener("click", () => {
     donatePopup.classList.add("donate-popup-hidden");
 });
