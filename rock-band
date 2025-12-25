@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Грим та Грім — Офіційний сайт</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <nav class="container">
+            <div class="logo">Грим та Грім</div>
+            <ul class="nav-menu">
+                <li><a href="#concerts">Найближчі концерти</a></li>
+                <li><a href="#history">Наша історія</a></li>
+                <li><a href="#members">Учасники гурту</a></li>
+                <li><a href="#contact">Зв'яжись з нами</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <div class="container hero-content">
+            <h1>Грим та Грім</h1>
+            <p>Справжній український рок, що гуркоче в серці.</p>
+            <a href="#contact" class="btn">ЗАМОВИТИ КВИТОК</a>
+        </div>
+    </section>
+
+    <section id="contact" class="contact container">
+        <h2>Зв'яжись з нами</h2>
+        <form id="contactForm">
+            <input type="text" id="name" placeholder="Твоє ім'я" required>
+            <input type="email" id="email" placeholder="Твій Email" required>
+            <textarea placeholder="Ваше повідомлення" required></textarea>
+            <button type="submit" class="btn">Надіслати</button>
+        </form>
+    </section>
+
+    <script>
+        document.getElementById('contactForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('Дякуємо! Ми отримали ваші дані та скоро зв’яжемося з вами.');
+            this.reset();
+        });
+    </script>
+</body>
+</html>
+
