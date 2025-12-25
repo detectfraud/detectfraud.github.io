@@ -7,8 +7,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --neon-green: #b3ff00; /* Колір з нашого лого */
-            --loto-orange: #ff5722; /* Помаранчевий Lotoplay */
+            --neon-green: #b3ff00;
+            --loto-orange: #ff5722;
             --bg-dark: #05070a;
             --card-bg: #0d1117;
             --text: #ffffff;
@@ -17,7 +17,6 @@
         * { margin: 0; padding: 0; box-sizing: border-box; scroll-behavior: smooth; }
         body { background-color: var(--bg-dark); font-family: 'Inter', sans-serif; color: var(--text); overflow-x: hidden; }
 
-        /* ЯРУС 1: ШАПКА НА ВСЮ ШИРИНУ */
         header {
             width: 100%;
             height: 100vh;
@@ -46,14 +45,40 @@
         .nav-bar a { color: #fff; text-decoration: none; font-weight: bold; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 2px; }
         .nav-bar a:hover { color: var(--loto-orange); }
 
-        /* СПІЛЬНІ СТИЛІ ДЛЯ ЯРУСІВ */
         section { padding: 100px 5%; width: 100%; }
         h2 { font-family: 'Orbitron', sans-serif; font-size: 2.5rem; margin-bottom: 50px; text-align: center; color: var(--loto-orange); }
 
         /* ЯРУС 2: КОНЦЕРТИ ТА УЧАСНИКИ */
-        .tier-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; background: #080a0e; }
+        .tier-2 { display: grid; grid-template-columns: 1fr 1.2fr; gap: 40px; background: #080a0e; }
         .card { background: var(--card-bg); padding: 30px; border-radius: 15px; border: 1px solid #1a1f26; }
         .card h3 { color: var(--neon-green); margin-bottom: 15px; }
+
+        /* СТИЛІ ДЛЯ СІТКИ МУЗИКАНТІВ */
+        .members-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .member-item {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.03);
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #1a1f26;
+            transition: 0.3s;
+        }
+        .member-item:hover { border-color: var(--neon-green); transform: translateY(-5px); }
+        .member-photo {
+            width: 100%;
+            aspect-ratio: 1/1;
+            background: #1a1f26;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            object-fit: cover;
+            border: 1px solid #333;
+        }
+        .member-name { font-weight: bold; color: var(--neon-green); display: block; font-size: 0.9rem; }
+        .member-role { font-size: 0.75rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; }
 
         /* ЯРУС 3: ІСТОРІЯ ТА МАПА */
         .tier-3 { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; border-top: 1px solid #1a1f26; }
@@ -74,6 +99,7 @@
         @media (max-width: 900px) {
             .tier-2, .tier-3 { grid-template-columns: 1fr; }
             .logo-area h1 { font-size: 3rem; }
+            .members-grid { grid-template-columns: 1fr 1fr; }
         }
     </style>
 </head>
@@ -82,12 +108,13 @@
     <header id="top">
         <div class="nav-bar">
             <a href="#concerts">Концерти</a>
+            <a href="#members">Учасники</a>
             <a href="#history">Історія</a>
             <a href="#contact">Замовити</a>
         </div>
         <div class="logo-area">
             <h1>Грим та Грім</h1>
-            <p style="letter-spacing: 5px; color: var(--loto-orange);">Енергія справжнього українського року. Ми не граємо музику, ми створюємо шторм.</p>
+            <p style="letter-spacing: 5px; color: var(--loto-orange); padding: 0 20px;">Енергія справжнього українського року. Ми не граємо музику, ми створюємо шторм.</p>
         </div>
         <a href="#contact" class="submit-btn" style="width: auto; margin-top: 20px;">Замовити квиток</a>
     </header>
@@ -105,13 +132,29 @@
                 <p>2 Квітня, 20:00. Презентація нового альбому.</p>
             </div>
         </div>
-        <div>
+        <div id="members">
             <h2>Учасники гурту</h2>
-            <div class="card">
-                <p><b>Вокал:</b> Максим "Грім" Сиченко</p>
-                <p><b>Гітара:</b> Артем Кодченко</p>
-                <p><b>Барабани:</b> Дмитро Ритм</p>
-                <p><b>Бас:</b> Сергій Низ</p>
+            <div class="members-grid">
+                <div class="member-item">
+                    <img src="ПОСИЛАННЯ_НА_ФОТО_1" alt="Максим Сиченко" class="member-photo">
+                    <span class="member-name">Максим Сиченко "Грім"</span>
+                    <span class="member-role">Вокал</span>
+                </div>
+                <div class="member-item">
+                    <img src="ПОСИЛАННЯ_НА_ФОТО_2" alt="Артем Кодченко" class="member-photo">
+                    <span class="member-name">Артем Кодченко</span>
+                    <span class="member-role">Гітара</span>
+                </div>
+                <div class="member-item">
+                    <img src="ПОСИЛАННЯ_НА_ФОТО_3" alt="Дмитро Ритвін" class="member-photo">
+                    <span class="member-name">Дмитро Ритвін</span>
+                    <span class="member-role">Барабани</span>
+                </div>
+                <div class="member-item">
+                    <img src="ПОСИЛАННЯ_НА_ФОТО_4" alt="Сергій Низор" class="member-photo">
+                    <span class="member-name">Сергій Низор</span>
+                    <span class="member-role">Бас</span>
+                </div>
             </div>
         </div>
     </section>
@@ -119,20 +162,16 @@
     <section class="tier-3" id="history">
         <div>
             <h2>Наша історія</h2>
-           <p style="color: #94a3b8; line-height: 1.8; text-align: justify;">
-    Історія <b>«Грим та Грім»</b> — це не просто хроніка репетицій, це маніфест внутрішньої свободи. Все почалося у 2018 році в одному з київських підвалів, де старі лампові підсилювачі ледь витримували напір сирого, безкомпромісного звуку. Тоді четверо музикантів, об’єднаних ідеєю відродження справжнього українського драйву, вирішили: їхня музика має звучати так, ніби саме небо розколюється навпіл.
-    <br><br>
-    Назва гурту народилася під час нічної грози на березі Дніпра — саме тоді прийшло розуміння, що <b>«Грим»</b> — це театральна маска, за якою ми ховаємось у соціумі, а <b>«Грім»</b> — це та справжня стихія, що живе всередині кожного з нас. 
-    <br><br>
-    Ми пройшли шлях від локальних андеграундних клубів до головних сцен найбільших фестивалів країни. Кожен наш трек — це сплав класичних рок-риффів та сучасних цифрових текстур. Ми не йдемо на компроміси з попсою, не граємо під фонограму і ніколи не мовчимо, коли є що сказати. 
-    <br><br>
-    Сьогодні «Грим та Грім» — це голос нової формації. Ми створюємо музику для тих, хто не боїться бути гучним, хто цінує українське слово і вірить, що рок — це не минуле, це вічне «зараз». Наша історія продовжується на кожному концерті, де тисячі сердець б'ються в унісон з нашими барабанами. Приєднуйся до шторму!
-</p>
+            <p style="color: #94a3b8; line-height: 1.8; text-align: justify;">
+                Історія <b>«Грим та Грім»</b> — це не просто хроніка репетицій, це маніфест внутрішньої свободи. Все почалося у 2018 році в одному з київських підвалів...
+                <br><br>
+                Сьогодні «Грим та Грім» — це голос нової формації. Ми створюємо музику для тих, хто не боїться бути гучним. Приєднуйся до шторму!
+            </p>
         </div>
         <div>
             <h2>Де ми є</h2>
             <div class="map-container">
-                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d162590.25206263544!2d30.3954605178523!3d50.40213190848529!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x40d4cf4ee15a4505%3A0x7649317428c69610!2z0JrQuNGX0LIsIDAyMDAw!5e0!3m2!1suk!2sua!4v1700000000000!5m2!1suk!2sua" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2540.6644485566846!2d30.520977476882414!3d50.44733478716383!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x40d4ce50fd4d58df%3A0x63351934989e247b!2z0JzQsNC50LTQsNC9INCd0LXQt9Cw0LvQtdC20L3QvtGB0YLRlg!5e0!3m2!1suk!2sua!4v1700000000000!5m2!1suk!2sua" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
             </div>
         </div>
     </section>
