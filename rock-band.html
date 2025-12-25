@@ -3,47 +3,248 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Грим та Грім — Офіційний сайт</title>
-    <link rel="stylesheet" href="style-rb.css">
+    <title>Грим та Грім | Офіційний сайт</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Oswald:wght@700&display=swap" rel="stylesheet">
+    <style>
+        /* CSS ЗМІННІ ТА ОБНУЛЕННЯ */
+        :root {
+            --primary: #ff5722; /* Помаранчевий Lotoplay */
+            --dark-bg: #0a0a0a;
+            --card-bg: #161616;
+            --text-main: #e2e8f0;
+            --text-dim: #94a3b8;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; scroll-behavior: smooth; }
+
+        body {
+            background-color: var(--dark-bg);
+            font-family: 'Inter', sans-serif;
+            color: var(--text-main);
+            line-height: 1.6;
+        }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+
+        /* HEADER */
+        header {
+            position: fixed;
+            width: 100%;
+            top: 0;
+            background: rgba(10, 10, 10, 0.9);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 80px;
+        }
+
+        .logo {
+            font-family: 'Oswald', sans-serif;
+            font-size: 1.8em;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--white);
+            background: linear-gradient(to right, #fff, var(--primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-links { display: flex; list-style: none; gap: 30px; }
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-main);
+            font-weight: 600;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            transition: 0.3s;
+        }
+        .nav-links a:hover { color: var(--primary); }
+
+        /* HERO SECTION */
+        .hero {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            /* Встав сюди посилання на соковите фото рок-концерту */
+            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.8)), 
+                        url('https://images.unsplash.com/photo-1493225255756-d9584f8606e9?auto=format&fit=crop&q=80&w=2070') center/cover no-repeat;
+        }
+
+        .hero-content h1 {
+            font-family: 'Oswald', sans-serif;
+            font-size: clamp(3rem, 10vw, 6rem);
+            text-transform: uppercase;
+            line-height: 1;
+            margin-bottom: 20px;
+            letter-spacing: -2px;
+        }
+
+        .hero-content p {
+            font-size: 1.2rem;
+            color: var(--text-dim);
+            max-width: 600px;
+            margin: 0 auto 40px;
+        }
+
+        .btn {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            padding: 18px 45px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 10px 20px rgba(255, 87, 34, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(255, 87, 34, 0.5);
+        }
+
+        /* CONTACT SECTION */
+        .contact { padding: 100px 0; background: #0f0f0f; }
+
+        .section-header { text-align: center; margin-bottom: 60px; }
+        .section-header h2 { font-family: 'Oswald', sans-serif; font-size: 3em; text-transform: uppercase; }
+        .section-header .underline { width: 80px; height: 4px; background: var(--primary); margin: 10px auto; }
+
+        .contact-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 50px;
+            align-items: start;
+        }
+
+        .form-container {
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-size: 0.9em; color: var(--text-dim); }
+        
+        input, textarea {
+            width: 100%;
+            padding: 15px;
+            background: #252525;
+            border: 1px solid #333;
+            border-radius: 10px;
+            color: white;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        /* FOOTER */
+        footer {
+            padding: 50px 0;
+            text-align: center;
+            border-top: 1px solid #1a1a1a;
+            color: var(--text-dim);
+            font-size: 0.9em;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 900px) {
+            .contact-grid { grid-template-columns: 1fr; }
+            .nav-links { display: none; }
+            .hero-content h1 { font-size: 4rem; }
+        }
+    </style>
 </head>
 <body>
+
     <header>
         <nav class="container">
             <div class="logo">Грим та Грім</div>
-            <ul class="nav-menu">
-                <li><a href="#concerts">Найближчі концерти</a></li>
-                <li><a href="#history">Наша історія</a></li>
-                <li><a href="#members">Учасники гурту</a></li>
-                <li><a href="#contact">Зв'яжись з нами</a></li>
+            <ul class="nav-links">
+                <li><a href="#home">Головна</a></li>
+                <li><a href="#concerts">Концерти</a></li>
+                <li><a href="#history">Історія</a></li>
+                <li><a href="#contact">Контакти</a></li>
             </ul>
         </nav>
     </header>
 
-    <section class="hero">
+    <section id="home" class="hero">
         <div class="container hero-content">
             <h1>Грим та Грім</h1>
-            <p>Справжній український рок, що гуркоче в серці.</p>
-            <a href="#contact" class="btn">ЗАМОВИТИ КВИТОК</a>
+            <p>Енергія справжнього українського року. Ми не граємо музику, ми створюємо шторм.</p>
+            <a href="#contact" class="btn">Замовити квиток</a>
         </div>
     </section>
 
-    <section id="contact" class="contact container">
-        <h2>Зв'яжись з нами</h2>
-        <form id="contactForm">
-            <input type="text" id="name" placeholder="Твоє ім'я" required>
-            <input type="email" id="email" placeholder="Твій Email" required>
-            <textarea placeholder="Ваше повідомлення" required></textarea>
-            <button type="submit" class="btn">Надіслати</button>
-        </form>
+    <section id="contact" class="contact">
+        <div class="container">
+            <div class="section-header">
+                <h2>Зв'яжись з нами</h2>
+                <div class="underline"></div>
+            </div>
+
+            <div class="contact-grid">
+                <div class="contact-info">
+                    <h3>Готові до драйву?</h3>
+                    <p style="margin: 20px 0; color: var(--text-dim);">Залиште свої дані, і наш менеджер зв'яжеться з вами для уточнення деталей замовлення квитків або організації виступу.</p>
+                    <p>📍 Київ, Україна</p>
+                    <p>📞 +38 (067) 738 55 90</p>
+                    <p>📧 rock@grymtagrim.com.ua</p>
+                </div>
+
+                <div class="form-container">
+                    <form id="lotoForm">
+                        <div class="form-group">
+                            <label>Ваше Ім'я</label>
+                            <input type="text" id="name" placeholder="Олександр" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Email адреса</label>
+                            <input type="email" id="email" placeholder="example@mail.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Повідомлення</label>
+                            <textarea id="message" rows="4" placeholder="Хочу квиток на концерт у Києві!" required></textarea>
+                        </div>
+                        <button type="submit" class="btn" style="width: 100%; border: none; cursor: pointer;">Надіслати драйв</button>
+                    </form>
+                </div>
+            </div>
+        </div>
     </section>
 
+    <footer>
+        <p>&copy; 2025 Гурт "Грим та Грім". Створено Володимиром Баскаковим для Lotoplay.</p>
+    </footer>
+
     <script>
-        document.getElementById('contactForm').addEventListener('submit', function(e) {
+        document.getElementById('lotoForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            alert('Дякуємо! Ми отримали ваші дані та скоро зв’яжемося з вами.');
-            this.reset();
+            
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+
+            if(name && email) {
+                alert(`Дякуємо, ${name}! Ваша заявка прийнята. Рок-н-рол скоро вийде на зв'язок!`);
+                this.reset();
+            }
         });
     </script>
 </body>
 </html>
-
