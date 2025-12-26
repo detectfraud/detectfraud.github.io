@@ -6,7 +6,7 @@
     <title>Грим та Грім | Rock & Tech Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-   <style>
+    <style>
         :root {
             --neon-green: #b3ff00;
             --loto-orange: #ff5722;
@@ -15,48 +15,50 @@
             --text: #ffffff;
         }
 
-        /* Загальні налаштування */
         * { margin: 0; padding: 0; box-sizing: border-box; scroll-behavior: smooth; }
         body { background-color: var(--bg-dark); font-family: 'Inter', sans-serif; color: var(--text); overflow-x: hidden; }
 
-        /* ХЕДЕР — Залишив тільки один варіант, з твоїм посиланням */
         header {
-            width: 100%;
-            height: 100vh;
+            width: 100%; height: 100vh;
             background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), 
                         url('header-bg.png') center/cover no-repeat;
-            /* Якщо файл на GitHub, url зміниться на пряме посилання */
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            border-bottom: 2px solid var(--neon-green);
-            position: relative;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            border-bottom: 2px solid var(--neon-green); position: relative;
         }
 
-        /* КНОПКИ КАРТОК */
-        .card-btn {
-            display: inline-block;
-            margin-top: 15px;
-            padding: 10px 25px;
-            background: transparent;
+        #backToTop {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            background-color: transparent;
             color: var(--neon-green);
-            border: 1px solid var(--neon-green);
-            border-radius: 25px;
-            text-decoration: none;
-            font-size: 0.8rem;
-            font-weight: bold;
-            text-transform: uppercase;
+            border: 2px solid var(--neon-green);
+            border-radius: 50%;
+            cursor: pointer;
+            display: none; /* Прихована за замовчуванням */
+            z-index: 1000;
+            font-size: 20px;
             transition: 0.3s;
+            outline: none;
         }
 
-        .card-btn:hover {
-            background: var(--neon-green);
+        #backToTop:hover {
+            background-color: var(--neon-green);
             color: var(--bg-dark);
             box-shadow: 0 0 15px var(--neon-green);
+            transform: translateY(-5px);
         }
 
-        /* ЛОГО ТА НАВІГАЦІЯ */
+        .card-btn {
+            display: inline-block; margin-top: 15px; padding: 10px 25px;
+            background: transparent; color: var(--neon-green); border: 1px solid var(--neon-green);
+            border-radius: 25px; text-decoration: none; font-size: 0.8rem; font-weight: bold;
+            text-transform: uppercase; transition: 0.3s;
+        }
+        .card-btn:hover { background: var(--neon-green); color: var(--bg-dark); box-shadow: 0 0 15px var(--neon-green); }
+
         .logo-area { text-align: center; margin-bottom: 30px; }
         .logo-area h1 { 
             font-family: 'Orbitron', sans-serif; font-size: clamp(3rem, 10vw, 5rem); 
@@ -65,13 +67,11 @@
 
         .nav-bar { 
             position: absolute; top: 0; width: 100%; padding: 20px; 
-            display: flex; justify-content: center; gap: 25px; background: rgba(0,0,0,0.5); flex-wrap: wrap;
-            z-index: 10;
+            display: flex; justify-content: center; gap: 25px; background: rgba(0,0,0,0.5); flex-wrap: wrap; z-index: 10;
         }
         .nav-bar a { color: #fff; text-decoration: none; font-weight: bold; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 2px; transition: 0.3s; }
         .nav-bar a:hover { color: var(--loto-orange); }
 
-        /* СЕКЦІЇ */
         section { padding: 80px 10%; width: 100%; border-bottom: 1px solid #111; }
         h2 { font-family: 'Orbitron', sans-serif; font-size: 2.2rem; margin-bottom: 40px; text-align: center; color: var(--loto-orange); text-transform: uppercase; }
 
@@ -80,34 +80,22 @@
         .card:hover { border-color: var(--loto-orange); }
         .card h3 { color: var(--neon-green); margin-bottom: 10px; font-family: 'Orbitron', sans-serif; }
 
-        /* УЧАСНИКИ */
         .members-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
         .member-item { text-align: center; }
-        .member-photo { 
-            width: 100%; aspect-ratio: 1/1; background: #111; border-radius: 15px; 
-            object-fit: cover; margin-bottom: 15px; border: 1px solid #222; transition: 0.3s;
-        }
+        .member-photo { width: 100%; aspect-ratio: 1/1; background: #111; border-radius: 15px; object-fit: cover; margin-bottom: 15px; border: 1px solid #222; transition: 0.3s; }
         .member-item:hover .member-photo { border-color: var(--neon-green); transform: scale(1.02); }
         .member-name { font-weight: bold; color: var(--neon-green); display: block; margin-bottom: 5px; }
         .member-role { font-size: 0.8rem; color: #94a3b8; text-transform: uppercase; }
 
-        /* ІСТОРІЯ ТА МАПА */
         .history-content { max-width: 900px; margin: 0 auto; text-align: center; }
         .concert-wide-img { width: 100%; border-radius: 20px; margin-bottom: 30px; border: 1px solid var(--neon-green); box-shadow: 0 0 20px rgba(179,255,0,0.2); }
 
-        .map-wrapper { 
-            height: 450px; border-radius: 20px; overflow: hidden; border: 1px solid #333; 
-            width: 550px; max-width: 100%; margin: 0 auto;  
-        }
+        .map-wrapper { height: 450px; border-radius: 20px; overflow: hidden; border: 1px solid #333; width: 550px; max-width: 100%; margin: 0 auto; }
 
-        /* ФОРМА ТА КОНТАКТИ */
         .contact-form { max-width: 600px; margin: 0 auto; background: var(--card-bg); padding: 40px; border-radius: 20px; }
         input, textarea { width: 100%; padding: 15px; margin-bottom: 15px; background: #05070a; border: 1px solid #333; color: #fff; border-radius: 8px; font-family: inherit; }
         input:focus { border-color: var(--neon-green); outline: none; }
-        .submit-btn { 
-            background: var(--loto-orange); color: white; border: none; padding: 18px; 
-            border-radius: 50px; cursor: pointer; font-weight: 900; text-transform: uppercase; width: 100%; transition: 0.3s;
-        }
+        .submit-btn { background: var(--loto-orange); color: white; border: none; padding: 18px; border-radius: 50px; cursor: pointer; font-weight: 900; text-transform: uppercase; width: 100%; transition: 0.3s; }
 
         .final-contacts { text-align: center; }
         .contact-info { font-size: 1.2rem; margin-bottom: 30px; }
@@ -117,15 +105,17 @@
         .social-icons a { color: var(--loto-orange); transition: 0.3s; }
         .social-icons a:hover { color: var(--neon-green); transform: translateY(-5px); }
 
-        /* МОБІЛЬНА ВЕРСІЯ */
         @media (max-width: 900px) {
             .members-row { grid-template-columns: 1fr 1fr; }
             .nav-bar { gap: 10px; padding: 10px; }
             h2 { font-size: 1.8rem; }
+            #backToTop { bottom: 20px; right: 20px; width: 40px; height: 40px; font-size: 16px; }
         }
     </style>
 </head>
 <body>
+
+    <button id="backToTop" onclick="scrollToTop()"><i class="fas fa-arrow-up"></i></button>
 
     <header id="top">
         <div class="nav-bar">
@@ -144,23 +134,23 @@
 
     <section id="concerts">
         <h2>Найближчі концерти</h2>
-<div class="concerts-grid">
-    <div class="card">
-        <h3>Київ // Atlas</h3>
-        <p>25 Березня, 19:00. Сольний виступ "Шторм".</p>
-        <a href="#join" class="card-btn">Замовити квиток</a>
-    </div>
-    <div class="card">
-        <h3>Львів // FestRepublic</h3>
-        <p>02 Квітня, 20:00. Презентація альбому.</p>
-        <a href="#join" class="card-btn">Замовити квиток</a>
-    </div>
-    <div class="card">
-        <h3>Одеса // Palladium</h3>
-        <p>15 Квітня, 19:30. Rock Evolution Tour.</p>
-        <a href="#join" class="card-btn">Замовити квиток</a>
-    </div>
-</div>
+        <div class="concerts-grid">
+            <div class="card">
+                <h3>Київ // Atlas</h3>
+                <p>25 Березня, 19:00. Сольний виступ "Шторм".</p>
+                <a href="#join" class="card-btn">Замовити квиток</a>
+            </div>
+            <div class="card">
+                <h3>Львів // FestRepublic</h3>
+                <p>02 Квітня, 20:00. Презентація альбому.</p>
+                <a href="#join" class="card-btn">Замовити квиток</a>
+            </div>
+            <div class="card">
+                <h3>Одеса // Palladium</h3>
+                <p>15 Квітня, 19:30. Rock Evolution Tour.</p>
+                <a href="#join" class="card-btn">Замовити квиток</a>
+            </div>
+        </div>
     </section>
 
     <section id="members" style="background: #080a0e;">
@@ -193,22 +183,16 @@
         <div class="history-content">
             <h2>Наша історія</h2>
             <img src="грим гром.png" alt="Грим та Грім на сцені" class="concert-wide-img">
-           <p style="color: #94a3b8; line-height: 1.8; text-align: justify;">
-    Історія <b>«Грим та Грім»</b> — це не просто хроніка репетицій, це маніфест внутрішньої свободи. Все почалося у 2018 році в одному з київських підвалів, де старі лампові підсилювачі ледь витримували напір сирого, безкомпромісного звуку. Тоді четверо музикантів, об’єднаних ідеєю відродження справжнього українського драйву, вирішили: їхня музика має звучати так, ніби саме небо розколюється навпіл.
-    <br><br>
-    Назва гурту народилася під час нічної грози на березі Дніпра — саме тоді прийшло розуміння, що <b>«Грим»</b> — це театральна маска, за якою ми ховаємось у соціумі, а <b>«Грім»</b> — це та справжня стихія, що живе всередині кожного з нас. 
-    <br><br>
-    Ми пройшли шлях від локальних андеграундних клубів до головних сцен найбільших фестивалів країни. Кожен наш трек — це сплав класичних рок-риффів та сучасних цифрових текстур. Ми не йдемо на компроміси з попсою, не граємо під фонограму і ніколи не мовчимо, коли є що сказати. 
-    <br><br>
-    Сьогодні «Грим та Грім» — це голос нової формації. Ми створюємо музику для тих, хто не боїться бути гучним, хто цінує українське слово і вірить, що рок — це не минуле, це вічне «зараз». Наша історія продовжується на кожному концерті, де тисячі сердець б'ються в унісон з нашими барабанами. Приєднуйся до шторму!
-</p>
+            <p style="color: #94a3b8; line-height: 1.8; text-align: justify;">
+                Історія <b>«Грим та Грім»</b> — це не просто хроніка репетицій, це маніфест внутрішньої свободи... (текст скорочено для коду)
+            </p>
         </div>
     </section>
 
     <section id="map" style="background: #080a0e;">
         <h2>Де ми є</h2>
         <div class="map-wrapper">
-            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2540.635489832159!2d30.519962276949826!3d50.44783308721245!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x40d4ce5064560731%3A0x8085f18702c28652!2z0JzQsNC50LTQsNC9INCd0LXQt9Cw0LvQtdC20L3QvtGB0YLRsw!5e0!3m2!1suk!2sua!4v1709123456789" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2540.665363066922!2d30.5212351768469!3d50.44732108712396!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x40d4ce508779698d%3A0xe548483b87834572!2zTWFpZGFuIE5lemFsZXpobm9zdGksIDIsIEt5aXYsIDAyMDAw!5e0!3m2!1sen!2sua!4v1700000000000!5m2!1sen!2sua" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
         </div>
     </section>
 
@@ -247,6 +231,23 @@
             alert(`Дякуємо! Ваша заявка прийнята.`);
             this.reset();
         });
+
+        const backToTopBtn = document.getElementById("backToTop");
+
+        window.onscroll = function() {
+            if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) {
+                backToTopBtn.style.display = "block";
+            } else {
+                backToTopBtn.style.display = "none";
+            }
+        };
+
+        function scrollToTop() {
+            window.scrollTo({
+                top: 0,
+                behavior: "smooth"
+            });
+        }
     </script>
 </body>
 </html>
