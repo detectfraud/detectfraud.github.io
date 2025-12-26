@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Грим та Грім | Rock & Tech Edition</title>
-    <link href="https://fonts.googleapis.com/css2?family=Metal+Mania&family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Metal+Mania&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
@@ -60,27 +60,32 @@
         .card-btn:hover { background: var(--neon-green); color: var(--bg-dark); box-shadow: 0 0 15px var(--neon-green); }
 
         .logo-area { text-align: center; margin-bottom: 30px; }
-.logo-area h1 { 
-    font-family: 'Metal Mania', system-ui; 
-    font-size: clamp(4rem, 15vw, 7rem); /* Збільшив розмір, бо шрифт дуже виразний */
+.logo-area h1 {
+    /* Підключаємо шрифт */
+    font-family: 'Metal Mania', cursive;
+    
+    /* Розмір та колір */
+    font-size: clamp(4rem, 15vw, 7rem);
     color: var(--neon-green); 
     text-transform: uppercase;
     letter-spacing: 5px;
-    /* Ефект подвійного сяйва: чорний контур для читабельності + зелений неон */
-    text-shadow: 
-        3px 3px 0px #000, 
-        -2px -2px 0px #000,
-        0 0 20px rgba(179, 255, 0, 0.7),
-        0 0 40px rgba(179, 255, 0, 0.3);
-    line-height: 1;
-    margin-bottom: 10px;
-}
-        .logo-area p {
-    margin-top: 20px;
-    font-weight: 700;
-    text-transform: uppercase;
-}
 
+    /* Ефект неонового сяйва (як на зображенні) */
+    text-shadow: 
+        /* Тонкий чорний контур для чіткості */
+        2px 2px 0px #000, 
+        -1px -1px 0px #000,
+        /* Внутрішнє сяйво */
+        0 0 10px rgba(179, 255, 0, 0.8),
+        /* Зовнішня неонова аура */
+        0 0 20px rgba(179, 255, 0, 0.6),
+        0 0 40px rgba(179, 255, 0, 0.4);
+    
+    line-height: 1.1;
+}
+background: linear-gradient(to bottom, #b3ff00 40%, #558000 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
         .nav-bar { 
             position: absolute; top: 0; width: 100%; padding: 20px; 
             display: flex; justify-content: center; gap: 25px; background: rgba(0,0,0,0.5); flex-wrap: wrap; z-index: 10;
