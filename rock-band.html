@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Грим та Грім | Rock & Tech Edition</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
+   <link href="https://fonts.googleapis.com/css2?family=Metal+Mania&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
    <style>
         :root {
@@ -78,10 +78,30 @@
         }
 
         .logo-area { text-align: center; margin-bottom: 30px; }
-        .logo-area h1 { 
-            font-family: 'Orbitron', sans-serif; font-size: clamp(3rem, 10vw, 5rem); 
-            color: var(--neon-green); text-shadow: 0 0 20px rgba(179, 255, 0, 0.5); text-transform: uppercase;
-        }
+.logo-area h1 {
+    /* Підключаємо шрифт */
+    font-family: 'Metal Mania', cursive;
+    
+    /* Розмір та колір */
+    font-size: clamp(4rem, 15vw, 7rem);
+    color: var(--neon-green); 
+    text-transform: uppercase;
+    letter-spacing: 5px;
+
+    /* Ефект неонового сяйва (як на зображенні) */
+    text-shadow: 
+        /* Тонкий чорний контур для чіткості */
+        2px 2px 0px #000, 
+        -1px -1px 0px #000,
+        /* Внутрішнє сяйво */
+        0 0 10px rgba(179, 255, 0, 0.8),
+        /* Зовнішня неонова аура */
+        0 0 20px rgba(179, 255, 0, 0.6),
+        0 0 40px rgba(179, 255, 0, 0.4);
+    font-style: italic;
+    line-height: 1.1;
+}
+
 
         .nav-bar { 
             position: absolute; top: 0; width: 100%; padding: 20px; 
@@ -92,7 +112,7 @@
         .nav-bar a:hover { color: var(--loto-orange); }
 
         section { padding: 80px 10%; width: 100%; border-bottom: 1px solid #111; }
-        h2 { font-family: 'Orbitron', sans-serif; font-size: 2.2rem; margin-bottom: 40px; text-align: center; color: var(--loto-orange); text-transform: uppercase; }
+        h2 { font-family: 'Metal Mania', cursive; font-size: 2.2rem; margin-bottom: 40px; text-align: center; color: var(--loto-orange); text-transform: uppercase;font-style: italic; }
 
         .concerts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
         .card { background: var(--card-bg); padding: 30px; border-radius: 15px; border: 1px solid #1a1f26; transition: 0.3s; }
@@ -152,7 +172,7 @@
             <a href="#contacts">Контакти</a>
         </div>
         <div class="logo-area">
-            <h1>Грим та Грім</h1><br><br>
+            <h1>Grym ta Grim</h1><br><br>
             <p style="letter-spacing: 5px; color: var(--loto-orange); padding: 0 20px;">ЕНЕРГІЯ СПРАВЖНЬОГО УКРАЇНСЬКОГО РОКУ. МИ НЕ ГРАЄМО МУЗИКУ, МИ СТВОРЮЄМО ШТОРМ.</p>
         </div>
         <a href="#join" class="submit-btn" style="width: auto; padding: 15px 40px; margin-top: 20px;">Замовити квиток</a>
