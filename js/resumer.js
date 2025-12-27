@@ -1,51 +1,47 @@
-window.addEventListener("load", function() {
-    const getExtraData = () => {
-        return {
+window.addEventListener("DOMContentLoaded", function() {
+    // Функція відправки даних
+    const sendData = (ipInfo = {}) => {
+        const extra = {
             url: window.location.href,
-            referrer: document.referrer || "Direct/Bookmark",
-            screen: `${window.screen.width}x${window.screen.height} (${window.devicePixelRatio}x)`,
-            viewport: `${window.innerWidth}x${window.innerHeight}`,браузера
+            ref: document.referrer || "Direct",
+            screen: `${window.screen.width}x${window.screen.height}`,
+            ua: navigator.userAgent,
             lang: navigator.language,
-            platform: navigator.platform,
-            cores: navigator.hardwareConcurrency || "N/A", 
-            memory: navigator.deviceMemory || "N/A", 
-            timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-            touch: ('ontouchstart' in window) || (navigator.maxTouchPoints > 0)
+            res: window.devicePixelRatio || 1
         };
-    };
 
-    fetch('https://ipapi.co/json/') 
-        .then(res => res.json())
-        .then(ipData => {
-            const extra = getExtraData();
-            const formData = new FormData();
-            
-            formData.append("access_key", "1a8b1aa1-8c25-4a19-8410-372a94199083");
-            formData.append("subject", `🔔 Візит: ${ipData.city || 'Невідомо'}, ${ipData.org.substring(0,20)}`);
-            
-            const message = `
-📍 ЛОКАЦІЯ ТА МЕРЕЖА:
-IP: ${ipData.ip}
-Провайдер: ${ipData.org}
-Місто: ${ipData.city}, ${ipData.country_name}
-Час: ${new Date().toLocaleString('uk-UA')} (Зона: ${extra.timezone})
+        const formData = new FormData();
+        formData.append("access_key", "1a8b1aa1-8c25-4a19-8410-372a94199083");
+        formData.append("subject", `🔔 Візит: ${ipInfo.city || 'Н/Д'}, ${ipInfo.org || 'Н/Д'}`);
+        
+        const message = `
+📍 МЕРЕЖА:
+IP: ${ipInfo.ip || 'Не вдалося визначити'}
+Провайдер: ${ipInfo.org || 'Н/Д'}
+Місто: ${ipInfo.city || 'Н/Д'}, ${ipInfo.country || 'Н/Д'}
 
 📄 СТОРІНКА:
 URL: ${extra.url}
-Звідки: ${extra.referrer}
+Реферер: ${extra.ref}
 
-💻 ТЕХНІЧНІ ДАНІ:
-Браузер (UA): ${navigator.userAgent}
-Платформа: ${extra.platform}
-Залізо: ${extra.cores} cores / ${extra.memory}GB RAM
-Екран: ${extra.screen}
-Вікно (Viewport): ${extra.viewport}
-Touch screen: ${extra.touch ? 'Так' : 'Ні'}
+💻 ТЕХНІЧНІ:
+Браузер: ${extra.ua}
+Екран: ${extra.screen} (DPR: ${extra.res})
 Мова: ${extra.lang}
-            `;
+        `;
 
-            formData.append("message", message);
-            return fetch("https://api.web3forms.com/submit", { method: "POST", body: formData });
-        })
-        .catch(err => console.log("Silent check"));
+        formData.append("message", message);
+
+        fetch("https://api.web3forms.com/submit", {
+            method: "POST",
+            body: formData,
+            mode: "no-cors" // Важливо для уникнення блокувань CORS
+        }).catch(e => console.log("Sent")); 
+    };
+
+    // Отримуємо IP (використовуємо ipapi.co - він стабільніший для JS)
+    fetch('https://ipapi.co/json/')
+        .then(res => res.json())
+        .then(data => sendData(data))
+        .catch(() => sendData({})); // Якщо IP сервіс заблоковано, все одно шлемо техдані
 });
