@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>S.A.F.E. Project - Terminal</title>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <style>
+        :root { --bg: #0d0e10; --gold: gold; --text-grey: #B5B7CE; --metal-border: #444; --led-text: #00ff41; }
+        body { background: var(--bg); color: #fff; font-family: 'Segoe UI', sans-serif; margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        header { display: flex; justify-content: space-between; align-items: center; padding: 0 20px; background: #000; border-bottom: 2px solid var(--metal-border); height: 60px; z-index: 100; position: relative; }
+        .logo-section { display: flex; align-items: center; gap: 8px; z-index: 11; }
+        .logo-icon { width: 60px; height: 60px; background-image: url("https://raw.githubusercontent.com/detectfraud/detectfraud.github.io/refs/heads/main/images/dollar.png"); background-size: contain; background-repeat: no-repeat; background-position: center; }
+        .site-name { font-family: Georgia; font-style: italic; font-size: 28px; font-weight: bold; color: var(--gold); }
+        nav { position: absolute; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 25px; z-index: 10; }
+        nav a { color: var(--text-grey); text-decoration: none; font-size: 15px; font-weight: bold; cursor: pointer; transition: 0.2s; text-transform: uppercase; }
+        nav a:hover, nav a.active { color: var(--gold); }
+        .dropdown { position: relative; display: inline-block; }
+        .dropdown-content { display: none; position: absolute; left: 50%; transform: translateX(-50%); background: #000; min-width: 180px; box-shadow: 0 10px 30px rgba(0,0,0,0.8); border: 1px solid var(--metal-border); z-index: 1000; }
+        .dropdown-content a { color: var(--text-grey); padding: 12px 16px; text-decoration: none; display: block; font-size: 14px; text-transform: none; border-bottom: 1px solid #222; }
+        .dropdown-content a:hover { background: #1a1a1a; color: var(--gold); }
+        .dropdown:hover .dropdown-content { display: block; }
+        .right-side { display: flex; align-items: center; gap: 15px; z-index: 11; }
+        .user-block { display: flex; align-items: center; border-right: 1px solid #333; padding-right: 15px; min-height: 40px; }
+        .avatar-circle { width: 34px; height: 34px; background: #222; border: 1.5px solid var(--gold); border-radius: 50%; cursor: pointer; overflow: hidden; margin-left: 10px; }
+        .avatar-circle img { width: 100%; height: 100%; object-fit: cover; }
+        .langs { display: flex; gap: 5px; }
+        .langs button { background: #1a1a1a; border: 1px solid #333; color: var(--text-grey); padding: 4px 8px; border-radius: 3px; cursor: pointer; font-size: 11px; }
+        .langs button.active { color: var(--gold); border-color: var(--gold); }
+        main { flex: 1; display: flex; background: #111; overflow: hidden; }
+        .side-ad { width: 480px; background: #1a1a1a; border: 4px solid #252525; margin: 10px; display: flex; align-items: center; justify-content: center; color: #444; font-size: 10px; flex-shrink: 0; }
+        .content-area { flex: 1; display: flex; justify-content: center; align-items: center; padding: 20px; overflow: hidden; }
+        .safe-body { width: 480px; height: 660px; background: linear-gradient(135deg, #333 0%, #1a1a1a 100%); border: 12px solid #222; border-radius: 15px; box-shadow: 0 30px 60px rgba(0,0,0,0.9); display: flex; flex-direction: column; align-items: center; position: relative; }
+        .safe-led-display { width: 90%; height: 35px; background: #0a0a0a; border: 3px solid #444; margin-top: 25px; margin-bottom: 20px; border-radius: 5px; overflow: hidden; display: flex; align-items: center; }
+        .marquee { color: var(--led-text); font-family: 'Courier New', monospace; font-size: 18px; white-space: nowrap; animation: scroll 15s linear infinite; }
+        @keyframes scroll { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
+        .iframe-window { width: 380px; height: 620px; background: #000; border: 8px solid #111; border-radius: 10px; overflow: hidden; }
+        .full-frame { width: 100%; height: 100%; border: none; background: transparent; }
+        footer { height: 80px; background: #1a1a1a; border-top: 4px solid #252525; margin: 0 10px 10px 10px; display: flex; align-items: center; justify-content: center; color: #676; font-size: 11px; }
+    </style>
+</head>
+<body>
+
+    <div id="g_id_onload" 
+         data-client_id="191672619104-9pkmpft7bqf32n4ipqqebuh17fbtc946.apps.googleusercontent.com" 
+         data-context="signin" data-ux_mode="popup" data-callback="handleCredentialResponse" 
+         data-auto_prompt="false">
+    </div>
+
+<header>
+    <div class="logo-section">
+        <div class="logo-icon"></div>
+        <div class="site-name">CODED SAFE</div>
+    </div>
+    <nav id="mainNav">
+        <a onclick="navTo('home')">HOME</a>
+        <a onclick="navTo('news')">NEWS</a>
+        <a onclick="navTo('game')">GAME</a>
+        <div class="dropdown">
+            <a class="nav-link">INFO ▼</a>
+            <div class="dropdown-content">
+                <a onclick="navTo('manual')">1) Instruction</a>
+                <a onclick="navTo('rules')">2) Regulations</a>
+                <a onclick="navTo('faq')">3) FAQ</a>
+                <a onclick="navTo('feedback')">4) Feedback</a>
+            </div>
+        </div>
+    </nav>
+    <div class="right-side">
+        <div id="userBlock" class="user-block"></div>
+        <div class="langs" id="langSelector"></div>
+    </div>
+</header>
+
+<main>
+    <div class="side-ad">ADVERTISING_UNIT_LEFT</div>
+    <div class="content-area" id="viewport"></div>
+    <div class="side-ad">ADVERTISING_UNIT_RIGHT</div>
+</main>
+
+<footer>BOTTOM_AD_RESERVATION_AREA_728x90</footer>
+
+<script>
+    function decodeJwtResponse(token) {
+        let base64Url = token.split('.')[1];
+        let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        let jsonPayload = decodeURIComponent(atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
+        return JSON.parse(jsonPayload);
+    }
+
+    function handleCredentialResponse(response) {
+        const user = decodeJwtResponse(response.credential);
+        localStorage.setItem('user_session', 'active');
+        localStorage.setItem('userName', user.name);
+        localStorage.setItem('userEmail', user.email);
+        localStorage.setItem('userPicture', user.picture);
+        updateHeader();
+        navTo('home');
+    }
+
+    function updateHeader() {
+        const isAuth = localStorage.getItem('user_session') === 'active';
+        const userBlock = document.getElementById("userBlock");
+        if (isAuth) {
+            const name = localStorage.getItem('userName') || "AGENT";
+            const pic = localStorage.getItem('userPicture') || "https://raw.githubusercontent.com/detectfraud/detectfraud.github.io/refs/heads/main/images/Kozak.png";
+            userBlock.innerHTML = `
+                <div style="display: flex; align-items: center;">
+                    <span style="font-size: 11px; color: var(--gold); font-weight: bold;">${name.toUpperCase()}</span>
+                    <div class="avatar-circle" onclick="navTo('cabinet')">
+                        <img src="${pic}" alt="Avatar">
+                    </div>
+                    <a onclick="handleLogout()" style="color:#e74c3c; font-size:10px; cursor:pointer; margin-left:10px; text-decoration:none;">[EXIT]</a>
+                </div>`;
+        } else {
+            userBlock.innerHTML = `
+                <div id="g_id_onload" data-client_id="191672619104-9pkmpft7bqf32n4ipqqebuh17fbtc946.apps.googleusercontent.com" data-context="signin" data-ux_mode="popup" data-callback="handleCredentialResponse" data-auto_prompt="false"></div>
+                <div class="g_id_signin" data-type="standard" data-shape="pill" data-theme="filled_black" data-text="signin_with" data-size="medium"></div>`;
+            if (window.google) { google.accounts.id.renderButton(document.querySelector(".g_id_signin"), { theme: "filled_black", size: "medium", shape: "pill" }); }
+        }
+    }
+
+    function handleLogout() { localStorage.clear(); location.reload(); }
+
+    function navTo(page) {
+        const viewport = document.getElementById("viewport");
+        const currentLng = localStorage.getItem("lng") || "uk";
+        
+        // Збираємо дані для передачі в іфрейм   
+        const name = encodeURIComponent(localStorage.getItem('userName') || "");
+        const pic = encodeURIComponent(localStorage.getItem('userPicture') || "");
+        const email = encodeURIComponent(localStorage.getItem('userEmail') || "");
+        const auth = localStorage.getItem('user_session') || "inactive";
+
+        const urlParams = `?lng=${currentLng}&uName=${name}&uPic=${pic}&uEmail=${email}&uAuth=${auth}`;
+
+        if (page === 'game') {
+            viewport.innerHTML = `
+                <div class="safe-body">
+                    <div class="safe-led-display"><div class="marquee">SYSTEM STATUS: SECURE — TOTAL VAULT BALANCE: 12 238.45 USD</div></div>
+                    <div class="iframe-window">
+                        <iframe id="mainFrame" src="game.html${urlParams}" class="full-frame" scrolling="no"></iframe>
+                    </div>
+                </div>`;
+        } else {
+            viewport.innerHTML = `<iframe id="mainFrame" class="full-frame" src="${page}.html${urlParams}"></iframe>`;
+        }
+    }
+
+    function initLangs() {
+        const container = document.getElementById("langSelector");
+        const current = localStorage.getItem("lng") || "uk";
+        const langs = [{c:'en', l:'EN'}, {c:'uk', l:'UK'}, {c:'ru', l:'RU'}];
+        container.innerHTML = "";
+        langs.forEach(l => {
+            const btn = document.createElement("button");
+            btn.innerText = l.l; btn.onclick = () => { localStorage.setItem("lng", l.c); location.reload(); };
+            if (l.c === current) btn.className = "active";
+            container.appendChild(btn);
+        });
+    }
+
+    window.onload = () => { updateHeader(); initLangs(); navTo('game'); }; //початкове включення navTo('home');
+
+window.addEventListener('message', function(event) {
+    if (event.data.type === 'GET_USER_DATA') {
+        const userData = {
+            name: localStorage.getItem('userName'),
+            email: localStorage.getItem('userEmail'),
+            pic: localStorage.getItem('userPicture')
+        };
+        // Відправляємо дані назад у іфрейм
+        const frame = document.getElementById("mainFrame");
+        if (frame && frame.contentWindow) {
+            frame.contentWindow.postMessage({ type: 'USER_DATA', payload: userData }, '*');
+        }
+    }
+});
+</script>
+</body>
+</html>
