@@ -40,12 +40,6 @@
 </head>
 <body>
 
-    <div id="g_id_onload" 
-         data-client_id="191672619104-9pkmpft7bqf32n4ipqqebuh17fbtc946.apps.googleusercontent.com" 
-         data-context="signin" data-ux_mode="popup" data-callback="handleCredentialResponse" 
-         data-auto_prompt="false">
-    </div>
-
 <header>
     <div class="logo-section">
         <div class="logo-icon"></div>
@@ -80,6 +74,9 @@
 <footer>BOTTOM_AD_RESERVATION_AREA_728x90</footer>
 
 <script>
+    // КОНФІГ КЛІЄНТА
+    const GOOGLE_CLIENT_ID = "787283342726-m2qe68s98mmdkpfo8fnkbgf2gk3jpm7l.apps.googleusercontent.com";
+
     function decodeJwtResponse(token) {
         let base64Url = token.split('.')[1];
         let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
@@ -94,12 +91,13 @@
         localStorage.setItem('userEmail', user.email);
         localStorage.setItem('userPicture', user.picture);
         updateHeader();
-        navTo('home');
+        navTo('game'); // Після входу показуємо гру
     }
 
     function updateHeader() {
         const isAuth = localStorage.getItem('user_session') === 'active';
         const userBlock = document.getElementById("userBlock");
+
         if (isAuth) {
             const name = localStorage.getItem('userName') || "AGENT";
             const pic = localStorage.getItem('userPicture') || "https://raw.githubusercontent.com/detectfraud/detectfraud.github.io/refs/heads/main/images/Kozak.png";
@@ -112,10 +110,20 @@
                     <a onclick="handleLogout()" style="color:#e74c3c; font-size:10px; cursor:pointer; margin-left:10px; text-decoration:none;">[EXIT]</a>
                 </div>`;
         } else {
-            userBlock.innerHTML = `
-                <div id="g_id_onload" data-client_id="191672619104-9pkmpft7bqf32n4ipqqebuh17fbtc946.apps.googleusercontent.com" data-context="signin" data-ux_mode="popup" data-callback="handleCredentialResponse" data-auto_prompt="false"></div>
-                <div class="g_id_signin" data-type="standard" data-shape="pill" data-theme="filled_black" data-text="signin_with" data-size="medium"></div>`;
-            if (window.google) { google.accounts.id.renderButton(document.querySelector(".g_id_signin"), { theme: "filled_black", size: "medium", shape: "pill" }); }
+            // Контейнер для кнопки Google
+            userBlock.innerHTML = `<div id="google_btn"></div>`;
+            
+            // Важливо: Ініціалізуємо кнопку після того, як створили контейнер
+            if (window.google) {
+                google.accounts.id.initialize({
+                    client_id: GOOGLE_CLIENT_ID,
+                    callback: handleCredentialResponse
+                });
+                google.accounts.id.renderButton(
+                    document.getElementById("google_btn"),
+                    { theme: "filled_black", size: "medium", shape: "pill", text: "signin_with" }
+                );
+            }
         }
     }
 
@@ -125,7 +133,6 @@
         const viewport = document.getElementById("viewport");
         const currentLng = localStorage.getItem("lng") || "uk";
         
-        // Збираємо дані для передачі в іфрейм   
         const name = encodeURIComponent(localStorage.getItem('userName') || "");
         const pic = encodeURIComponent(localStorage.getItem('userPicture') || "");
         const email = encodeURIComponent(localStorage.getItem('userEmail') || "");
@@ -159,22 +166,25 @@
         });
     }
 
-    window.onload = () => { updateHeader(); initLangs(); navTo('game'); }; //початкове включення navTo('home');
+    window.onload = () => { 
+        initLangs();
+        updateHeader();
+        navTo('game'); 
+    };
 
-window.addEventListener('message', function(event) {
-    if (event.data.type === 'GET_USER_DATA') {
-        const userData = {
-            name: localStorage.getItem('userName'),
-            email: localStorage.getItem('userEmail'),
-            pic: localStorage.getItem('userPicture')
-        };
-        // Відправляємо дані назад у іфрейм
-        const frame = document.getElementById("mainFrame");
-        if (frame && frame.contentWindow) {
-            frame.contentWindow.postMessage({ type: 'USER_DATA', payload: userData }, '*');
+    window.addEventListener('message', function(event) {
+        if (event.data.type === 'GET_USER_DATA') {
+            const userData = {
+                name: localStorage.getItem('userName'),
+                email: localStorage.getItem('userEmail'),
+                pic: localStorage.getItem('userPicture')
+            };
+            const frame = document.getElementById("mainFrame");
+            if (frame && frame.contentWindow) {
+                frame.contentWindow.postMessage({ type: 'USER_DATA', payload: userData }, '*');
+            }
         }
-    }
-});
+    });
 </script>
 </body>
 </html>
