@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>S.A.F.E. - Operator Manual</title>
+    <style>
+        :root { 
+            --bg: #0d0e10; 
+            --gold: gold; 
+            --text-grey: #B5B7CE;
+            --terminal-green: #00ff41;
+            --border: #252525;
+        }
+        
+        body { 
+            background: var(--bg); color: var(--text-grey); 
+            font-family: 'Courier New', monospace; padding: 30px; 
+            line-height: 1.4; font-size: 13px;
+        }
+
+        .manual-wrapper { max-width: 750px; margin: 0 auto; }
+        
+        .header { 
+            border: 1px solid var(--border); padding: 20px; 
+            text-align: center; margin-bottom: 30px; background: #111;
+        }
+        .header h1 { color: var(--gold); margin: 0; font-size: 18px; text-transform: uppercase; }
+        
+        .section { margin-bottom: 25px; border-left: 2px solid var(--gold); padding-left: 20px; }
+        .section h2 { color: #fff; font-size: 15px; text-transform: uppercase; margin-top: 0; }
+
+        .status-box { 
+            background: #1a1a1a; border: 1px solid var(--border); 
+            padding: 10px; margin: 10px 0; display: inline-block; width: 100%;
+        }
+
+        .code-example { color: var(--terminal-green); font-weight: bold; }
+
+        /* Візуалізація кольорів для мануала */
+        .color-ref { display: flex; gap: 10px; margin-top: 10px; }
+        .c-box { width: 15px; height: 15px; border: 1px solid #fff; }
+        .green { background: #2ecc71; }
+        .yellow { background: #f1c40f; }
+        .red { background: #e74c3c; }
+
+        .footer { 
+            margin-top: 50px; text-align: center; color: #444; 
+            font-size: 10px; border-top: 1px solid var(--border); padding-top: 20px; 
+        }
+    </style>
+</head>
+<body>
+
+<div class="manual-wrapper">
+    <div class="header">
+        <h1 id="m-title">КЕРІВНИЦТВО ОПЕРАТОРА: ТЕРМІНАЛ S.A.F.E.</h1>
+        <div id="m-id">DOC_ID: MAN-ALPHA-2022-REV9</div>
+    </div>
+
+    <div id="manual-content"></div>
+
+    <div class="footer">
+        CONFIDENTIAL INFORMATION — FOR AUTHORIZED AGENTS ONLY<br>
+        S.A.F.E. PROJECT CORE © 2021-2026
+    </div>
+</div>
+
+<script>
+    const translations = {
+        uk: {
+            title: "КЕРІВНИЦТВО ОПЕРАТОРА: ТЕРМІНАЛ S.A.F.E.",
+            sections: [
+                {
+                    h: "1. ОБ'ЄКТ ДЕШИФРУВАННЯ",
+                    c: "Ваша мета — підібрати 7-значну комбінацію символів для розблокування Vault. Система використовує змішаний алфавітно-цифровий реєстр."
+                },
+                {
+                    h: "2. АЛГОРИТМ ВВОДУ ТА ЗВОРОТНИЙ ЗВ'ЯЗОК",
+                    c: `Після кожної спроби система аналізує ввід та надає статус по кожному символу:<br>
+                        <div class="color-ref"><div class="c-box green"></div> <b>Зелений:</b> Символ вірний і на своєму місці.</div>
+                        <div class="color-ref"><div class="c-box yellow"></div> <b>Жовтий:</b> Символ є у коді, але позиція невірна.</div>
+                        <div class="color-ref"><div class="c-box red"></div> <b>Червоний:</b> Символ повністю відсутній у коді.</div>`
+                },
+                {
+                    h: "3. ЕНЕРГОЗАБЕЗПЕЧЕННЯ (СПРОБИ)",
+                    c: "Термінал має автономний блок живлення на <b>3 цикли (спроби)</b>. Після вичерпання енергії необхідно ініціювати 'Protocol Reset' — перегляд інформаційного блоку для регенерації живлення."
+                },
+                {
+                    h: "4. ФІНАЛІЗАЦІЯ ТРАНЗАКЦІЇ",
+                    c: "При 100% збігу всіх 7 позицій система переходить у режим виводу активів. Вам буде запропоновано ввести адресу вашого USDT/BTC гаманця для зарахування вмісту сейфа."
+                },
+                {
+                    h: "ПОРАДА АГЕНТУ:",
+                    c: "Використовуйте метод виключення. Червоні символи більше не повинні з'являтися у ваших наступних спробах для економії енергії термінала."
+                }
+            ]
+        },
+        en: {
+            title: "OPERATOR MANUAL: S.A.F.E. TERMINAL",
+            sections: [
+                {
+                    h: "1. DECRYPTION OBJECTIVE",
+                    c: "Your goal is to guess a 7-digit combination to unlock the Vault. The system uses a mixed alphanumeric register."
+                },
+                {
+                    h: "2. INPUT ALGORITHM & FEEDBACK",
+                    c: `After each attempt, the system analyzes the input and provides a status for each character:<br>
+                        <div class="color-ref"><div class="c-box green"></div> <b>Green:</b> Correct character in the correct position.</div>
+                        <div class="color-ref"><div class="c-box yellow"></div> <b>Yellow:</b> Character is present but in the wrong position.</div>
+                        <div class="color-ref"><div class="c-box red"></div> <b>Red:</b> Character is not in the code at all.</div>`
+                },
+                {
+                    h: "3. POWER SUPPLY (ATTEMPTS)",
+                    c: "The terminal has an autonomous power unit for <b>3 cycles (attempts)</b>. Once depleted, you must initiate a 'Protocol Reset' — view an information block to regenerate power."
+                },
+                {
+                    h: "4. TRANSACTION FINALIZATION",
+                    c: "Upon 100% match of all 7 positions, the system enters asset withdrawal mode. You will be prompted to enter your USDT/BTC wallet address."
+                },
+                {
+                    h: "AGENT TIP:",
+                    c: "Use the elimination method. Red characters should not appear in your subsequent attempts to save terminal energy."
+                }
+            ]
+        },
+        ru: {
+            title: "РУКОВОДСТВО ОПЕРАТОРА: ТЕРМИНАЛ S.A.F.E.",
+            sections: [
+                {
+                    h: "1. ОБЪЕКТ ДЕШИФРОВКИ",
+                    c: "Ваша цель — подобрать 7-значную комбинацию для разблокировки Vault. Система использует смешанный алфавитно-цифровой регистр."
+                },
+                {
+                    h: "2. АЛГОРИТМ ВВОДА И ОБРАТНАЯ СВЯЗЬ",
+                    c: `После каждой попытки система анализирует ввод и выдает статус по каждому символу:<br>
+                        <div class="color-ref"><div class="c-box green"></div> <b>Зеленый:</b> Символ верный и на своем месте.</div>
+                        <div class="color-ref"><div class="c-box yellow"></div> <b>Желтый:</b> Символ есть в коде, но позиция неверна.</div>
+                        <div class="color-ref"><div class="c-box red"></div> <b>Красный:</b> Символ полностью отсутствует в коде.</div>`
+                },
+                {
+                    h: "3. ЭНЕРГОСНАБЖЕНИЕ (ПОПЫТКИ)",
+                    c: "Терминал имеет блок питания на <b>3 цикла (попытки)</b>. После исчерпания энергии необходимо запустить 'Protocol Reset' — просмотр инфо-блока для регенерации."
+                },
+                {
+                    h: "4. ФИНАЛИЗАЦИЯ ТРАНЗАКЦИИ",
+                    c: "При 100% совпадении всех 7 позиций система переходит в режим вывода. Вам будет предложено ввести адрес USDT/BTC кошелька."
+                },
+                {
+                    h: "СОВЕТ АГЕНТУ:",
+                    c: "Используйте метод исключения. Красные символы не должны появляться в следующих попытках для экономии энергии."
+                }
+            ]
+        }
+    };
+
+    function initManual() {
+        const lng = localStorage.getItem("lng") || "uk";
+        const content = translations[lng];
+        
+        document.getElementById("m-title").innerText = content.title;
+
+        const html = content.sections.map(sec => `
+            <div class="section">
+                <h2>${sec.h}</h2>
+                <div>${sec.c}</div>
+            </div>
+        `).join('');
+
+        document.getElementById("manual-content").innerHTML = html;
+    }
+
+    window.onload = initManual;
+</script>
+</body>
+</html>
