@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        :root { --bg: #0d0e10; --gold: gold; --accent: #2ecc71; --grey: #B5B7CE; }
+        body { 
+            background: var(--bg); color: var(--grey); 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            padding: 30px; line-height: 1.6; max-width: 800px; margin: auto;
+        }
+        h1 { color: var(--gold); font-size: 22px; text-align: center; letter-spacing: 1px; margin-bottom: 40px; }
+        
+        .faq-item { margin-bottom: 25px; border-left: 3px solid #333; padding-left: 20px; transition: 0.3s; }
+        .faq-item:hover { border-left-color: var(--gold); background: rgba(255, 215, 0, 0.02); }
+        
+        .question { color: #fff; font-weight: bold; font-size: 16px; margin-bottom: 8px; display: block; }
+        .answer { color: var(--grey); font-size: 14px; }
+        
+        b { color: var(--gold); }
+        .highlight { color: var(--accent); font-weight: bold; }
+        
+        .tip-box { 
+            background: #1a1a1a; border: 1px solid #333; padding: 15px; 
+            margin-top: 50px; border-radius: 8px; font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>ЧАСТІ ЗАПИТАННЯ (FAQ)</h1>
+
+    <div class="faq-item">
+        <span class="question">Що це за проект і чи справді тут можна щось відкрити?</span>
+        <div class="answer">
+            <b>S.A.F.E. Project</b> — це симулятор дешифрування високого рівня. Ваша мета — знайти 7-значний код доступу до віртуального сховища. Так, система працює на реальних імовірнісних алгоритмах, і кожен успішний збіг наближає вас до результату.
+        </div>
+    </div>
+
+    <div class="faq-item">
+        <span class="question">Я вгадав 6 літер із 7, але сейф не відкрився. Чому?</span>
+        <div class="answer">
+            Це найпоширеніша ситуація! У криптографії 6 вгаданих символів означають, що ви <span class="highlight">дуже близько</span>, але код все ще неповний. Система вимагає <b>100% точності</b>. Один невірний символ — і замок залишається заблокованим. Продовжуйте спроби, ваша інтуїція вас не підводить!
+        </div>
+    </div>
+
+    <div class="faq-item">
+        <span class="question">У мене закінчилися спроби. Що робити?</span>
+        <div class="answer">
+            Система безпеки надає 3 спроби на одну сесію. Якщо вони вичерпані, ви можете ініціювати <b>"Скидання протоколу"</b>. Для цього потрібно переглянути короткий інформаційний модуль (рекламу), який відновить енергію термінала і дасть вам ще 3 спроби.
+        </div>
+    </div>
+
+    <div class="faq-item">
+        <span class="question">Чи є якісь секретні комбінації (читерство)?</span>
+        <div class="answer">
+            Система використовує протокол <b>Adaptive Entropy</b>. Це означає, що код змінюється динамічно. Спроби вводити послідовні цифри (наприклад, 1, 2, 3, 4, 5, 6, 7) часто призводять до активації захисту, і система видає мінімальний результат. Найкраща стратегія — повний рандом і довіра до власної інтуїції.
+        </div>
+    </div>
+
+    <div class="faq-item">
+        <span class="question">Чому іноді випадає 0 літер, а іноді одразу 5?</span>
+        <div class="answer">
+            Це залежить від "рівня опору" Сховища в конкретну хвилину. Чим більше ви граєте, тим краще ви відчуваєте ритм системи. Будьте терплячі: після серії невдач зазвичай настає прорив.
+        </div>
+    </div>
+
+    <div class="tip-box">
+        <b>ПОРАДА ВІД АДМІНІСТРАЦІЇ:</b> <br>
+        Не намагайтеся грати за шаблоном. Система "відчуває" ботів та скрипти. Найвищі результати (5/7 та 6/7) зазвичай отримують ті, хто робить паузи між спробами та змінює тактику вибору символів.
+    </div>
+
+</body>
+</html>
