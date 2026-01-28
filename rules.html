@@ -2,76 +2,154 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
+    <title>S.A.F.E. - Regulations</title>
     <style>
         body { 
             background: #0d0e10; color: #B5B7CE; 
-            font-family: 'Times New Roman', serif; /* Для більшої офіційності */
+            font-family: 'Times New Roman', serif; 
             padding: 40px; line-height: 1.5; font-size: 14px; text-align: justify;
         }
         .doc-header { text-align: center; margin-bottom: 30px; }
         .doc-title { color: #fff; font-size: 18px; font-weight: bold; text-transform: uppercase; }
-        h2 { color: #fff; font-size: 16px; border-bottom: 1px solid #333; padding-bottom: 5px; margin-top: 30px; }
-        .section-title { font-weight: bold; text-decoration: underline; }
+        h2 { color: #fff; font-size: 16px; border-bottom: 1px solid #333; padding-bottom: 5px; margin-top: 30px; text-transform: uppercase; }
         .indent { margin-left: 25px; margin-bottom: 10px; }
         b { color: #fff; }
         .stamp { 
             float: right; border: 3px solid #1a1a1a; padding: 10px; 
             color: #222; font-weight: bold; transform: rotate(-5deg); 
-            margin-top: 50px; border-radius: 5px;
+            margin-top: 50px; border-radius: 5px; pointer-events: none;
+            user-select: none;
         }
+        #doc-content { max-width: 800px; margin: 0 auto; }
     </style>
 </head>
 <body>
 
-    <div class="doc-header">
-        <div class="doc-title">Положення про порядок використання програмного комплексу «S.A.F.E. Terminal»</div>
-        <p>Редакція №01/26 від 09.01.2026</p>
-    </div>
-
-    <h2>1. ЗАГАЛЬНІ ПОЛОЖЕННЯ</h2>
-    <div class="indent">
-        1.1. Дане Положення (надалі — «Правила») визначає юридичні та технічні засади експлуатації інтерфейсу «S.A.F.E. Terminal» (надалі — «Система»).<br>
-        1.2. Система є програмним продуктом, що надає Користувачеві доступ до симуляційних та інформаційних модулів на умовах <b>«AS IS» (як є)</b>.<br>
-        1.3. Використання Системи підтверджує повну та беззастережну згоду Користувача з даними Правилами. У разі незгоди, Користувач зобов’язаний негайно припинити використання Системи.
-    </div>
-
-    <h2>2. ТЕРМІНИ ТА ВИЗНАЧЕННЯ</h2>
-    <div class="indent">
-        2.1. <b>Користувач</b> — фізична особа, яка пройшла процедуру ідентифікації та отримала доступ до функціоналу Системи.<br>
-        2.2. <b>Сесія дешифрування</b> — дискретний процес взаємодії з криптографічним модулем, обмежений кількістю спроб, визначених Системою.<br>
-        2.3. <b>HoneyPot (Протокол ізоляції)</b> — автоматизований алгоритм захисту, призначений для виявлення та блокування несанкціонованої активності.
-    </div>
-
-    <h2>3. ПОРЯДОК ЕКСПЛУАТАЦІЇ ТА ОБМЕЖЕННЯ</h2>
-    <div class="indent">
-        3.1. Користувач зобов’язується використовувати Систему виключно через передбачений графічний інтерфейс. Будь-які спроби реверс-інжинірингу, модифікації коду або автоматизації вводу (використання ботів) суворо заборонені.<br>
-        3.2. <b>Алгоритм доступу:</b><br>
-        <div class="indent">
-            3.2.1. Формування ідентифікаційного ключа (7 алфавітних символів).<br>
-            3.2.2. Синхронізація цифрових індексів (7 числових значень).<br>
-            3.2.3. Фіналізація та верифікація результату Системою.
+    <div id="doc-content">
+        <div class="doc-header">
+            <div class="doc-title" id="t-main-title">Положення про порядок використання програмного комплексу «S.A.F.E. Terminal»</div>
+            <p id="t-version">Редакція №01/26 від 09.01.2026</p>
         </div>
-        3.3. Кількість спроб у межах однієї сесії обмежена <b>трьома одиницями</b>. Поновлення спроб здійснюється шляхом ініціалізації зовнішніх інформаційних модулів (рекламних блоків).
+
+        <div id="legal-sections"></div>
+
+        <div class="stamp">
+            S.A.F.E. PROJECT<br>
+            VERIFIED & SECURED<br>
+            2026/01/09
+        </div>
     </div>
 
-    <h2>4. ВІДПОВІДАЛЬНІСТЬ СТОРІН</h2>
-    <div class="indent">
-        4.1. Адміністрація Системи не несе відповідальності за прямі або непрямі збитки, що виникли внаслідок втрати Користувачем доступу до терміналу або помилок у тлумаченні результатів Сесії.<br>
-        4.2. Система залишає за собою право впроваджувати динамічну складність (Adaptive Entropy) для підтримки цілісності бази даних.<br>
-        4.3. Виявлення лінійних послідовностей вводу розцінюється як спроба обходу захисту та активує п. 2.3 даних Правил.
-    </div>
+<script>
+    const translations = {
+        uk: {
+            mainTitle: "Положення про порядок використання програмного комплексу «S.A.F.E. Terminal»",
+            version: "Редакція №01/26 від 09.01.2026",
+            sections: [
+                {
+                    h: "1. ЗАГАЛЬНІ ПОЛОЖЕННЯ",
+                    c: `1.1. Дане Положення (надалі — «Правила») визначає юридичні та технічні засади експлуатації інтерфейсу «S.A.F.E. Terminal» (надалі — «Система»).<br>
+                        1.2. Система надає доступ до симуляційних модулів на умовах <b>«AS IS» (як є)</b>.<br>
+                        1.3. Використання Системи підтверджує повну згоду Користувача з даними Правилами.`
+                },
+                {
+                    h: "2. ТЕРМІНИ ТА ВИЗНАЧЕННЯ",
+                    c: `2.1. <b>Користувач</b> — особа, яка пройшла ідентифікацію Google ID.<br>
+                        2.2. <b>Сесія</b> — процес взаємодії з криптографічним модулем, обмежений кількістю спроб.<br>
+                        2.3. <b>HoneyPot</b> — алгоритм захисту від несанкціонованої автоматизації (ботів).`
+                },
+                {
+                    h: "3. ПОРЯДОК ЕКСПЛУАТАЦІЇ",
+                    c: `3.1. Заборонені будь-які спроби реверс-інжинірингу або автоматизації вводу.<br>
+                        3.2. <b>Алгоритм:</b> 7 алфавітних символів + 7 числових індексів.<br>
+                        3.3. Кількість спроб обмежена <b>трьома одиницями</b>. Поновлення можливе через інформаційні модулі (рекламу).`
+                },
+                {
+                    h: "4. ВІДПОВІДАЛЬНІСТЬ СТОРІН",
+                    c: `4.1. Адміністрація не несе відповідальності за збитки внаслідок помилок у тлумаченні результатів.<br>
+                        4.2. Система використовує <b>Adaptive Entropy</b> для підтримки складності.<br>
+                        4.3. Виявлення автоматизованого вводу активує протокол блокування ID.`
+                }
+            ]
+        },
+        en: {
+            mainTitle: "Regulations on the use of the 'S.A.F.E. Terminal' software package",
+            version: "Revision №01/26 dated 09.01.2026",
+            sections: [
+                {
+                    h: "1. GENERAL PROVISIONS",
+                    c: `1.1. These Regulations (hereinafter — 'Rules') define the legal and technical basis for the operation of the 'S.A.F.E. Terminal' (hereinafter — 'System').<br>
+                        1.2. The System provides access to simulation modules on an <b>'AS IS'</b> basis.<br>
+                        1.3. Use of the System confirms the User's full agreement with these Rules.`
+                },
+                {
+                    h: "2. TERMS AND DEFINITIONS",
+                    c: `2.1. <b>User</b> — an individual identified via Google ID.<br>
+                        2.2. <b>Session</b> — a discrete process of interaction with the cryptographic module, limited by the number of attempts.<br>
+                        2.3. <b>HoneyPot</b> — an automated protection algorithm designed to detect unauthorized activity.`
+                },
+                {
+                    h: "3. OPERATION AND RESTRICTIONS",
+                    c: `3.1. Any attempts at reverse engineering or input automation (bots) are strictly prohibited.<br>
+                        3.2. <b>Access Algorithm:</b> Formation of a 7-character key and synchronization of 7 digital indices.<br>
+                        3.3. The number of attempts is limited to <b>three units</b>. Resetting is done via information modules (ads).`
+                },
+                {
+                    h: "4. LIABILITY",
+                    c: `4.1. Administration is not liable for damages resulting from loss of access or misinterpretation of results.<br>
+                        4.2. The System implements <b>Adaptive Entropy</b> to maintain data integrity.<br>
+                        4.3. Detection of linear input sequences triggers the blocking protocol.`
+                }
+            ]
+        },
+        ru: {
+            mainTitle: "Положение о порядке использования программного комплекса «S.A.F.E. Terminal»",
+            version: "Редакция №01/26 от 09.01.2026",
+            sections: [
+                {
+                    h: "1. ОБЩИЕ ПОЛОЖЕНИЯ",
+                    c: `1.1. Данное Положение (далее — «Правила») определяет юридические и технические основы эксплуатации интерфейса «S.A.F.E. Terminal».<br>
+                        1.2. Система предоставляет доступ к модулям на условиях <b>«AS IS» (как есть)</b>.<br>
+                        1.3. Использование Системы подтверждает полное согласие Пользователя с данными Правилами.`
+                },
+                {
+                    h: "2. ТЕРМИНЫ И ОПРЕДЕЛЕНИЯ",
+                    c: `2.1. <b>Пользователь</b> — лицо, прошедшее идентификацию через Google ID.<br>
+                        2.2. <b>Сессия</b> — процесс взаимодействия с криптографическим модулем, ограниченный количеством попыток.<br>
+                        2.3. <b>HoneyPot</b> — алгоритм защиты от несанкционированной автоматизации.`
+                },
+                {
+                    h: "3. ПОРЯДОК ЭКСПЛУАТАЦИИ",
+                    c: `3.1. Любые попытки реверс-инжиниринга или автоматизации ввода (боты) строго запрещены.<br>
+                        3.2. <b>Алгоритм:</b> 7 алфавитных символов + 7 числовых индексов.<br>
+                        3.3. Лимит попыток — <b>три единицы</b>. Восстановление доступно через информационные блоки (рекламу).`
+                },
+                {
+                    h: "4. ОТВЕТСТВЕННОСТЬ СТОРОН",
+                    c: `4.1. Администрация не несет ответственности за убытки, возникшие вследствие ошибок в толковании результатов.<br>
+                        4.2. Система использует <b>Adaptive Entropy</b> для динамической сложности.<br>
+                        4.3. Выявление линейных последовательностей ввода активирует протокол блокировки.`
+                }
+            ]
+        }
+    };
 
-    <h2>5. ПРИКІНЦЕВІ ПОЛОЖЕННЯ</h2>
-    <div class="indent">
-        5.1. Адміністрація має право вносити зміни до цих Правил в односторонньому порядку.<br>
-        5.2. Усі спори, пов'язані з використанням Системи, вирішуються шляхом переговорів на підставі технічних логів Системи, які є пріоритетним джерелом доказів.
-    </div>
+    function initRules() {
+        const lng = localStorage.getItem("lng") || "uk";
+        const content = translations[lng];
+        
+        document.getElementById("t-main-title").innerText = content.mainTitle;
+        document.getElementById("t-version").innerText = content.version;
 
-    <div class="stamp">
-        S.A.F.E. PROJECT<br>
-        VERIFIED & SECURED<br>
-        2026/01/09
-    </div>
+        const sectionsHtml = content.sections.map(sec => `
+            <h2>${sec.h}</h2>
+            <div class="indent">${sec.c}</div>
+        `).join('');
 
+        document.getElementById("legal-sections").innerHTML = sectionsHtml;
+    }
+
+    window.onload = initRules;
+</script>
 </body>
 </html>
