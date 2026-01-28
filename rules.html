@@ -2,137 +2,178 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <title>S.A.F.E. - Regulations</title>
+    <title>S.A.F.E. - Protocol & Regulations</title>
     <style>
         body { 
             background: #0d0e10; color: #B5B7CE; 
             font-family: 'Times New Roman', serif; 
-            padding: 40px; line-height: 1.5; font-size: 14px; text-align: justify;
+            padding: 50px; line-height: 1.6; font-size: 13px; text-align: justify;
         }
-        .doc-header { text-align: center; margin-bottom: 30px; }
-        .doc-title { color: #fff; font-size: 18px; font-weight: bold; text-transform: uppercase; }
-        h2 { color: #fff; font-size: 16px; border-bottom: 1px solid #333; padding-bottom: 5px; margin-top: 30px; text-transform: uppercase; }
-        .indent { margin-left: 25px; margin-bottom: 10px; }
+        #doc-content { max-width: 850px; margin: 0 auto; background: #0f1012; padding: 40px; border: 1px solid #1a1a1a; box-shadow: 0 0 50px rgba(0,0,0,0.5); }
+        .doc-header { text-align: center; margin-bottom: 40px; border-bottom: 2px solid #333; padding-bottom: 20px; }
+        .doc-title { color: #fff; font-size: 20px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
+        .doc-subtitle { font-size: 12px; margin-top: 10px; color: #666; }
+        
+        h2 { color: #fff; font-size: 15px; border-bottom: 1px solid #222; padding-bottom: 3px; margin-top: 25px; text-transform: uppercase; letter-spacing: 1px; }
+        .indent { margin-left: 30px; margin-bottom: 15px; }
         b { color: #fff; }
+        
+        .stamp-area { margin-top: 60px; display: flex; justify-content: flex-end; }
         .stamp { 
-            float: right; border: 3px solid #1a1a1a; padding: 10px; 
-            color: #222; font-weight: bold; transform: rotate(-5deg); 
-            margin-top: 50px; border-radius: 5px; pointer-events: none;
+            border: 3px double #1a1a1a; padding: 15px; 
+            color: #2a2a2a; font-weight: bold; transform: rotate(-8deg); 
+            text-align: center; line-height: 1.2; font-family: monospace;
             user-select: none;
         }
-        #doc-content { max-width: 800px; margin: 0 auto; }
+        
+        .watermark { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-45deg); font-size: 100px; color: rgba(255,255,255,0.02); pointer-events: none; z-index: 0; text-transform: uppercase; }
     </style>
 </head>
 <body>
+    <div class="watermark">CLASSIFIED</div>
 
     <div id="doc-content">
         <div class="doc-header">
-            <div class="doc-title" id="t-main-title">Положення про порядок використання програмного комплексу «S.A.F.E. Terminal»</div>
-            <p id="t-version">Редакція №01/26 від 09.01.2026</p>
+            <div class="doc-title" id="t-main-title">ПРОТОКОЛ ЕКСПЛУАТАЦІЇ ТА РЕГЛАМЕНТ ВЗАЄМОДІЇ З ЯДРОМ «S.A.F.E. PROJECT»</div>
+            <div class="doc-subtitle" id="t-version">REG-ID: 787-ALPHA-2026 | Редакція №01/26 від 09.01.2026</div>
         </div>
 
         <div id="legal-sections"></div>
 
-        <div class="stamp">
-            S.A.F.E. PROJECT<br>
-            VERIFIED & SECURED<br>
-            2026/01/09
+        <div class="stamp-area">
+            <div class="stamp">
+                S.A.F.E. PROJECT MANAGEMENT<br>
+                CENTRAL TERMINAL AUTHENTICATED<br>
+                DATE: 2026/01/28<br>
+                STATUS: APPROVED
+            </div>
         </div>
     </div>
 
 <script>
-    const translations = {
-        uk: {
-            mainTitle: "Положення про порядок використання програмного комплексу «S.A.F.E. Terminal»",
-            version: "Редакція №01/26 від 09.01.2026",
-            sections: [
-                {
-                    h: "1. ЗАГАЛЬНІ ПОЛОЖЕННЯ",
-                    c: `1.1. Дане Положення (надалі — «Правила») визначає юридичні та технічні засади експлуатації інтерфейсу «S.A.F.E. Terminal» (надалі — «Система»).<br>
-                        1.2. Система надає доступ до симуляційних модулів на умовах <b>«AS IS» (як є)</b>.<br>
-                        1.3. Використання Системи підтверджує повну згоду Користувача з даними Правилами.`
-                },
-                {
-                    h: "2. ТЕРМІНИ ТА ВИЗНАЧЕННЯ",
-                    c: `2.1. <b>Користувач</b> — особа, яка пройшла ідентифікацію Google ID.<br>
-                        2.2. <b>Сесія</b> — процес взаємодії з криптографічним модулем, обмежений кількістю спроб.<br>
-                        2.3. <b>HoneyPot</b> — алгоритм захисту від несанкціонованої автоматизації (ботів).`
-                },
-                {
-                    h: "3. ПОРЯДОК ЕКСПЛУАТАЦІЇ",
-                    c: `3.1. Заборонені будь-які спроби реверс-інжинірингу або автоматизації вводу.<br>
-                        3.2. <b>Алгоритм:</b> 7 алфавітних символів + 7 числових індексів.<br>
-                        3.3. Кількість спроб обмежена <b>трьома одиницями</b>. Поновлення можливе через інформаційні модулі (рекламу).`
-                },
-                {
-                    h: "4. ВІДПОВІДАЛЬНІСТЬ СТОРІН",
-                    c: `4.1. Адміністрація не несе відповідальності за збитки внаслідок помилок у тлумаченні результатів.<br>
-                        4.2. Система використовує <b>Adaptive Entropy</b> для підтримки складності.<br>
-                        4.3. Виявлення автоматизованого вводу активує протокол блокування ID.`
-                }
-            ]
-        },
-        en: {
-            mainTitle: "Regulations on the use of the 'S.A.F.E. Terminal' software package",
-            version: "Revision №01/26 dated 09.01.2026",
-            sections: [
-                {
-                    h: "1. GENERAL PROVISIONS",
-                    c: `1.1. These Regulations (hereinafter — 'Rules') define the legal and technical basis for the operation of the 'S.A.F.E. Terminal' (hereinafter — 'System').<br>
-                        1.2. The System provides access to simulation modules on an <b>'AS IS'</b> basis.<br>
-                        1.3. Use of the System confirms the User's full agreement with these Rules.`
-                },
-                {
-                    h: "2. TERMS AND DEFINITIONS",
-                    c: `2.1. <b>User</b> — an individual identified via Google ID.<br>
-                        2.2. <b>Session</b> — a discrete process of interaction with the cryptographic module, limited by the number of attempts.<br>
-                        2.3. <b>HoneyPot</b> — an automated protection algorithm designed to detect unauthorized activity.`
-                },
-                {
-                    h: "3. OPERATION AND RESTRICTIONS",
-                    c: `3.1. Any attempts at reverse engineering or input automation (bots) are strictly prohibited.<br>
-                        3.2. <b>Access Algorithm:</b> Formation of a 7-character key and synchronization of 7 digital indices.<br>
-                        3.3. The number of attempts is limited to <b>three units</b>. Resetting is done via information modules (ads).`
-                },
-                {
-                    h: "4. LIABILITY",
-                    c: `4.1. Administration is not liable for damages resulting from loss of access or misinterpretation of results.<br>
-                        4.2. The System implements <b>Adaptive Entropy</b> to maintain data integrity.<br>
-                        4.3. Detection of linear input sequences triggers the blocking protocol.`
-                }
-            ]
-        },
-        ru: {
-            mainTitle: "Положение о порядке использования программного комплекса «S.A.F.E. Terminal»",
-            version: "Редакция №01/26 от 09.01.2026",
-            sections: [
-                {
-                    h: "1. ОБЩИЕ ПОЛОЖЕНИЯ",
-                    c: `1.1. Данное Положение (далее — «Правила») определяет юридические и технические основы эксплуатации интерфейса «S.A.F.E. Terminal».<br>
-                        1.2. Система предоставляет доступ к модулям на условиях <b>«AS IS» (как есть)</b>.<br>
-                        1.3. Использование Системы подтверждает полное согласие Пользователя с данными Правилами.`
-                },
-                {
-                    h: "2. ТЕРМИНЫ И ОПРЕДЕЛЕНИЯ",
-                    c: `2.1. <b>Пользователь</b> — лицо, прошедшее идентификацию через Google ID.<br>
-                        2.2. <b>Сессия</b> — процесс взаимодействия с криптографическим модулем, ограниченный количеством попыток.<br>
-                        2.3. <b>HoneyPot</b> — алгоритм защиты от несанкционированной автоматизации.`
-                },
-                {
-                    h: "3. ПОРЯДОК ЭКСПЛУАТАЦИИ",
-                    c: `3.1. Любые попытки реверс-инжиниринга или автоматизации ввода (боты) строго запрещены.<br>
-                        3.2. <b>Алгоритм:</b> 7 алфавитных символов + 7 числовых индексов.<br>
-                        3.3. Лимит попыток — <b>три единицы</b>. Восстановление доступно через информационные блоки (рекламу).`
-                },
-                {
-                    h: "4. ОТВЕТСТВЕННОСТЬ СТОРОН",
-                    c: `4.1. Администрация не несет ответственности за убытки, возникшие вследствие ошибок в толковании результатов.<br>
-                        4.2. Система использует <b>Adaptive Entropy</b> для динамической сложности.<br>
-                        4.3. Выявление линейных последовательностей ввода активирует протокол блокировки.`
-                }
-            ]
-        }
-    };
+const translations = {
+    uk: {
+        mainTitle: "ПРОТОКОЛ ЕКСПЛУАТАЦІЇ ТА РЕГЛАМЕНТ ВЗАЄМОДІЇ З ЯДРОМ «S.A.F.E. PROJECT»",
+        version: "REG-ID: 787-ALPHA-2026 | Редакція №01/26 від 09.01.2026",
+        sections: [
+            {
+                h: "1. ПРЕАМБУЛА ТА ПРАВОВИЙ СТАТУС",
+                c: `1.1. Цей документ є публічною офертою. Використання інтерфейсу Terminal означає безумовне прийняття протоколів безпеки.<br>
+                    1.2. Програмний комплекс функціонує на базі автономного ядра з використанням алгоритмів децентралізованої ентропії.<br>
+                    1.3. Адміністрація не виступає фінансовою установою. Весь контент є симуляцією криптографічного зламу.`
+            },
+            {
+                h: "2. ІДЕНТИФІКАЦІЯ ТА ВЕРИФІКАЦІЯ",
+                c: `2.1. Доступ до операційного середовища надається лише особам, що пройшли Single Sign-On (SSO) через шлюз Google ID.<br>
+                    2.2. Користувач несе одноосібну відповідальність за цілісність свого токена доступу.<br>
+                    2.3. Використання тимчасових або скомпрометованих облікових записів призводить до негайної ануляції поточної сесії дешифрування.`
+            },
+            {
+                h: "3. ТЕХНІЧНИЙ РЕГЛАМЕНТ ДЕШИФРУВАННЯ",
+                c: `3.1. <b>Процедура спроб:</b> Кожна сесія обмежена 3-ма циклами. Кожен цикл ініціює запит до генератора випадкових чисел (RNG).<br>
+                    3.2. <b>Інформаційне підживлення:</b> Відновлення енергоблока термінала здійснюється через валідацію рекламного трафіку.<br>
+                    3.3. <b>Adaptive Difficulty:</b> Система автоматично калібрує складність коду залежно від загальної обчислювальної потужності мережі.`
+            },
+            {
+                h: "4. ФІНАНСОВІ ПРОТОКОЛИ ТА ДИВІДЕНДИ",
+                c: `4.1. <b>Referral Linkage:</b> Дивіденди у розмірі 10% нараховуються за принципом "Daily Activity Check".<br>
+                    4.2. <b>Податкова відповідальність:</b> Будь-які активи підлягають самостійному декларуванню Користувачем згідно з чинним законодавством його юрисдикції.<br>
+                    4.3. Система не виконує функції податкового агента.`
+            },
+            {
+                h: "5. ПОРЯДОК ВИВЕДЕННЯ АКТИВІВ (TRANSFER PROTOCOL)",
+                c: `5.1. У разі успішного повного дешифрування (100% збіг 7-значного коду), Користувачеві відкривається доступ до форми **Final Verification**.<br>
+                    5.2. Виплата вмісту сховища здійснюється виключно у цифровій валюті (USDT/BTC) на адресу криптографічного гаманця, вказаного Користувачем.<br>
+                    5.3. Користувач несе повну відповідальність за коректність вказаної адреси (Network: TRC20/ERC20). Помилка в одній літері адреси призводить до безповоротної втрати активу у блокчейні.`
+            },
+            {
+                h: "6. ФОРС-МАЖОР ТА ВІДМОВА ВІД ГАРАНТІЙ",
+                c: `6.1. Система не гарантує успішного результату дешифрування незалежно від кількості витраченого часу.<br>
+                    6.2. <b>Uplink Error:</b> Адміністрація не відповідає за розрив зв'язку, спричинений технічними факторами поза зоною контролю Системи.<br>
+                    6.3. Будь-які маніпуляції з клієнтським кодом розцінюються як спроба вторгнення та призводять до вічного бану по IP.`
+            }
+        ]
+    },
+    en: {
+        mainTitle: "OPERATION PROTOCOL & CORE INTERACTION REGULATIONS «S.A.F.E. PROJECT»",
+        version: "REG-ID: 787-ALPHA-2026 | Revision №01/26 dated 01/09/2026",
+        sections: [
+            {
+                h: "1. PREAMBLE AND LEGAL STATUS",
+                c: `1.1. This document is a public offer. Use of the interface signifies acceptance of all security protocols.<br>
+                    1.2. The software operates on an autonomous core using decentralized entropy algorithms.<br>
+                    1.3. Administration is not a financial institution. All content is a simulation of cryptographic decryption.`
+            },
+            {
+                h: "2. IDENTIFICATION AND VERIFICATION",
+                c: `2.1. Access is granted only via Single Sign-On (SSO) through the Google ID gateway.<br>
+                    2.2. The User is solely responsible for the integrity of their access token.<br>
+                    2.3. Compromised accounts result in immediate annulment of the session.`
+            },
+            {
+                h: "3. TECHNICAL REGULATIONS",
+                c: `3.1. <b>Attempt Procedure:</b> Limited to 3 cycles. Each cycle initiates a request to the RNG generator.<br>
+                    3.2. <b>Information Feed:</b> Restoration of attempts is carried out through ad traffic validation.<br>
+                    3.3. <b>Adaptive Difficulty:</b> The system calibrates difficulty based on network power.`
+            },
+            {
+                h: "4. FINANCIAL PROTOCOLS",
+                c: `4.1. <b>Referral Linkage:</b> 10% dividends are credited via 'Daily Activity Check'.<br>
+                    4.2. <b>Tax Liability:</b> Any assets obtained must be independently declared by the User in their jurisdiction.`
+            },
+            {
+                h: "5. ASSET WITHDRAWAL (TRANSFER PROTOCOL)",
+                c: `5.1. Upon successful 100% decryption of the 7-digit code, the User receives access to the **Final Verification** form.<br>
+                    5.2. Payout of the vault contents is performed exclusively in digital currency (USDT/BTC) to the cryptographic wallet address provided by the User.<br>
+                    5.3. The User is fully responsible for the accuracy of the address (Network: TRC20/ERC20). A single character error results in permanent loss of assets in the blockchain.`
+            },
+            {
+                h: "6. FORCE MAJEURE AND DISCLAIMER",
+                c: `6.1. Success is not guaranteed regardless of time spent.<br>
+                    6.2. <b>Uplink Error:</b> Administration is not responsible for connection losses beyond its control.<br>
+                    6.3. Code manipulation results in a permanent IP ban.`
+            }
+        ]
+    },
+    ru: {
+        mainTitle: "ПРОТОКОЛ ЭКСПЛУАТАЦИИ И РЕГЛАМЕНТ ВЗАИМОДЕЙСТВИЯ С ЯДРОМ «S.A.F.E. PROJECT»",
+        version: "REG-ID: 787-ALPHA-2026 | Редакция №01/26 от 09.01.2026",
+        sections: [
+            {
+                h: "1. ПРЕАМБУЛА И ПРАВОВОЙ СТАТУС",
+                c: `1.1. Данный документ является публичной офертой. Использование интерфейса означает принятие протоколов безопасности.<br>
+                    1.2. Комплекс функционирует на базе автономного ядра с использованием алгоритмов децентрализованной энтропии.`
+            },
+            {
+                h: "2. ИДЕНТИФИКАЦИЯ",
+                c: `2.1. Доступ предоставляется только через шлюз Google ID.<br>
+                    2.2. Пользователь несет единоличную ответственность за сохранность токена доступа.`
+            },
+            {
+                h: "3. ТЕХНИЧЕСКИЙ РЕГЛАМЕНТ",
+                c: `3.1. <b>Процедура попыток:</b> Ограничена 3 циклами. Каждый цикл инициирует запрос к RNG.<br>
+                    3.2. <b>Информационная подпитка:</b> Восстановление попыток через валидацию рекламного трафика.`
+            },
+            {
+                h: "4. ФИНАНСОВЫЕ ПРОТОКОЛЫ",
+                c: `4.1. <b>Referral Linkage:</b> Дивиденды 10% начисляются по принципу 'Daily Activity Check'.<br>
+                    4.2. <b>Налоговая ответственность:</b> Любые активы подлежат самостоятельному декларированию Пользователем.`
+            },
+            {
+                h: "5. ПОРЯДОК ВЫВОДА АКТИВОВ (TRANSFER PROTOCOL)",
+                c: `5.1. При успешном 100% дешифровании 7-значного кода Пользователю открывается форма **Final Verification**.<br>
+                    5.2. Выплата содержимого сейфа осуществляется исключительно в цифровой валюте (USDT/BTC) на адрес криптокошелька Пользователя.<br>
+                    5.3. Пользователь несет полную ответственность за корректность адреса (Network: TRC20/ERC20). Ошибка в одном символе ведет к безвозвратной потере актива.`
+            },
+            {
+                h: "6. ФОРС-МАЖОР",
+                c: `6.1. Успешный результат не гарантирован.<br>
+                    6.2. <b>Uplink Error:</b> Администрация не отвечает за технические сбои вне зоны контроля.<br>
+                    6.3. Манипуляции с кодом ведут к вечному бану по IP.`
+            }
+        ]
+    }
+};
 
     function initRules() {
         const lng = localStorage.getItem("lng") || "uk";
