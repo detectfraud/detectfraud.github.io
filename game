@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root { --bg: #0f1113; --accent: #2ecc71; --gold: #f1c40f; --cell-bg: #050505; }
+        body { background: var(--bg); color: #fff; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; margin: 0; padding-top: 15px; user-select: none; overflow: hidden; }
+        .header-row { width: 90%; display: flex; justify-content: space-between; margin-bottom: 10px; color: var(--gold); font-weight: bold; font-size: 18px; }
+        .word-out { color: var(--accent); letter-spacing: 4px; font-size: 22px; margin-bottom: 10px; min-height: 25px; font-weight: bold; text-transform: uppercase; }
+        .cells { display: flex; gap: 8px; margin-bottom: 20px; }
+        .cell { width: 38px; height: 50px; background: var(--cell-bg); border: 2px solid #333; display: flex; align-items: center; justify-content: center; font-size: 22px; color: var(--gold); border-radius: 8px; font-weight: bold; }
+        .cell.correct { background: #143a22; border-color: var(--accent); color: #fff; }
+        .grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; width: 90%; }
+        button { background: #2a2e32; border: 1px solid #444; color: #ddd; height: 50px; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: bold; transition: 0.1s; }
+        button:active { transform: scale(0.95); background: #3a3e42; }
+        button:disabled { opacity: 0.3; cursor: default; filter: grayscale(1); }
+        #lastRow { display: grid; gap: 8px; width: 90%; margin-top: 8px; }
+        .btn-confirm { width: 90%; background: #27ae60; color: #fff; padding: 15px; margin-top: 15px; font-weight: bold; border: none; border-radius: 10px; cursor: pointer; font-size: 18px; }
+        #ad-block-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 17, 19, 0.98); z-index: 10000; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+        .ab-content { border: 2px solid var(--gold); padding: 30px; border-radius: 15px; max-width: 320px; }
+        .ab-btn { background: var(--accent); color: #fff; border: none; padding: 12px 25px; border-radius: 8px; font-weight: bold; margin-top: 20px; cursor: pointer; width: 100%; }
+    </style>
+</head>
+<body>
+    <div id="ad-block-overlay"><div class="ab-content"><h2>ADBLOCK / DEVTOOLS</h2><p>Будь ласка, вимкніть захист для продовження.</p><button class="ab-btn" onclick="location.reload()">ОНОВИТИ</button></div></div>
+    
+    <div class="header-row"><div id="game-counter">3</div><div id="session-counter">1</div></div>
+    <div class="word-out" id="res"></div>
+    <div class="cells" id="row">
+        <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+    </div>
+    <div id="mainGrid" class="grid"></div>
+    <div id="lastRow"></div>
+    <button class="btn-confirm" id="confirmBtn" onclick="act()">ПІДТВЕРДИТИ</button>
+
+    <script>
+        const isDebug = window.location.hash === "#test";
+        const urlParams = new URLSearchParams(window.location.search);
+        let curLng = urlParams.get('lng') || 'uk';
+
+        const Langs = {
+            uk: { alpha: "АБВГҐДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЬЮЯ", confirm: "ПІДТВЕРДИТИ", wait: "ЗАЧЕКАЙТЕ...", clear: "ОЧИСТКА", lastGrid: "1.2fr 1fr 1fr 1fr 1.2fr", split: 30, ad_session: "Сесія вичерпана. Дивитись рекламу?" },
+            ru: { alpha: "АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ", confirm: "ПОДТВЕРДИТЬ", wait: "ПОДОЖДИТЕ...", clear: "ОЧИСТКА", lastGrid: "1.2fr 1fr 1fr 1fr 1.2fr", split: 30, ad_session: "Сессия исчерпана. Посмотреть рекламу?" },
+            en: { alpha: "ABCDEFGHIJKLMNOPQRSTUVWXYZ", confirm: "CONFIRM", wait: "WAITING...", clear: "CLEAR", lastGrid: "1.5fr 1fr 1fr 1.5fr", split: 24, ad_session: "Session expired. Renew with ad?" }
+        };
+
+        const HistoryManager = {
+            key: "____sys_stat_v1",
+            save(d) { let s = this.load(); s.push({p: btoa(d.join(',')), t: Date.now()}); localStorage.setItem(this.key, JSON.stringify(s.slice(-50))); },
+            load() { try { return JSON.parse(localStorage.getItem(this.key)) || []; } catch(e) { return []; } },
+            checkAbuse(d) { let p = btoa(d.join(',')); return this.load().filter(i => i.p === p).length > 2; }
+        };
+
+        let cur = Langs[curLng] || Langs['uk'], targetWord = [], currentInput = [], isDigitalMode = false, isRevealed = false;
+        let gameCounter = 3, sessionValue = 1;
+
+        //window.lockGame = () => { if (!isDebug) document.getElementById('ad-block-overlay').style.display = 'flex'; };
+
+        // --- CORE ENGINE (INTERNAL) ---
+        window.InternalEngine = {
+            sync: async function(q) {
+                if (isDebug) return {v: 2};
+                const _0xS = atob("MHwxfDF8MXwyIzF8MXwyfDIjMXwyfDJ8Mw=="); // Твої шанси
+                const h = ["googlesyndication", "luckyads"];
+                fetch(`https://${h[Math.floor(Math.random()*h.length)]}.com/favicon.ico`, {mode:'no-cors'}).catch(()=>{});
+                
+                const _m = _0xS.split('#'), _v = _m[q.c - 1].split('|').map(Number);
+                let r = _v[Math.floor(Math.random() * _v.length)];
+                if (q.ab) r = Math.random() > 0.5 ? 0 : 1;
+                return new Promise(res => setTimeout(() => res({v: r}), 700));
+            },
+            process: function(v, ind, tw, al) {
+                const cl = document.getElementById('row').children;
+                const fa = al.split('');
+                window.currentShuffledAlpha = [...fa].sort(() => 0.5 - Math.random());
+
+                let ap = Array.from({length: 7}, (_, k) => k).sort(() => Math.random() - 0.5), wp = [];
+                if (v > 0) {
+                    wp.push(ap.pop());
+                    while (wp.length < v && ap.length > 0) {
+                        let c = ap.pop();
+                        if (!wp.some(p => Math.abs(p - c) === 1) || v > 3) wp.push(c);
+                        else ap.unshift(c);
+                    }
+                }
+
+                let res = new Array(7);
+                wp.forEach(p => {
+                    let l = tw[p]; res[p] = l;
+                    let bi = ind[p] - 1, oi = window.currentShuffledAlpha.indexOf(l);
+                    [window.currentShuffledAlpha[bi], window.currentShuffledAlpha[oi]] = [window.currentShuffledAlpha[oi], window.currentShuffledAlpha[bi]];
+                });
+
+                let sp = fa.filter(l => !tw.includes(l)).sort(() => 0.5 - Math.random());
+                for (let i = 0; i < 7; i++) {
+                    if (res[i]) continue;
+                    let bi = ind[i] - 1, l = sp.pop();
+                    res[i] = l; window.currentShuffledAlpha[bi] = l;
+                }
+
+                const _k = atob("Y29ycmVjdA=="); // "correct"
+                for (let i = 0; i < 7; i++) {
+                    cl[i].innerText = res[i];
+                    if (wp.includes(i)) cl[i].classList.add(_k);
+                }
+            }
+        };
+
+        function updateDisplay() {
+            const cells = document.getElementById('row').children;
+            for (let i = 0; i < 7; i++) cells[i].innerText = isDigitalMode ? (currentInput[i] ? "*" : "") : (currentInput[i] || "");
+        }
+
+        function draw() {
+            document.getElementById('game-counter').innerText = gameCounter;
+            document.getElementById('session-counter').innerText = sessionValue;
+            const m = document.getElementById('mainGrid'), l = document.getElementById('lastRow');
+            m.innerHTML = ''; l.innerHTML = '';
+            l.style.gridTemplateColumns = cur.lastGrid;
+
+            for (let i = 0; i < cur.split; i++) m.appendChild(createBtn(i));
+            
+            const bc = document.createElement('button'); bc.innerText = cur.clear; 
+            bc.onclick = () => {
+                if (isRevealed) {
+                    gameCounter--;
+                    if (gameCounter === 0) { alert(cur.ad_session); gameCounter = 3; sessionValue++; targetWord = []; isDigitalMode = false; document.getElementById('res').innerText = ""; }
+                    document.querySelectorAll('.cell').forEach(c => {c.innerText=""; c.classList.remove('correct')});
+                }
+                currentInput = []; isRevealed = false; updateDisplay(); draw();
+            };
+            l.appendChild(bc);
+
+            for (let i = cur.split; i < cur.alpha.length; i++) l.appendChild(createBtn(i));
+
+            const bb = document.createElement('button'); bb.innerText = '<-'; 
+            bb.onclick = () => { if(!isRevealed) { currentInput.pop(); updateDisplay(); draw(); } };
+            l.appendChild(bb);
+        }
+
+        function createBtn(i) {
+            const b = document.createElement('button');
+            let label = (isRevealed && isDigitalMode) ? window.currentShuffledAlpha[i] : (isDigitalMode ? (i+1) : cur.alpha[i]);
+            b.innerText = label;
+            if (isDigitalMode && !isRevealed && isNaN(label)) b.disabled = true;
+            if (!isRevealed && currentInput.includes(label.toString())) b.disabled = true;
+            b.onclick = () => { if (!isRevealed && currentInput.length < 7) { currentInput.push(label.toString()); updateDisplay(); draw(); } };
+            return b;
+        }
+
+        async function act() {
+            if (currentInput.length !== 7 || isRevealed) return;
+            const btn = document.getElementById('confirmBtn');
+            if (!isDigitalMode) {
+                targetWord = [...currentInput]; document.getElementById('res').innerText = targetWord.join('');
+                currentInput = []; isDigitalMode = true; updateDisplay(); draw();
+            } else {
+                btn.innerText = cur.wait; btn.disabled = true;
+                let inds = currentInput.map(Number), diffs = inds.slice(1).map((n, i) => n - inds[i]);
+                try {
+                    const res = await window.InternalEngine.sync({ c: gameCounter, ab: HistoryManager.checkAbuse(diffs) });
+                    isRevealed = true; HistoryManager.save(diffs);
+                    window.InternalEngine.process(res.v, inds, targetWord, cur.alpha);
+                } catch(e) { window.lockGame(); }
+                btn.disabled = false; btn.innerText = cur.confirm; draw();
+            }
+        }
+
+        // --- PROTECTION BOOT ---
+        !function() {
+            const _check = () => {
+                if (isDebug) return;
+                if (window.outerWidth - window.innerWidth > 160 || window.outerHeight - window.innerHeight > 160) {
+                    (function() {}.constructor("debugger")()); window.lockGame();
+                }
+            };
+            window.addEventListener('resize', _check);
+            setInterval(_check, 2000);
+            document.addEventListener("DOMContentLoaded", () => {
+                draw();
+                if (isDebug) return;
+                const d = document.createElement("div");
+                d.className = "adsbygoogle lucky-ads-block";
+                d.style.cssText = "width:1px;height:1px;position:absolute;left:-999px;";
+                document.body.appendChild(d);
+                setTimeout(() => { if (!d || d.offsetHeight === 0) window.lockGame(); }, 1500);
+            });
+        }();
+    </script>
+</body>
+</html>
