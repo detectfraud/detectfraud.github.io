@@ -10,7 +10,7 @@
             --gold: gold; 
             --text-grey: #B5B7CE;
             --metal-border: #444;
-            --accent-blue: #00ff41; /* Змінив на зелений в стилі терміналу */
+            --accent-green: #00ff41;
         }
         
         body { 
@@ -74,14 +74,14 @@
 <body>
 
     <div id="g_id_onload" 
-         data-client_id="787283342726-m2qe68s98mmdkpfo8fnkbgf2gk3jpm7l.apps.googleusercontent.com" 
+         data-client_id="191672619104-9pkmpft7bqf32n4ipqqebuh17fbtc946.apps.googleusercontent.com" 
          data-context="signin" data-ux_mode="popup" data-callback="handleCredentialResponse" 
          data-auto_prompt="false">
     </div>
 
-    <div class="form-title">S.A.F.E. FEEDBACK TERMINAL</div>
+    <div class="form-title" id="t-title">S.A.F.E. FEEDBACK TERMINAL</div>
 
-    <p id="userInfo">СТАТУС: ПЕРЕВІРКА ДОСТУПУ...</p>
+    <p id="userInfo"></p>
     
     <div class="g_id_signin"></div>
 
@@ -89,49 +89,99 @@
         <input id="myForm-name" type="hidden" name="name">
         <input id="myForm-email" type="hidden" name="email">
         
-        <label style="font-size: 11px;">КАНАЛ: ПРЯМИЙ ЗВ'ЯЗОК З АДМІНІСТРАЦІЄЮ<span style="color: var(--gold);">*</span><br>
-            <textarea id="myForm-message" name="message" placeholder="ВВЕДІТЬ ПОВІДОМЛЕННЯ ДЛЯ ЦЕНТРАЛЬНОГО ОФІСУ..." required></textarea>
+        <label style="font-size: 11px;"><span id="t-label">> ПОВІДОМЛЕННЯ АДМІНІСТРАЦІЇ</span><span style="color: var(--gold);"> *</span><br>
+            <textarea id="myForm-message" name="message" required></textarea>
         </label>
 
         <div class="btn-group">
-            <button type="reset">ОЧИСТИТИ</button>
+            <button type="reset" id="t-reset">ОЧИСТИТИ</button>
             <button type="submit" id="sendButton" disabled>НАДІСЛАТИ</button>
         </div>
         
         <div id="result"></div>
     </form>
 
-    <p class="info-note">
-        УВАГА: Термінал доступний лише для верифікованих агентів.<br>
-        Ліміт: 3 звіти на добу. Протокол шифрування: AES-256.
-    </p>
+    <p class="info-note" id="t-note"></p>
 
 <script>
     const scriptURL = "https://script.google.com/macros/s/AKfycbxWBhDitBhF-LR_0gXa-F-8Zqzj0e0mw8W2C3QMGZ4-W6nXE09FCbZl16qSNL9d26M/exec";
     const MAX_MESSAGES_PER_DAY = 3;
 
+    const translations = {
+        uk: {
+            title: "S.A.F.E. FEEDBACK ТЕРМІНАЛ",
+            statusNo: "СТАТУС: АВТОРИЗАЦІЯ ВІДСУТНЯ",
+            statusWait: "УВІЙДІТЬ ДЛЯ РОБОТИ З ТЕРМІНАЛОМ",
+            agent: "АГЕНТ",
+            label: "> ПОВІДОМЛЕННЯ АДМІНІСТРАЦІЇ",
+            placeholder: "ВВЕДІТЬ ВАШ ТЕКСТ ТУТ...",
+            reset: "ОЧИСТИТИ",
+            send: "НАДІСЛАТИ",
+            sending: "ПЕРЕДАЧА...",
+            success: "ПАКЕТ УСПІШНО ПРИЙНЯТО ЦЕНТРОМ!",
+            error: "КРИТИЧНА ПОМИЛКА МЕРЕЖІ.",
+            quotaEx: "КВОТА ВИЧЕРПАНА",
+            available: "ДОСТУПНО ПАКЕТІВ",
+            note: "УВАГА: Термінал доступний лише для верифікованих агентів.<br>Ліміт: Три повідомлення на добу.<br>Всі дані передаються через захищений шлюз. Використання нецензурної лексики призведе до блокування ID."
+        },
+        en: {
+            title: "S.A.F.E. FEEDBACK TERMINAL",
+            statusNo: "STATUS: UNAUTHORIZED",
+            statusWait: "PLEASE LOGIN TO USE TERMINAL",
+            agent: "AGENT",
+            label: "> MESSAGE TO ADMINISTRATION",
+            placeholder: "ENTER YOUR TEXT HERE...",
+            reset: "CLEAR",
+            send: "SEND",
+            sending: "SENDING...",
+            success: "PACKET SUCCESSFULLY RECEIVED BY CENTER!",
+            error: "CRITICAL NETWORK ERROR.",
+            quotaEx: "QUOTA EXCEEDED",
+            available: "PACKETS AVAILABLE",
+            note: "WARNING: Terminal available for verified agents only.<br>Limit: 3 messages per day.<br>All data sent via secure gateway. Abuse or spam will result in Google ID ban."
+        },
+        ru: {
+            title: "S.A.F.E. FEEDBACK ТЕРМИНАЛ",
+            statusNo: "СТАТУС: АВТОРИЗАЦИЯ ОТСУТСТВУЕТ",
+            statusWait: "ВОЙДИТЕ ДЛЯ РАБОТЫ С ТЕРМИНАЛОМ",
+            agent: "АГЕНТ",
+            label: "> СООБЩЕНИЕ АДМИНИСТРАЦИИ",
+            placeholder: "ВВЕДИТЕ ВАШ ТЕКСТ ЗДЕСЬ...",
+            reset: "ОЧИСТИТЬ",
+            send: "ОТПРАВИТЬ",
+            sending: "ОТПРАВКА...",
+            success: "ПАКЕТ УСПЕШНО ПРИНЯТ ЦЕНТРОМ!",
+            error: "КРИТИЧЕСКАЯ ОШИБКА СЕТИ.",
+            quotaEx: "КВОТА ИСЧЕРПАНА",
+            available: "ДОСТУПНО ПАКЕТОВ",
+            note: "ВНИМАНИЕ: Терминал доступен только для верифицированных агентов.<br>Лимит: Три сообщения в сутки.<br>Все данные передаются через защищенный шлюз. Спам приведет к блокировке ID."
+        }
+    };
+
+    function getLng() {
+        return localStorage.getItem("lng") || "uk";
+    }
+
     function canSendMessage() {
         const today = (new Date()).toISOString().split("T")[0];
-        const lastDate = localStorage.getItem("msgDate");
-        let count = parseInt(localStorage.getItem("msgCounter") || "0");
-        
-        if (lastDate !== today) {
+        if (localStorage.getItem("msgDate") !== today) {
             localStorage.setItem("msgDate", today);
             localStorage.setItem("msgCounter", "0");
-            return true;
         }
-        return count < MAX_MESSAGES_PER_DAY;
+        return parseInt(localStorage.getItem("msgCounter") || "0") < MAX_MESSAGES_PER_DAY;
     }
 
     function updateRemainingLabel() {
+        const lng = getLng();
         const count = parseInt(localStorage.getItem("msgCounter") || "0");
         const left = MAX_MESSAGES_PER_DAY - count;
         const resDiv = document.getElementById("result");
+        
         if (left <= 0) {
-            resDiv.innerHTML = "<span style='color:#e74c3c;'>КВОТА ВИЧЕРПАНА (0/3)</span>";
+            resDiv.innerHTML = `<span style='color:#e74c3c;'>${translations[lng].quotaEx} (0/3)</span>`;
             return false;
         } else {
-            resDiv.innerHTML = `<span style='color:var(--accent-blue);'>ДОСТУПНО ПАКЕТІВ: ${left}/${MAX_MESSAGES_PER_DAY}</span>`;
+            resDiv.innerHTML = `<span style='color:var(--accent-green);'>${translations[lng].available}: ${left}/${MAX_MESSAGES_PER_DAY}</span>`;
             return true;
         }
     }
@@ -148,51 +198,52 @@
         localStorage.setItem("user_session", "active");
         localStorage.setItem("userName", user.name);
         localStorage.setItem("userEmail", user.email);
-        localStorage.setItem("userPicture", user.picture);
         updateUserInfo();
     }
 
     function updateUserInfo() {
+        const lng = translations[getLng()];
         const name = localStorage.getItem("userName");
         const email = localStorage.getItem("userEmail");
         const info = document.getElementById("userInfo");
-        const logout = document.getElementById("logoutBtn");
         const signinBtn = document.querySelector(".g_id_signin");
         const sendBtn = document.getElementById("sendButton");
 
+        // Static translations
+        document.getElementById("t-title").innerText = lng.title;
+        document.getElementById("t-label").innerText = lng.label;
+        document.getElementById("myForm-message").placeholder = lng.placeholder;
+        document.getElementById("t-reset").innerText = lng.reset;
+        document.getElementById("t-note").innerHTML = lng.note;
+        sendBtn.textContent = lng.send;
+
         if (name && email) {
-            info.innerHTML = `АГЕНТ: <b style="color:#fff">${name.toUpperCase()}</b> | ID: <b style="color:#fff">${email}</b>`;
+            info.innerHTML = `${lng.agent}: <b style="color:#fff">${name.toUpperCase()}</b> | ID: <b style="color:#fff">${email}</b>`;
             if (signinBtn) signinBtn.style.display = "none";
-            logout.style.display = "inline-block";
-            
             document.getElementById("myForm-name").value = name;
             document.getElementById("myForm-email").value = email;
-
             const hasLimit = updateRemainingLabel();
             sendBtn.disabled = !hasLimit;
         } else {
-            info.innerHTML = "СТАТУС: <span style='color:#e74c3c'>АВТОРИЗАЦІЯ ВІДСУТНЯ</span>";
-            logout.style.display = "none";
+            info.innerHTML = `<span style='color:#e74c3c'>${lng.statusNo}</span>`;
             if (signinBtn) signinBtn.style.display = "flex";
             sendBtn.disabled = true;
-            document.getElementById("result").innerText = "УВІЙДІТЬ ДЛЯ РОБОТИ З ТЕРМІНАЛОМ";
+            document.getElementById("result").innerText = lng.statusWait;
         }
     }
 
     document.getElementById("myForm").addEventListener("submit", function(e) {
         e.preventDefault();
+        const lng = translations[getLng()];
         if (!canSendMessage()) return;
 
         const btn = document.getElementById("sendButton");
-        const originalText = btn.textContent;
         btn.disabled = true;
-        btn.textContent = "ПЕРЕДАЧА...";
+        btn.textContent = lng.sending;
 
         const formData = new FormData(this);
         const params = new URLSearchParams();
         for (const [key, value] of formData.entries()) { params.append(key, value); }
-        
-        // Додаємо мітку сторінки
         params.append("ref", "feedback_terminal");
 
         fetch(scriptURL, {
@@ -200,22 +251,16 @@
             headers: { "Content-Type": "application/x-www-form-urlencoded" },
             body: params.toString()
         })
-        .then(res => {
-            document.getElementById("result").innerHTML = "<span style='color:var(--accent-blue);'>ПАКЕТ УСПІШНО ПРИЙНЯТО ЦЕНТРОМ!</span>";
-            
-            let count = parseInt(localStorage.getItem("msgCounter") || "0");
-            localStorage.setItem("msgCounter", count + 1);
-            
+        .then(() => {
+            document.getElementById("result").innerHTML = `<span style='color:var(--accent-green);'>${lng.success}</span>`;
+            localStorage.setItem("msgCounter", parseInt(localStorage.getItem("msgCounter") || "0") + 1);
             this.reset();
-            setTimeout(() => {
-                updateUserInfo();
-                btn.textContent = originalText;
-            }, 3000);
+            setTimeout(() => { updateUserInfo(); }, 3000);
         })
-        .catch(err => {
-            document.getElementById("result").innerHTML = "<span style='color:red;'>КРИТИЧНА ПОМИЛКА МЕРЕЖІ.</span>";
+        .catch(() => {
+            document.getElementById("result").innerHTML = `<span style='color:red;'>${lng.error}</span>`;
             btn.disabled = false;
-            btn.textContent = originalText;
+            btn.textContent = lng.send;
         });
     });
 
