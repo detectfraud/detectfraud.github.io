@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>S.A.F.E. - Training Circuit</title>
+    <style>
+        /* Основні стилі копіюємо з головної сторінки */
+        body { background: #0d0e10; color: #B5B7CE; font-family: 'Courier New', monospace; text-align: center; }
+        
+        .demo-badge {
+            background: #f1c40f; color: #000; padding: 5px 20px;
+            font-weight: bold; position: fixed; top: 10px; left: 50%;
+            transform: translateX(-50%); border-radius: 5px;
+            box-shadow: 0 0 15px rgba(241, 196, 15, 0.5);
+            z-index: 1000; text-transform: uppercase;
+        }
+
+        .safe-container {
+            margin-top: 80px;
+            /* Тут твій дизайн сейфа */
+            border: 2px solid #333; display: inline-block; padding: 40px;
+        }
+
+        .screen {
+            background: #000; color: #00ff41; padding: 20px;
+            border: 1px solid #00ff41; margin-bottom: 20px; font-size: 24px;
+        }
+
+        .btn-open {
+            background: gold; color: black; border: none; padding: 10px 30px;
+            font-weight: bold; cursor: pointer; text-transform: uppercase;
+        }
+
+        /* Стиль для вікна успіху в демо-режимі */
+        #success-modal {
+            display: none; position: fixed; top: 50%; left: 50%;
+            transform: translate(-50%, -50%); background: #16181b;
+            border: 2px solid gold; padding: 30px; z-index: 2000;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="demo-badge">Тренувальний контур / Training Mode</div>
+
+    <div class="safe-container">
+        <div class="screen" id="display">_ _ _ _ _ _ _</div>
+        
+        <div class="keypad">
+            <button class="btn-open" onclick="checkDemoCode()">DECRYPT</button>
+        </div>
+    </div>
+
+    <div id="success-modal">
+        <h2 style="color: gold;">СИМУЛЯЦІЯ УСПІШНА!</h2>
+        <p>Ви щойно зламали 7-значний код у демо-режимі.</p>
+        <p style="font-size: 12px; color: #666;">У реальному секторі це принесло б вам доступ до активів Vault.</p>
+        <hr style="border: 0.5px solid #333;">
+        <button onclick="location.href='index.html'" style="padding: 10px 20px; cursor: pointer;">ПЕРЕЙТИ ДО РЕАЛЬНОГО СЕЙФА</button>
+    </div>
+
+    <script>
+        // В демо-режимі можемо поставити фіксований код для швидкого тесту
+        const DEMO_CODE = "DEMO777"; 
+        let currentInput = "";
+
+        function checkDemoCode() {
+            // Твоя логіка перевірки
+            if (currentInput === DEMO_CODE) {
+                document.getElementById('success-modal').style.display = 'block';
+            } else {
+                alert("ACCESS DENIED: ТРЕНУВАЛЬНА ПОМИЛКА");
+            }
+        }
+    </script>
+</body>
+</html>
