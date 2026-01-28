@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>S.A.F.E. - Feedback Hub</title>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <style>
+        :root { 
+            --bg: #0d0e10; 
+            --gold: gold; 
+            --text-grey: #B5B7CE;
+            --metal-border: #444;
+            --accent-blue: #00ff41; /* Змінив на зелений в стилі терміналу */
+        }
+        
+        body { 
+            background: var(--bg); color: var(--text-grey); 
+            font-family: 'Segoe UI', sans-serif; padding: 20px; 
+            display: flex; flex-direction: column; align-items: center;
+            min-height: 100vh; margin: 0;
+        }
+
+        #myForm {
+            background-color: #16181b;
+            border: 1px solid var(--metal-border);
+            padding: 25px;
+            width: 100%;
+            max-width: 500px;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            text-transform: uppercase;
+        }
+
+        .form-title {
+            display: block; text-align: center; font-size: 20px;
+            color: var(--gold); font-weight: bold; margin-bottom: 20px;
+            letter-spacing: 2px;
+        }
+
+        #userInfo { font-size: 12px; margin-bottom: 10px; color: var(--gold); text-align: center; min-height: 18px; }
+        
+        textarea {
+            width: 100%; height: 120px; background: #000;
+            border: 1px solid var(--metal-border); color: var(--gold);
+            padding: 10px; border-radius: 4px; box-sizing: border-box;
+            font-family: 'Courier New', monospace; resize: none; margin-top: 10px;
+        }
+
+        textarea:focus { border-color: var(--gold); outline: none; }
+
+        .btn-group { margin-top: 20px; display: flex; gap: 10px; }
+
+        button {
+            flex: 1; padding: 12px; font-weight: bold; cursor: pointer;
+            text-transform: uppercase; border-radius: 4px; border: 1px solid var(--metal-border);
+            transition: 0.2s;
+        }
+
+        button[type="submit"] { background: var(--gold); color: #000; border: none; }
+        button[type="reset"] { background: #222; color: #fff; }
+        button:hover:not(:disabled) { opacity: 0.8; transform: translateY(-1px); }
+        button:disabled { background: #333 !important; color: #666 !important; cursor: not-allowed; }
+
+        #logoutBtn { 
+            background: transparent; color: #e74c3c; border: 1px solid #e74c3c; 
+            padding: 5px 10px; font-size: 10px; margin-bottom: 15px; cursor: pointer;
+        }
+
+        .info-note { 
+            font-size: 11px; color: var(--text-grey); margin-top: 15px; 
+            text-align: center; opacity: 0.8; line-height: 1.4; max-width: 400px;
+        }
+
+        #result { text-align: center; font-size: 13px; margin-top: 15px; font-family: 'Courier New', monospace; }
+
+        .g_id_signin { display: flex; justify-content: center; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+
+    <div id="g_id_onload" 
+         data-client_id="787283342726-m2qe68s98mmdkpfo8fnkbgf2gk3jpm7l.apps.googleusercontent.com" 
+         data-context="signin" data-ux_mode="popup" data-callback="handleCredentialResponse" 
+         data-auto_prompt="false">
+    </div>
+
+    <div class="form-title">S.A.F.E. FEEDBACK TERMINAL</div>
+
+    <p id="userInfo">СТАТУС: ПЕРЕВІРКА ДОСТУПУ...</p>
+    <button id="logoutBtn" style="display:none;" onclick="logoutUser()">[ DISCONNECT GOOGLE ID ]</button>
+    
+    <div class="g_id_signin"></div>
+
+    <form id="myForm">
+        <input id="myForm-name" type="hidden" name="name">
+        <input id="myForm-email" type="hidden" name="email">
+        
+        <label style="font-size: 11px;">КАНАЛ: ПРЯМИЙ ЗВ'ЯЗОК З АДМІНІСТРАЦІЄЮ<span style="color: var(--gold);">*</span><br>
+            <textarea id="myForm-message" name="message" placeholder="ВВЕДІТЬ ПОВІДОМЛЕННЯ ДЛЯ ЦЕНТРАЛЬНОГО ОФІСУ..." required></textarea>
+        </label>
+
+        <div class="btn-group">
+            <button type="reset">ОЧИСТИТИ</button>
+            <button type="submit" id="sendButton" disabled>НАДІСЛАТИ</button>
+        </div>
+        
+        <div id="result"></div>
+    </form>
+
+    <p class="info-note">
+        УВАГА: Термінал доступний лише для верифікованих агентів.<br>
+        Ліміт: 3 звіти на добу. Протокол шифрування: AES-256.
+    </p>
+
+<script>
+    const scriptURL = "https://script.google.com/macros/s/AKfycbxWBhDitBhF-LR_0gXa-F-8Zqzj0e0mw8W2C3QMGZ4-W6nXE09FCbZl16qSNL9d26M/exec";
+    const MAX_MESSAGES_PER_DAY = 3;
+
+    function canSendMessage() {
+        const today = (new Date()).toISOString().split("T")[0];
+        const lastDate = localStorage.getItem("msgDate");
+        let count = parseInt(localStorage.getItem("msgCounter") || "0");
+        
+        if (lastDate !== today) {
+            localStorage.setItem("msgDate", today);
+            localStorage.setItem("msgCounter", "0");
+            return true;
+        }
+        return count < MAX_MESSAGES_PER_DAY;
+    }
+
+    function updateRemainingLabel() {
+        const count = parseInt(localStorage.getItem("msgCounter") || "0");
+        const left = MAX_MESSAGES_PER_DAY - count;
+        const resDiv = document.getElementById("result");
+        if (left <= 0) {
+            resDiv.innerHTML = "<span style='color:#e74c3c;'>КВОТА ВИЧЕРПАНА (0/3)</span>";
+            return false;
+        } else {
+            resDiv.innerHTML = `<span style='color:var(--accent-blue);'>ДОСТУПНО ПАКЕТІВ: ${left}/${MAX_MESSAGES_PER_DAY}</span>`;
+            return true;
+        }
+    }
+
+    function decodeJwtResponse(token) {
+        let base64Url = token.split('.')[1];
+        let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        let jsonPayload = decodeURIComponent(atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
+        return JSON.parse(jsonPayload);
+    }
+
+    function handleCredentialResponse(response) {
+        const user = decodeJwtResponse(response.credential);
+        localStorage.setItem("user_session", "active");
+        localStorage.setItem("userName", user.name);
+        localStorage.setItem("userEmail", user.email);
+        localStorage.setItem("userPicture", user.picture);
+        updateUserInfo();
+    }
+
+    function updateUserInfo() {
+        const name = localStorage.getItem("userName");
+        const email = localStorage.getItem("userEmail");
+        const info = document.getElementById("userInfo");
+        const logout = document.getElementById("logoutBtn");
+        const signinBtn = document.querySelector(".g_id_signin");
+        const sendBtn = document.getElementById("sendButton");
+
+        if (name && email) {
+            info.innerHTML = `АГЕНТ: <b style="color:#fff">${name.toUpperCase()}</b> | ID: <b style="color:#fff">${email}</b>`;
+            if (signinBtn) signinBtn.style.display = "none";
+            logout.style.display = "inline-block";
+            
+            document.getElementById("myForm-name").value = name;
+            document.getElementById("myForm-email").value = email;
+
+            const hasLimit = updateRemainingLabel();
+            sendBtn.disabled = !hasLimit;
+        } else {
+            info.innerHTML = "СТАТУС: <span style='color:#e74c3c'>АВТОРИЗАЦІЯ ВІДСУТНЯ</span>";
+            logout.style.display = "none";
+            if (signinBtn) signinBtn.style.display = "flex";
+            sendBtn.disabled = true;
+            document.getElementById("result").innerText = "УВІЙДІТЬ ДЛЯ РОБОТИ З ТЕРМІНАЛОМ";
+        }
+    }
+
+    function logoutUser() {
+        localStorage.clear();
+        location.reload();
+    }
+
+    document.getElementById("myForm").addEventListener("submit", function(e) {
+        e.preventDefault();
+        if (!canSendMessage()) return;
+
+        const btn = document.getElementById("sendButton");
+        const originalText = btn.textContent;
+        btn.disabled = true;
+        btn.textContent = "ПЕРЕДАЧА...";
+
+        const formData = new FormData(this);
+        const params = new URLSearchParams();
+        for (const [key, value] of formData.entries()) { params.append(key, value); }
+        
+        // Додаємо мітку сторінки
+        params.append("ref", "feedback_terminal");
+
+        fetch(scriptURL, {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: params.toString()
+        })
+        .then(res => {
+            document.getElementById("result").innerHTML = "<span style='color:var(--accent-blue);'>ПАКЕТ УСПІШНО ПРИЙНЯТО ЦЕНТРОМ!</span>";
+            
+            let count = parseInt(localStorage.getItem("msgCounter") || "0");
+            localStorage.setItem("msgCounter", count + 1);
+            
+            this.reset();
+            setTimeout(() => {
+                updateUserInfo();
+                btn.textContent = originalText;
+            }, 3000);
+        })
+        .catch(err => {
+            document.getElementById("result").innerHTML = "<span style='color:red;'>КРИТИЧНА ПОМИЛКА МЕРЕЖІ.</span>";
+            btn.disabled = false;
+            btn.textContent = originalText;
+        });
+    });
+
+    window.onload = updateUserInfo;
+</script>
+</body>
+</html>
