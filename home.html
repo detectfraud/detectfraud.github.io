@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        :root { --bg: #0f1113; --gold: gold; --accent: #00ff41; --text: #B5B7CE; }
+        body { 
+            background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; 
+            margin: 0; padding: 50px; line-height: 1.8;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+        
+        .hero-section { text-align: center; margin-bottom: 60px; }
+        .hero-title { 
+            font-size: 42px; color: var(--gold); font-weight: bold; 
+            text-transform: uppercase; letter-spacing: 6px; margin-bottom: 10px;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
+        }
+        .hero-subtitle { font-size: 16px; color: #676e7a; text-transform: uppercase; letter-spacing: 2px; }
+
+        /* Динамічний блок статусу */
+        .agent-status-bar {
+            display: none; /* Показуємо тільки авторизованим */
+            background: rgba(0, 255, 65, 0.05);
+            border: 1px solid var(--accent);
+            padding: 15px 25px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .story-section { 
+            background: #16181b; border: 1px solid #333; 
+            padding: 40px; border-radius: 15px; position: relative;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            margin-bottom: 40px;
+        }
+        .story-section::before {
+            content: "SECURITY PROTOCOL ACTIVE"; position: absolute; top: -10px; left: 20px;
+            background: #f1c40f; color: #000; padding: 2px 10px; font-size: 10px; font-weight: bold;
+        }
+
+        h2 { color: var(--gold); text-transform: uppercase; font-size: 22px; margin: 30px 0 15px 0; border-bottom: 1px solid #333; display: inline-block; padding-bottom: 5px; }
+        p { margin-bottom: 20px; font-size: 17px; text-align: justify; }
+
+        .highlight { color: #fff; font-weight: bold; border-bottom: 1px solid var(--gold); }
+        .accent-text { color: var(--accent); font-weight: bold; }
+
+        .feature-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin: 40px 0; }
+        .feature-card { 
+            background: #0d0e10; border: 1px solid #222; padding: 25px; border-radius: 10px; 
+            transition: 0.3s;
+        }
+        .feature-card:hover { border-color: var(--gold); background: #111; }
+        .feature-card h4 { color: var(--gold); margin: 0 0 10px 0; text-transform: uppercase; font-size: 16px; }
+        .feature-card p { font-size: 14px; margin: 0; color: #888; text-align: left; }
+
+        .ref-bonus-box { 
+            background: linear-gradient(90deg, #1a1a1a 0%, #2c240a 100%); 
+            border: 2px solid var(--gold); padding: 30px; border-radius: 12px; margin: 40px 0;
+            text-align: center;
+        }
+
+        .cta-box { text-align: center; margin-top: 50px; }
+        .btn-start { 
+            display: inline-block; padding: 22px 70px; 
+            background: transparent; border: 2px solid var(--gold); color: var(--gold); 
+            font-weight: bold; font-size: 20px; text-decoration: none; border-radius: 5px; 
+            cursor: pointer; transition: 0.4s; text-transform: uppercase;
+        }
+        .btn-start:hover { 
+            background: var(--gold); color: #000; 
+            box-shadow: 0 0 40px rgba(255, 215, 0, 0.6); transform: scale(1.05);
+        }
+
+        .terminal-footer { font-family: 'Courier New', monospace; font-size: 12px; color: #444; margin-top: 40px; text-align: center; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="hero-section">
+        <img src="https://raw.githubusercontent.com/detectfraud/detectfraud.github.io/refs/heads/main/images/dollar.png" style="width: 40%; max-width: 300px; margin-bottom: 20px;">
+        <div class="hero-title">CODED SAFE</div>
+        <div class="hero-subtitle">Твій цифровий інстинкт — твій єдиний ключ</div>
+    </div>
+
+    <div id="agentStatus" class="agent-status-bar">
+        <div>
+            STATUS: <span class="accent-text">AUTHORIZED</span> | 
+            AGENT: <span id="agentName" style="color: #fff; font-weight: bold;">---</span>
+        </div>
+        <div style="font-size: 12px; font-family: monospace;">READY_FOR_EXTRACTION_01</div>
+    </div>
+
+    <div class="story-section">
+        <h2>Твоя рука. Твій код. Твій виграш.</h2>
+        <p>
+            Забудь про автоматичні скрипти та бездушні кнопки "Start". У <span class="highlight">S.A.F.E.</span> ти — не просто глядач, а зламник. Кожен символ семизначного коду ти <span class="highlight">вводиш власноруч</span>. Це момент найвищої напруги, коли кінчики пальців торкаються клавіш, а підсвідомість шепоче правильну цифру. 
+        </p>
+        <p>
+            Ми прибрали все зайве. Тут немає графіків чи складних формул. Тільки ти, заперті двері сховища і твоє <span class="accent-text">передчуття</span>. Ти відчуваєш ритм системи? Ти бачиш код крізь пікселі? Вводь його впевнено. Система дає лише три шанси, щоб довести, що твоя інтуїція сильніша за будь-який шифр.
+        </p>
+
+        <div class="feature-grid">
+            <div class="feature-card">
+                <h4>Ручне введення</h4>
+                <p>Ти сам керуєш процесом дешифрування. Кожна цифра вводиться тобою особисто. Твій вибір — твоя перемога.</p>
+            </div>
+            <div class="feature-card">
+                <h4>Чистий інстинкт</h4>
+                <p>Алгоритми тут безсилі. Лише людська інтуїція здатна знайти шлях крізь хаос випадкових чисел.</p>
+            </div>
+        </div>
+
+        <h2>Синдикат: Заробляй разом із командою</h2>
+        <p>
+            У світі <span class="highlight">CODED SAFE</span> успіх поширюється на тих, хто тримається разом. Наша реферальна програма побудована на принципі взаємної вигоди, але з жорсткою умовою для справжніх гравців.
+        </p>
+
+        <div class="ref-bonus-box">
+            <h3 style="color: var(--gold); margin-top: 0; font-size: 24px;">ПРАВИЛО АКТИВНОГО ПАРТНЕРА</h3>
+            <p style="font-size: 18px; color: #fff;">
+                Якщо твій реферал зламує сейф і отримує куш — <span class="accent-text">ти автоматично отримуєш свій відсоток</span>. 
+            </p>
+            <p style="font-size: 15px; color: var(--gold); border: 1px dashed var(--gold); padding: 10px; display: inline-block;">
+                АЛЕ ПАМ'ЯТАЙ: Бонус нараховується лише за умови, що <span style="text-decoration: underline;">ТИ САМ грав у цей день</span>.
+            </p>
+            <p style="font-size: 14px; margin-top: 15px; color: #888;">
+                Підтримуй систему в активному стані, роби хоча б одну спробу зламу щодня, і прибуток твоєї команди ніколи не пройде повз твій гаманець.
+            </p>
+        </div>
+
+        <div class="cta-box">
+            <button class="btn-start" id="mainButton" onclick="window.parent.navTo('game')">Увійти в термінал</button>
+        </div>
+    </div>
+
+    <div class="terminal-footer">
+        SECURE CONNECTION ESTABLISHED // SESSION_ID: <span id="sessionID">---</span>
+    </div>
+</div>
+
+<script>
+    function updatePageStatus() {
+        const isAuth = localStorage.getItem('user_session') === 'active';
+        const agentBar = document.getElementById('agentStatus');
+        const agentName = document.getElementById('agentName');
+        const mainBtn = document.getElementById('mainButton');
+        const sessionSpan = document.getElementById('sessionID');
+
+        // Генеруємо випадковий ID сесії для вигляду
+        sessionSpan.innerText = Math.random().toString(36).substring(2, 10).toUpperCase();
+
+        if (isAuth) {
+            agentBar.style.display = 'flex';
+            agentName.innerText = localStorage.getItem('userName').toUpperCase();
+            mainBtn.innerText = "ЗАПУСТИТИ ДЕШИФРАТОР";
+        } else {
+            agentBar.style.display = 'none';
+            mainBtn.innerText = "УВІЙТИ В ТЕРМІНАЛ";
+        }
+    }
+
+    window.onload = updatePageStatus;
+
+    window.addEventListener('message', (e) => {
+        if (e.data.type === 'CHANGE_LNG_REQUEST') {
+            console.log("Language change requested: " + e.data.newLng);
+        }
+    });
+</script>
+</body>
+</html>
