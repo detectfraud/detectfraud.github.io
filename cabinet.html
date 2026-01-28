@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        :root { --bg: #0d0e10; --gold: gold; --text-grey: #B5B7CE; --border: #333; }
+        body { background: var(--bg); color: var(--text-grey); font-family: 'Segoe UI', sans-serif; margin: 0; padding: 40px; }
+        .grid-container { display: grid; grid-template-columns: 1fr 2fr; gap: 20px; }
+        .card { background: #16181b; border: 1px solid #333; border-radius: 12px; padding: 20px; text-align: center; }
+
+        .big-avatar { width: 100px; height: 100px; border-radius: 50%; border: 3px solid var(--gold); margin-bottom: 10px; }
+        
+        .ref-box { margin-top: 20px; }
+        .ref-input-group { display: flex; gap: 5px; margin-top: 10px; }
+        input { flex: 1; background: #000; border: 1px solid #444; color: var(--gold); padding: 10px; border-radius: 5px; }
+        .copy-btn { background: var(--gold); color: #000; border: none; padding: 10px 15px; border-radius: 5px; font-weight: bold; cursor: pointer; }
+        
+        .stat-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px dashed #222; }
+        .stat-val { color: var(--gold); font-weight: bold; }
+
+        .profile-header { display: flex; align-items: center; gap: 30px; background: #16181b; padding: 30px; border: 1px solid var(--border); border-radius: 15px; }
+        .profile-pic { width: 120px; height: 120px; border-radius: 10px; border: 2px solid var(--gold); object-fit: cover; }
+        .profile-info h1 { margin: 0; color: #fff; font-size: 28px; }
+        .profile-info p { margin: 5px 0; color: var(--gold); }
+    </style>
+</head>
+<body>
+
+<div class="grid-container">
+    <div class="card profile-info">
+        <img id="uPic" src="https://raw.githubusercontent.com/detectfraud/detectfraud.github.io/refs/heads/main/images/Kozak.png" alt="User Photo" class="profile-pic">
+        <h3 id="uName" style="color: #fff; margin: 10px 0;">---</h3>
+        <p id="uEmail">---</p>
+        <p id="uNick">---</p>
+    </div>
+
+    <div class="card">
+        <h3 style="color: var(--gold); margin-top: 0;">РЕФЕРАЛЬНА ПРОГРАМА</h3>
+        <p style="font-size: 13px;">Запрошуйте друзів та отримуйте 10% від їхнього прибутку.</p>
+        
+        <div class="ref-box">
+            <label style="font-size: 12px; color: #676e7a;">ВАШЕ ПОСИЛАННЯ:</label>
+            <div class="ref-input-group">
+                <input type="text" id="refLink" value="https://coded-safe.com/?ref=agent777" readonly>
+                <button class="copy-btn" onclick="copyRef()">COPY</button>
+            </div>
+        </div>
+
+        <div style="margin-top: 30px;">
+            <h4 style="margin-bottom: 10px;">Статистика рефералів</h4>
+            <div class="stat-row"><span>Всього запрошено:</span> <span class="stat-val">12</span></div>
+            <div class="stat-row"><span>Зароблено з реф:</span> <span class="stat-val">0 USD</span></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function updateFields(data) {
+        if (data.name) document.getElementById('uName').innerText = data.name.toUpperCase();
+        if (data.email) document.getElementById('uEmail').innerText = data.email;
+        if (data.pic) document.getElementById('uPic').src = data.pic;
+      //  if (data.nick) document.getElementById('uNick').src = data.nick;
+    }
+
+    // Слухаємо дані від головної сторінки
+    window.addEventListener('message', function(event) {
+        if (event.data.type === 'USER_DATA') {
+            updateFields(event.data.payload);
+        }
+    });
+
+    // При завантаженні просимо головну сторінку дати дані
+    window.onload = function() {
+        window.parent.postMessage({ type: 'GET_USER_DATA' }, '*');
+    };
+//COPY
+    function copyRef() {
+        const input = document.getElementById("refLink");
+        input.select();
+        document.execCommand("copy");
+        alert("Посилання скопійовано!");
+    }
+</script>
+
+</body>
+</html>
