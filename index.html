@@ -113,7 +113,7 @@
 
         if (isAuth) {
             const name = localStorage.getItem('userName') || "AGENT";
-            const pic = localStorage.getItem('userPicture') || "https://raw.githubusercontent.com/detectfraud/detectfraud.github.io/refs/heads/main/images/Kozak.png";
+            const pic = localStorage.getItem('userPicture') || "";
             userBlock.innerHTML = `
                 <div style="display: flex; align-items: center;">
                     <span style="font-size: 11px; color: var(--gold); font-weight: bold;">${name.toUpperCase()}</span>
