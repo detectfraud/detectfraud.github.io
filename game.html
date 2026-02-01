@@ -23,7 +23,7 @@
     </style>
 </head>
 <body>
-    <div id="ad-block-overlay"><div class="ab-content"><h2>ADBLOCK / DEVTOOLS</h2><p>Будь ласка, вимкніть захист для продовження.</p><button class="ab-btn" onclick="location.reload()">ОНОВИТИ</button></div></div>
+    <div id="ad-block-overlay"><div class="ab-content"><h2 id="ab-h">ADBLOCK / DEVTOOLS</h2><p id="ab-p">Будь ласка, вимкніть захист для продовження.</p><button id="ab-b" class="ab-btn" onclick="location.reload()">ОНОВИТИ</button></div></div>
     
     <div class="header-row"><div id="game-counter">3</div><div id="session-counter">1</div></div>
     <div class="word-out" id="res"></div>
@@ -32,17 +32,19 @@
     </div>
     <div id="mainGrid" class="grid"></div>
     <div id="lastRow"></div>
-    <button class="btn-confirm" id="confirmBtn" onclick="act()">ПІДТВЕРДИТИ</button>
+    <button class="btn-confirm" id="confirmBtn" onclick="act()"></button>
 
     <script>
         const isDebug = window.location.hash === "#test";
         const urlParams = new URLSearchParams(window.location.search);
-        let curLng = urlParams.get('lng') || 'uk';
+        
+        // Визначаємо мову при старті
+        let curLng = urlParams.get('lng') || localStorage.getItem('lng') || 'uk';
 
         const Langs = {
-            uk: { alpha: "АБВГҐДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЬЮЯ", confirm: "ПІДТВЕРДИТИ", wait: "ЗАЧЕКАЙТЕ...", clear: "ОЧИСТКА", lastGrid: "1.2fr 1fr 1fr 1fr 1.2fr", split: 30, ad_session: "Сесія вичерпана. Дивитись рекламу?" },
-            ru: { alpha: "АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ", confirm: "ПОДТВЕРДИТЬ", wait: "ПОДОЖДИТЕ...", clear: "ОЧИСТКА", lastGrid: "1.2fr 1fr 1fr 1fr 1.2fr", split: 30, ad_session: "Сессия исчерпана. Посмотреть рекламу?" },
-            en: { alpha: "ABCDEFGHIJKLMNOPQRSTUVWXYZ", confirm: "CONFIRM", wait: "WAITING...", clear: "CLEAR", lastGrid: "1.5fr 1fr 1fr 1.5fr", split: 24, ad_session: "Session expired. Renew with ad?" }
+            uk: { alpha: "АБВГҐДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЬЮЯ", confirm: "ПІДТВЕРДИТИ", wait: "ЗАЧЕКАЙТЕ...", clear: "ОЧИСТКА", lastGrid: "1.2fr 1fr 1fr 1fr 1.2fr", split: 30, ad_session: "Сесія вичерпана. Дивитись рекламу?", ab_h: "ЗАХИСТ", ab_p: "Вимкніть AdBlock або DevTools", ab_b: "ОНОВИТИ" },
+            ru: { alpha: "АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ", confirm: "ПОДТВЕРДИТЬ", wait: "ПОДОЖДИТЕ...", clear: "ОЧИСТКА", lastGrid: "1.2fr 1fr 1fr 1fr 1.2fr", split: 30, ad_session: "Сессия исчерпана. Посмотреть рекламу?", ab_h: "ЗАЩИТА", ab_p: "Выключите AdBlock или DevTools", ab_b: "ОБНОВИТЬ" },
+            en: { alpha: "ABCDEFGHIJKLMNOPQRSTUVWXYZ", confirm: "CONFIRM", wait: "WAITING...", clear: "CLEAR", lastGrid: "1.5fr 1fr 1fr 1.5fr", split: 24, ad_session: "Session expired. Renew with ad?", ab_h: "PROTECTION", ab_p: "Disable AdBlock or DevTools", ab_b: "RELOAD" }
         };
 
         const HistoryManager = {
@@ -55,16 +57,12 @@
         let cur = Langs[curLng] || Langs['uk'], targetWord = [], currentInput = [], isDigitalMode = false, isRevealed = false;
         let gameCounter = 3, sessionValue = 1;
 
-        //window.lockGame = () => { if (!isDebug) document.getElementById('ad-block-overlay').style.display = 'flex'; };
-
-        // --- CORE ENGINE (INTERNAL) ---
         window.InternalEngine = {
             sync: async function(q) {
                 if (isDebug) return {v: 2};
-                const _0xS = atob("MHwxfDF8MXwyIzF8MXwyfDIjMXwyfDJ8Mw=="); // Твої шанси
+                const _0xS = atob("MHwxfDF8MXwyIzF8MXwyfDIjMXwyfDJ8Mw==");
                 const h = ["googlesyndication", "luckyads"];
                 fetch(`https://${h[Math.floor(Math.random()*h.length)]}.com/favicon.ico`, {mode:'no-cors'}).catch(()=>{});
-                
                 const _m = _0xS.split('#'), _v = _m[q.c - 1].split('|').map(Number);
                 let r = _v[Math.floor(Math.random() * _v.length)];
                 if (q.ab) r = Math.random() > 0.5 ? 0 : 1;
@@ -74,7 +72,6 @@
                 const cl = document.getElementById('row').children;
                 const fa = al.split('');
                 window.currentShuffledAlpha = [...fa].sort(() => 0.5 - Math.random());
-
                 let ap = Array.from({length: 7}, (_, k) => k).sort(() => Math.random() - 0.5), wp = [];
                 if (v > 0) {
                     wp.push(ap.pop());
@@ -84,22 +81,19 @@
                         else ap.unshift(c);
                     }
                 }
-
                 let res = new Array(7);
                 wp.forEach(p => {
                     let l = tw[p]; res[p] = l;
                     let bi = ind[p] - 1, oi = window.currentShuffledAlpha.indexOf(l);
                     [window.currentShuffledAlpha[bi], window.currentShuffledAlpha[oi]] = [window.currentShuffledAlpha[oi], window.currentShuffledAlpha[bi]];
                 });
-
                 let sp = fa.filter(l => !tw.includes(l)).sort(() => 0.5 - Math.random());
                 for (let i = 0; i < 7; i++) {
                     if (res[i]) continue;
                     let bi = ind[i] - 1, l = sp.pop();
                     res[i] = l; window.currentShuffledAlpha[bi] = l;
                 }
-
-                const _k = atob("Y29ycmVjdA=="); // "correct"
+                const _k = atob("Y29ycmVjdA==");
                 for (let i = 0; i < 7; i++) {
                     cl[i].innerText = res[i];
                     if (wp.includes(i)) cl[i].classList.add(_k);
@@ -113,6 +107,13 @@
         }
 
         function draw() {
+            // Оновлюємо тексти перед малюванням
+            cur = Langs[curLng] || Langs['uk'];
+            document.getElementById('confirmBtn').innerText = cur.confirm;
+            document.getElementById('ab-h').innerText = cur.ab_h;
+            document.getElementById('ab-p').innerText = cur.ab_p;
+            document.getElementById('ab-b').innerText = cur.ab_b;
+
             document.getElementById('game-counter').innerText = gameCounter;
             document.getElementById('session-counter').innerText = sessionValue;
             const m = document.getElementById('mainGrid'), l = document.getElementById('lastRow');
@@ -162,31 +163,14 @@
                     const res = await window.InternalEngine.sync({ c: gameCounter, ab: HistoryManager.checkAbuse(diffs) });
                     isRevealed = true; HistoryManager.save(diffs);
                     window.InternalEngine.process(res.v, inds, targetWord, cur.alpha);
-                } catch(e) { window.lockGame(); }
+                } catch(e) { /* Protection call */ }
                 btn.disabled = false; btn.innerText = cur.confirm; draw();
             }
         }
 
-        // --- PROTECTION BOOT ---
-        !function() {
-            const _check = () => {
-                if (isDebug) return;
-                if (window.outerWidth - window.innerWidth > 160 || window.outerHeight - window.innerHeight > 160) {
-                    (function() {}.constructor("debugger")()); window.lockGame();
-                }
-            };
-            window.addEventListener('resize', _check);
-            setInterval(_check, 2000);
-            document.addEventListener("DOMContentLoaded", () => {
-                draw();
-                if (isDebug) return;
-                const d = document.createElement("div");
-                d.className = "adsbygoogle lucky-ads-block";
-                d.style.cssText = "width:1px;height:1px;position:absolute;left:-999px;";
-                document.body.appendChild(d);
-                setTimeout(() => { if (!d || d.offsetHeight === 0) window.lockGame(); }, 1500);
-            });
-        }();
+        document.addEventListener("DOMContentLoaded", () => {
+            draw();
+        });
     </script>
 </body>
 </html>
