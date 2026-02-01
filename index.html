@@ -20,7 +20,8 @@
 
         nav { position: absolute; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 25px; z-index: 10; }
         nav a { color: var(--text-grey); text-decoration: none; font-size: 14px; font-weight: bold; cursor: pointer; transition: 0.2s; text-transform: uppercase; padding: 5px 0; border-bottom: 2px solid transparent; }
-        nav a:hover, nav a.active { color: var(--gold); border-bottom-color: var(--gold); }
+        nav a:hover { color: var(--gold);} 
+        nav a.active { color: var(--gold) !important; border-bottom-color: var(--gold) !important; }
 
         .dropdown { position: relative; display: inline-block; }
         .dropdown-content { display: none; position: absolute; left: 50%; transform: translateX(-50%); background: #000; min-width: 180px; box-shadow: 0 10px 30px rgba(0,0,0,0.8); border: 1px solid var(--metal-border); z-index: 1000; }
@@ -35,7 +36,47 @@
 
         .langs { display: flex; gap: 5px; }
         .langs button { background: #1a1a1a; border: 1px solid #333; color: var(--text-grey); padding: 4px 8px; border-radius: 3px; cursor: pointer; font-size: 11px; }
-        .langs button.active { color: var(--gold); border-color: var(--gold); }
+        .langs button.active { color: var(--gold) ; border-color: var(--gold); }
+
+/* Контейнер для випадаючого меню аватара */
+.user-dropdown {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+/* Стилі для меню (ідентичні dropdown-content, але з вирівнюванням вправо) */
+.user-dropdown-content {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: #000;
+    min-width: 150px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+    border: 1px solid var(--metal-border);
+    z-index: 1001;
+}
+
+.user-dropdown-content a {
+    color: var(--text-grey);
+    padding: 10px 15px;
+    text-decoration: none;
+    display: block;
+    font-size: 13px;
+    border-bottom: 1px solid #222;
+    cursor: pointer;
+}
+
+.user-dropdown-content a:hover {
+    background: #1a1a1a;
+    color: var(--gold);
+}
+
+/* Показуємо при наведенні */
+.user-dropdown:hover .user-dropdown-content {
+    display: block;
+}
 
         main { flex: 1; display: flex; background: #111; overflow: hidden; }
         .side-ad { width: 480px; background: #1a1a1a; border: 4px solid #252525; margin: 10px; display: flex; align-items: center; justify-content: center; color: #444; font-size: 10px; flex-shrink: 0; }
@@ -66,10 +107,9 @@
         <div class="dropdown">
             <a class="nav-link">INFO ▼</a>
             <div class="dropdown-content">
-                <a onclick="navTo('manual')">1) Instruction</a>
-                <a onclick="navTo('rules')">2) Regulations</a>
-                <a onclick="navTo('faq')">3) FAQ</a>
-                <a onclick="navTo('feedback')">4) Feedback</a>
+                <a onclick="navTo('manual')">Instruction</a>
+                <a onclick="navTo('rules')">Regulations</a>
+                <a onclick="navTo('faq')">FAQ</a>
             </div>
         </div>
     </nav>
@@ -78,6 +118,16 @@
         <div class="langs" id="langSelector"></div>
     </div>
 </header>
+
+<div id="customModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 9999; justify-content: center; align-items: center;">
+    <div style="background: #111; border: 2px solid var(--gold); padding: 30px; border-radius: 10px; width: 320px; text-align: center; box-shadow: 0 0 20px rgba(255,215,0,0.2);">
+        <p id="modalText" style="color: var(--gold); font-weight: bold; margin-bottom: 25px; font-size: 16px;"></p>
+        <div style="display: flex; justify-content: space-around; gap: 10px;">
+            <button id="modalConfirm" style="background: var(--gold); color: #000; border: none; padding: 8px 20px; font-weight: bold; cursor: pointer; border-radius: 4px; flex: 1;">OK</button>
+            <button onclick="closeModal()" style="background: #333; color: var(--text-grey); border: 1px solid var(--metal-border); padding: 8px 20px; cursor: pointer; border-radius: 4px; flex: 1;">CANCEL</button>
+        </div>
+    </div>
+</div>
 
 <main>
     <div class="side-ad">ADVERTISING_UNIT_LEFT</div>
@@ -107,44 +157,85 @@
         navTo('game'); 
     }
 
-    function updateHeader() {
-        const isAuth = localStorage.getItem('user_session') === 'active';
-        const userBlock = document.getElementById("userBlock");
+function updateHeader() {
+    const isAuth = localStorage.getItem('user_session') === 'active';
+    const userBlock = document.getElementById("userBlock");
 
-        if (isAuth) {
-            const name = localStorage.getItem('userName') || "AGENT";
-            const pic = localStorage.getItem('userPicture') || "";
-            userBlock.innerHTML = `
-                <div style="display: flex; align-items: center;">
-                    <span style="font-size: 11px; color: var(--gold); font-weight: bold;">${name.toUpperCase()}</span>
-                    <div class="avatar-circle" onclick="navTo('cabinet')">
-                        <img src="${pic}" alt="Avatar">
-                    </div>
-                    <a onclick="handleLogout()" style="color:#e74c3c; font-size:10px; cursor:pointer; margin-left:10px; text-decoration:none;">[EXIT]</a>
-                </div>`;
-        } else {
-            userBlock.innerHTML = `<div id="google_btn"></div>`;
-            setTimeout(() => {
-                if (window.google) {
-                    google.accounts.id.initialize({
-                        client_id: GOOGLE_CLIENT_ID,
-                        callback: handleCredentialResponse
-                    });
-                    google.accounts.id.renderButton(
-                        document.getElementById("google_btn"),
-                        { theme: "filled_black", size: "medium", shape: "pill", text: "signin_with" }
-                    );
-                }
-            }, 100);
-        }
+    if (isAuth) {
+        const name = localStorage.getItem('userName') || "AGENT";
+        const pic = localStorage.getItem('userPicture') || "";
+        
+        userBlock.innerHTML = `
+            <div class="user-dropdown">
+                <span style="font-size: 11px; color: var(--gold); font-weight: bold; cursor: default;">
+                    ${name.toUpperCase()}
+                </span>
+                <div class="avatar-circle">
+                    <img src="${pic}" alt="Avatar">
+                </div>
+                <div class="user-dropdown-content">
+                    <a onclick="navTo('cabinet')">Cabinet</a>
+                    <a onclick="navTo('feedback')">Feedback</a>
+                    <a onclick="handleLogout()" style="color: #e74c3c;">EXIT</a>
+                </div>
+            </div>`;
+    } else {
+        // Логіка кнопки Google залишається без змін
+        userBlock.innerHTML = `<div id="google_btn"></div>`;
+        setTimeout(() => {
+            if (window.google) {
+                google.accounts.id.initialize({
+                    client_id: GOOGLE_CLIENT_ID,
+                    callback: handleCredentialResponse
+                });
+                google.accounts.id.renderButton(
+                    document.getElementById("google_btn"),
+                    { theme: "filled_black", size: "medium", shape: "pill", text: "signin_with" }
+                );
+            }
+        }, 100);
     }
+}
 
-    function handleLogout() { 
-        localStorage.clear(); 
-        location.reload(); 
-    }
+// Тексти для модального вікна
+const modalTranslations = {
+    'uk': { msg: 'ВИ ВПЕВНЕНІ, ЩО ХОЧЕТЕ ВИЙТИ?', ok: 'ТАК', cancel: 'СКАСУВАТИ' },
+    'en': { msg: 'ARE YOU SURE YOU WANT TO EXIT?', ok: 'YES', cancel: 'CANCEL' },
+    'ru': { msg: 'ВЫ УВЕРЕНЫ, ЧТО ХОТИТЕ ВЫЙТИ?', ok: 'ДА', cancel: 'ОТМЕНА' }
+};
 
-    function navTo(page) {
+function handleLogout() {
+    const currentLng = localStorage.getItem("lng") || "uk";
+    const t = modalTranslations[currentLng] || modalTranslations['en'];
+    
+    const modal = document.getElementById('customModal');
+    const modalText = document.getElementById('modalText');
+    const confirmBtn = document.getElementById('modalConfirm');
+    
+    // Встановлюємо тексти
+    modalText.innerText = t.msg;
+    confirmBtn.innerText = t.ok;
+    // Знаходимо кнопку скасування (друга в блоці) і міняємо текст
+    confirmBtn.nextElementSibling.innerText = t.cancel;
+
+    // Показуємо модалку
+    modal.style.display = 'flex';
+
+    // Вішаємо подію на кнопку підтвердження (одноразово)
+    confirmBtn.onclick = () => {
+        const keys = Object.keys(localStorage);
+        keys.forEach(key => {
+            if (key.includes('user')) localStorage.removeItem(key);
+        });
+        location.reload();
+    };
+}
+
+function closeModal() {
+    document.getElementById('customModal').style.display = 'none';
+}
+
+function navTo(page) {
         // 1. Запам'ятовуємо сторінку
         localStorage.setItem('currentPage', page);
 
@@ -158,17 +249,40 @@
         const urlParams = `?lng=${currentLng}&uName=${name}&uPic=${pic}&uEmail=${email}&uAuth=${auth}`;
 
         // 2. Підсвічуємо активний лінк
-        document.querySelectorAll('#mainNav a').forEach(a => {
-            a.classList.toggle('active', a.getAttribute('data-page') === page);
-        });
+document.querySelectorAll('#mainNav a').forEach(a => {
+        // Видаляємо active у всіх перед початком
+        a.classList.remove('active');
+        
+        // 1. Перевірка для звичайних посилань (HOME, NEWS, GAME) через data-page
+        if (a.getAttribute('data-page') === page) {
+            a.classList.add('active');
+        }
+        
+        // 2. Перевірка для пунктів у DROPDOWN через атрибут onclick
+        // Шукаємо рядок виду navTo('faq') у тексті атрибута
+        const clickAttr = a.getAttribute('onclick') || "";
+        if (clickAttr.includes(`navTo('${page}')`)) {
+            a.classList.add('active');
+            
+            // 3. Додатково підсвічуємо головну кнопку "INFO ▼", 
+            // якщо активний один із її підпунктів
+            const parentLink = a.closest('.dropdown')?.querySelector('.nav-link');
+            if (parentLink) parentLink.classList.add('active');
+        }
+    });
 
         // 3. Відмальовуємо контент
         if (page === 'game') {
+            // ВИЗНАЧАЄМО ФАЙЛ: якщо авторизований - game.html, якщо ні - demo.html
+            const gameFile = (auth === 'active') ? 'game.html' : 'demo.html';
+            
             viewport.innerHTML = `
                 <div class="safe-body">
-                    <div class="safe-led-display"><div class="marquee">SYSTEM STATUS: SECURE — TOTAL VAULT BALANCE: 12 238.45 USD</div></div>
+                    <div class="safe-led-display">
+                        <div class="marquee">SYSTEM STATUS: SECURE — TOTAL VAULT BALANCE: 12 238.45 USD</div>
+                    </div>
                     <div class="iframe-window">
-                        <iframe id="mainFrame" src="game.html${urlParams}" class="full-frame" scrolling="no"></iframe>
+                        <iframe id="mainFrame" src="${gameFile}${urlParams}" class="full-frame" scrolling="no"></iframe>
                     </div>
                 </div>`;
         } else {
